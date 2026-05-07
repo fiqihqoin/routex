@@ -193,6 +193,53 @@ const Register = () => {
             <p className="mt-4 text-lg text-muted-foreground">
               No credit card required. Sandbox environment included.
             </p>
+
+            <ol className="mt-12 relative space-y-5">
+              <span
+                aria-hidden
+                className="absolute left-[11px] top-3 bottom-3 w-px bg-border"
+              />
+              {steps.map((s, i) => {
+                const active = i === 0;
+                return (
+                  <li key={s} className="relative flex items-center gap-4">
+                    <span
+                      className={`relative z-10 flex h-6 w-6 items-center justify-center rounded-full border-2 ${
+                        active
+                          ? "border-teal bg-teal/15 shadow-[0_0_20px_hsl(var(--teal)/0.4)]"
+                          : "border-border bg-background"
+                      }`}
+                    >
+                      <span
+                        className={`h-2 w-2 rounded-full ${
+                          active ? "bg-teal animate-pulse" : "bg-muted-foreground/40"
+                        }`}
+                      />
+                    </span>
+                    <span
+                      className={`text-sm font-mono ${
+                        active ? "text-foreground font-medium" : "text-muted-foreground"
+                      }`}
+                    >
+                      {s}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+
+          <div className="relative mt-8 grid grid-cols-3 gap-4 max-w-lg">
+            {[
+              { icon: Shield, text: "Bank-grade encryption" },
+              { icon: Lock, text: "Credentials encrypted at rest" },
+              { icon: CheckCircle2, text: "Sandbox environment included" },
+            ].map(({ icon: Icon, text }) => (
+              <div key={text} className="flex items-start gap-2 text-[11px] text-muted-foreground">
+                <Icon className="h-4 w-4 text-teal shrink-0 mt-px" />
+                <span>{text}</span>
+              </div>
+            ))}
           </div>
         </aside>
 
@@ -217,6 +264,9 @@ const Register = () => {
                     Create your account
                   </div>
                   <h2 className="mt-2 text-2xl font-bold tracking-tight">Get started for free</h2>
+                  <p className="mt-3 text-[11px] font-mono text-muted-foreground">
+                    Step 1 of 1 — account details
+                  </p>
 
                   {generalError && (
                     <div className="mt-4 p-3 rounded-lg border border-destructive/40 bg-destructive/10 text-xs text-destructive-foreground flex items-center gap-2">
@@ -231,7 +281,7 @@ const Register = () => {
                       label="Full name"
                       placeholder="Your full name"
                       value={form.name}
-                      onChange={(v) => update("name", v)}
+                      onChange={(v: string) => update("name", v)}
                       error={errors.name}
                       className={fieldClass(errors.name)}
                     />
@@ -247,6 +297,7 @@ const Register = () => {
                         onChange={(e) => update("email", e.target.value)}
                         onBlur={() => blur("email")}
                         className={fieldClass(errors.email || (emailInvalid ? "x" : ""))}
+                        aria-invalid={!!errors.email}
                       />
                       {errors.email || emailInvalid ? (
                         <p className="flex items-center gap-1 text-[11px] text-destructive">
@@ -270,7 +321,29 @@ const Register = () => {
                         value={form.password}
                         onChange={(e) => update("password", e.target.value)}
                         className={fieldClass(errors.password)}
+                        aria-invalid={!!errors.password}
                       />
+                      <div className="mt-2 flex items-center gap-2">
+                        <div className="flex-1 h-1 rounded-full bg-border overflow-hidden">
+                          <div
+                            className={`h-full transition-all duration-300 ${strength.color}`}
+                            style={{ width: `${(strength.score / 3) * 100}%` }}
+                          />
+                        </div>
+                        <span
+                          className={`text-[10px] font-mono w-10 text-right ${
+                            strength.score === 3
+                              ? "text-teal"
+                              : strength.score === 2
+                              ? "text-yellow-500"
+                              : strength.score === 1
+                              ? "text-destructive"
+                              : "text-muted-foreground"
+                          }`}
+                        >
+                          {strength.label || "—"}
+                        </span>
+                      </div>
                     </div>
 
                     <div className="space-y-1.5">
@@ -285,11 +358,17 @@ const Register = () => {
                           onChange={(e) => update("confirm", e.target.value)}
                           onBlur={() => blur("confirm")}
                           className={`${fieldClass(errors.confirm)} pr-10`}
+                          aria-invalid={!!errors.confirm}
                         />
                         {confirmMatches && (
                           <Check className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-teal" />
                         )}
                       </div>
+                      {errors.confirm && (
+                        <p className="flex items-center gap-1 text-[11px] text-destructive">
+                          <AlertCircle className="h-3 w-3" /> {errors.confirm}
+                        </p>
+                      )}
                     </div>
 
                     <Field
@@ -297,7 +376,7 @@ const Register = () => {
                       label="Company name"
                       placeholder="PT Your Company"
                       value={form.company}
-                      onChange={(v) => update("company", v)}
+                      onChange={(v: string) => update("company", v)}
                       error={errors.company}
                       className={fieldClass(errors.company)}
                     />
@@ -307,7 +386,7 @@ const Register = () => {
                       label="Use case"
                       placeholder="e.g. Payment gateway"
                       value={form.useCase}
-                      onChange={(v) => update("useCase", v)}
+                      onChange={(v: string) => update("useCase", v)}
                       error={errors.useCase}
                       className={fieldClass(errors.useCase)}
                     />
@@ -315,7 +394,11 @@ const Register = () => {
                     <div className="space-y-1.5">
                       <Label className="text-xs text-muted-foreground">Expected monthly volume</Label>
                       <Select value={form.volume} onValueChange={(v) => update("volume", v)}>
-                        <SelectTrigger className={`h-11 bg-card focus:ring-teal ${errors.volume ? "border-destructive/60" : ""}`}>
+                        <SelectTrigger
+                          className={`h-11 bg-card focus:ring-teal ${
+                            errors.volume ? "border-destructive/60" : ""
+                          }`}
+                        >
                           <SelectValue placeholder="Select volume range" />
                         </SelectTrigger>
                         <SelectContent>
@@ -325,6 +408,34 @@ const Register = () => {
                           <SelectItem value=">10m">&gt; Rp 10 miliar</SelectItem>
                         </SelectContent>
                       </Select>
+                      {errors.volume && (
+                        <p className="flex items-center gap-1 text-[11px] text-destructive">
+                          <AlertCircle className="h-3 w-3" /> {errors.volume}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="pt-2">
+                      <label className="flex items-start gap-2 text-xs text-muted-foreground cursor-pointer select-none">
+                        <Checkbox
+                          checked={form.terms}
+                          onCheckedChange={(v) => update("terms", !!v)}
+                          className={`mt-0.5 data-[state=checked]:bg-teal data-[state=checked]:border-teal ${
+                            errors.terms ? "border-destructive" : ""
+                          }`}
+                        />
+                        <span>
+                          I agree to the{" "}
+                          <a href="#" className="text-teal hover:text-teal-glow">Terms of Service</a>{" "}
+                          and{" "}
+                          <a href="#" className="text-teal hover:text-teal-glow">Privacy Policy</a>
+                        </span>
+                      </label>
+                      {errors.terms && (
+                        <p className="mt-1.5 flex items-center gap-1 text-[11px] text-destructive">
+                          <AlertCircle className="h-3 w-3" /> {errors.terms}
+                        </p>
+                      )}
                     </div>
 
                     <Button
@@ -334,12 +445,20 @@ const Register = () => {
                       disabled={loading}
                       className="w-full transition-transform hover:scale-[1.02]"
                     >
-                      {loading ? "Creating account..." : "Create account"}
+                      {loading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" /> Creating account...
+                        </>
+                      ) : (
+                        "Create account"
+                      )}
                     </Button>
 
                     <p className="text-center text-xs text-muted-foreground pt-2">
                       Already have an account?{" "}
-                      <Link to="/login" className="text-teal hover:text-teal-glow">Sign in →</Link>
+                      <Link to="/login" className="text-teal hover:text-teal-glow transition-colors font-medium">
+                        Sign in →
+                      </Link>
                     </p>
                   </form>
                 </>
@@ -352,24 +471,70 @@ const Register = () => {
   );
 };
 
-const Field = ({ id, label, placeholder, value, onChange, error, className }: any) => (
+const Field = ({
+  id,
+  label,
+  placeholder,
+  value,
+  onChange,
+  error,
+  className,
+}: {
+  id: string;
+  label: string;
+  placeholder: string;
+  value: string;
+  onChange: (v: string) => void;
+  error?: string;
+  className?: string;
+}) => (
   <div className="space-y-1.5">
     <Label htmlFor={id} className="text-xs text-muted-foreground">{label}</Label>
-    <Input id={id} placeholder={placeholder} value={value} onChange={(e) => onChange(e.target.value)} className={className} />
-    {error && <p className="flex items-center gap-1 text-[11px] text-destructive"><AlertCircle className="h-3 w-3" /> {error}</p>}
+    <Input
+      id={id}
+      placeholder={placeholder}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className={className}
+      aria-invalid={!!error}
+    />
+    {error && (
+      <p className="flex items-center gap-1 text-[11px] text-destructive">
+        <AlertCircle className="h-3 w-3" /> {error}
+      </p>
+    )}
   </div>
 );
 
-const SuccessState = ({ email, resent, onResend }: any) => (
+const SuccessState = ({
+  email,
+  resent,
+  onResend,
+}: {
+  email: string;
+  resent: boolean;
+  onResend: () => void;
+}) => (
   <div className="text-center animate-fade-up">
     <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-teal/10 border border-teal/30 shadow-[0_0_40px_hsl(var(--teal)/0.3)]">
-      <Check className="h-12 w-12 text-teal" />
+      <CheckCircle2 className="h-12 w-12 text-teal" />
     </div>
+
     <h2 className="mt-6 text-2xl font-bold tracking-tight">Check your email</h2>
-    <p className="mt-3 text-sm text-muted-foreground">We sent a verification link to {email}</p>
+    <p className="mt-3 text-sm text-muted-foreground">
+      We sent a verification link to <span className="text-foreground font-medium">{email}</span>
+    </p>
+
     <div className="mt-8">
-      <Button variant="heroOutline" size="lg" onClick={onResend} disabled={resent} className="w-full">
-        <Mail className="h-4 w-4" /> {resent ? "Verification email sent" : "Resend verification email"}
+      <Button
+        variant="heroOutline"
+        size="lg"
+        onClick={onResend}
+        disabled={resent}
+        className="w-full"
+      >
+        <Mail className="h-4 w-4 mr-2" />
+        {resent ? "Verification email sent" : "Resend verification email"}
       </Button>
     </div>
   </div>

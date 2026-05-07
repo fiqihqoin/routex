@@ -414,3 +414,30 @@
 2026/05/07 01:36:32 [warn] 21#21: *91 delaying request, excess: 0.610, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-B33vts5c.css HTTP/1.1", host: "localhost", referrer: "https://localhost/"
 2026/05/07 01:36:32 [warn] 20#20: *85 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/2/00/0000000002 while reading upstream, client: 172.18.0.1, server: localhost, request: "GET /assets/index-B62eOtV2.js HTTP/1.1", upstream: "http://172.18.0.6:9000/assets/index-B62eOtV2.js", host: "localhost", referrer: "https://localhost/"
 2026/05/07 01:36:32 [warn] 20#20: *90 delaying request, excess: 1.550, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1", host: "localhost"
+2026/05/07 02:07:06 [notice] 1#1: signal 3 (SIGQUIT) received, shutting down
+2026/05/07 02:07:06 [notice] 21#21: gracefully shutting down
+2026/05/07 02:07:06 [notice] 20#20: gracefully shutting down
+2026/05/07 02:07:06 [notice] 20#20: exiting
+2026/05/07 02:07:06 [notice] 21#21: exiting
+2026/05/07 02:07:06 [notice] 21#21: exit
+2026/05/07 02:07:06 [notice] 20#20: exit
+2026/05/07 02:07:06 [notice] 1#1: signal 17 (SIGCHLD) received from 20
+2026/05/07 02:07:06 [notice] 1#1: worker process 20 exited with code 0
+2026/05/07 02:07:06 [notice] 1#1: worker process 21 exited with code 0
+2026/05/07 02:07:06 [notice] 1#1: exit
+2026/05/07 02:07:07 [notice] 1#1: using the "epoll" event method
+2026/05/07 02:07:07 [notice] 1#1: nginx/1.29.8
+2026/05/07 02:07:07 [notice] 1#1: built by gcc 15.2.0 (Alpine 15.2.0) 
+2026/05/07 02:07:07 [notice] 1#1: OS: Linux 6.8.0-100-generic
+2026/05/07 02:07:07 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1024:524288
+2026/05/07 02:07:07 [notice] 1#1: start worker processes
+2026/05/07 02:07:07 [notice] 1#1: start worker process 21
+2026/05/07 02:07:07 [notice] 1#1: start worker process 22
+2026/05/07 02:14:28 [warn] 22#22: *9 delaying request, excess: 0.910, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-B33vts5c.css HTTP/1.1", host: "localhost", referrer: "https://localhost/register"
+2026/05/07 02:14:28 [warn] 21#21: *8 delaying request, excess: 1.900, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-B62eOtV2.js HTTP/1.1", host: "localhost", referrer: "https://localhost/register"
+2026/05/07 02:14:32 [warn] 22#22: *3 delaying request, excess: 0.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-B33vts5c.css HTTP/1.1", host: "localhost", referrer: "https://localhost/"
+2026/05/07 02:14:32 [warn] 22#22: *9 delaying request, excess: 1.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-B62eOtV2.js HTTP/1.1", host: "localhost", referrer: "https://localhost/"
+2026/05/07 02:14:32 [warn] 22#22: *9 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.18.0.1, server: localhost, request: "GET /assets/index-B62eOtV2.js HTTP/1.1", upstream: "http://172.18.0.6:9000/assets/index-B62eOtV2.js", host: "localhost", referrer: "https://localhost/"
+2026/05/07 02:22:42 [warn] 21#21: *25 delaying request, excess: 0.810, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-DR6IpjMT.css HTTP/1.1", host: "localhost", referrer: "https://localhost/login"
+2026/05/07 02:22:42 [warn] 21#21: *26 delaying request, excess: 1.780, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-CepMw7aq.js HTTP/1.1", host: "localhost", referrer: "https://localhost/login"
+2026/05/07 02:22:42 [warn] 21#21: *26 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/2/00/0000000002 while reading upstream, client: 172.18.0.1, server: localhost, request: "GET /assets/index-CepMw7aq.js HTTP/1.1", upstream: "http://172.18.0.6:9000/assets/index-CepMw7aq.js", host: "localhost", referrer: "https://localhost/login"
