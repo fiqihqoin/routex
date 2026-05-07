@@ -1,0 +1,169 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ptms-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-ptms_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-ptms_password}
+      POSTGRES_DB: ${DB_DATABASE:-ptms_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - ptms-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: ptms-redis
+    restart: always
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ptms-network
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: ptms-rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-guest}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - ptms-network
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q check_running"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  transaction-api:
+    build:
+      context: ../../services/transaction-api
+    container_name: ptms-transaction-api
+    restart: always
+    environment:
+      DATABASE_URL: postgres://ptms_user:ptms_password@postgres:5432/ptms_db
+      REDIS_URL: redis:6379
+      PTMS_APP_KEY: base64:H9SO6s8jlpW01g060jiWdVMCuJcK1GhxXpiutlUwzFU=
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      PORT: "8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ptms-network
+
+  admin:
+    build:
+      context: ../../services/admin
+    container_name: ptms-admin
+    restart: always
+    environment:
+      APP_NAME: PTMS-Admin
+      APP_ENV: local
+      APP_KEY: base64:H9SO6s8jlpW01g060jiWdVMCuJcK1GhxXpiutlUwzFU=
+      APP_DEBUG: "true"
+      APP_URL: http://localhost
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: ptms_db
+      DB_USERNAME: ptms_user
+      DB_PASSWORD: ptms_password
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
+      QUEUE_CONNECTION: redis
+      SESSION_DRIVER: database
+      PTMS_APP_KEY: base64:H9SO6s8jlpW01g060jiWdVMCuJcK1GhxXpiutlUwzFU=
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - ptms-network
+
+  admin-queue:
+    build:
+      context: ../../services/admin
+    container_name: ptms-admin-queue
+    command: php artisan queue:work --sleep=3 --tries=5 --max-time=3600
+    restart: always
+    environment:
+      APP_NAME: PTMS-Admin
+      APP_ENV: local
+      APP_KEY: base64:H9SO6s8jlpW01g060jiWdVMCuJcK1GhxXpiutlUwzFU=
+      APP_DEBUG: "true"
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_DATABASE: ptms_db
+      DB_USERNAME: ptms_user
+      DB_PASSWORD: ptms_password
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
+      QUEUE_CONNECTION: redis
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ptms-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: ptms-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+      - ./nginx/logs:/var/log/nginx
+    networks:
+      - ptms-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      transaction-api:
+        condition: service_started
+      admin:
+        condition: service_started
+
+networks:
+  ptms-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  rabbitmq_data:

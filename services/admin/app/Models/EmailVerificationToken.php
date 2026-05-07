@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class EmailVerificationToken extends Model
+{
+    use HasUuids;
+
+    protected $fillable = ['ptms_user_id', 'token', 'expires_at', 'used_at'];
+
+    protected $casts = [
+        'expires_at' => 'datetime',
+        'used_at' => 'datetime',
+    ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(PtmsUser::class, 'ptms_user_id');
+    }
+
+    public function isValid(): bool
+    {
+        return $this->used_at === null && $this->expires_at->isFuture();
+    }
+}

@@ -1,0 +1,40 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "PTMS - System Overview",
+    "tags": [ "ptms", "performance", "health" ],
+    "timezone": "browser",
+    "panels": [
+      {
+        "title": "QRIS Generation Success Rate",
+        "type": "graph",
+        "targets": [
+          { "expr": "sum(rate(ptms_qris_generation_total{status=\"success\"}[5m])) / sum(rate(ptms_qris_generation_total[5m]))" }
+        ]
+      },
+      {
+        "title": "Average Routing Latency",
+        "type": "singlestat",
+        "targets": [
+          { "expr": "rate(ptms_routing_duration_seconds_sum[5m]) / rate(ptms_routing_duration_seconds_count[5m])" }
+        ]
+      },
+      {
+        "title": "Circuit Breaker Status per Vendor",
+        "type": "table",
+        "targets": [
+          { "expr": "ptms_circuit_breaker_state" }
+        ]
+      },
+      {
+        "title": "Rate Limit Rejections",
+        "type": "bar_chart",
+        "targets": [
+          { "expr": "sum by (reason) (rate(ptms_rate_limit_rejections_total[5m]))" }
+        ]
+      }
+    ],
+    "schemaVersion": 21,
+    "version": 1
+  }
+}

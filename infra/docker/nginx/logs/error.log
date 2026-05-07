@@ -1,0 +1,416 @@
+2026/05/05 03:58:01 [emerg] 1#1: host not found in upstream "admin:9000" in /etc/nginx/conf.d/default.conf:11
+2026/05/05 03:58:01 [emerg] 1#1: host not found in upstream "admin:9000" in /etc/nginx/conf.d/default.conf:11
+2026/05/05 03:58:02 [emerg] 1#1: host not found in upstream "admin:9000" in /etc/nginx/conf.d/default.conf:11
+2026/05/05 03:58:02 [emerg] 1#1: host not found in upstream "admin:9000" in /etc/nginx/conf.d/default.conf:11
+2026/05/05 03:58:03 [emerg] 1#1: host not found in upstream "admin:9000" in /etc/nginx/conf.d/default.conf:11
+2026/05/05 03:58:05 [emerg] 1#1: host not found in upstream "admin:9000" in /etc/nginx/conf.d/default.conf:11
+2026/05/05 03:58:09 [notice] 1#1: using the "epoll" event method
+2026/05/05 03:58:09 [notice] 1#1: nginx/1.29.8
+2026/05/05 03:58:09 [notice] 1#1: built by gcc 15.2.0 (Alpine 15.2.0) 
+2026/05/05 03:58:09 [notice] 1#1: OS: Linux 6.8.0-100-generic
+2026/05/05 03:58:09 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1024:524288
+2026/05/05 03:58:09 [notice] 1#1: start worker processes
+2026/05/05 03:58:09 [notice] 1#1: start worker process 21
+2026/05/05 03:58:09 [notice] 1#1: start worker process 22
+2026/05/05 04:07:55 [error] 21#21: *2 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET /metrics HTTP/1.1", upstream: "http://172.18.0.6:9000/metrics", host: "localhost"
+2026/05/05 04:08:24 [error] 22#22: *5 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET /metrics HTTP/1.1", upstream: "http://172.18.0.6:9000/metrics", host: "localhost"
+2026/05/05 04:19:32 [error] 22#22: *8 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET /metrics HTTP/1.1", upstream: "http://172.18.0.6:9000/metrics", host: "localhost"
+2026/05/05 04:19:57 [notice] 1#1: signal 3 (SIGQUIT) received, shutting down
+2026/05/05 04:19:57 [notice] 22#22: gracefully shutting down
+2026/05/05 04:19:57 [notice] 21#21: gracefully shutting down
+2026/05/05 04:19:57 [notice] 21#21: exiting
+2026/05/05 04:19:57 [notice] 22#22: exiting
+2026/05/05 04:19:57 [notice] 21#21: exit
+2026/05/05 04:19:57 [notice] 22#22: exit
+2026/05/05 04:19:57 [notice] 1#1: signal 17 (SIGCHLD) received from 21
+2026/05/05 04:19:57 [notice] 1#1: worker process 21 exited with code 0
+2026/05/05 04:19:57 [notice] 1#1: worker process 22 exited with code 0
+2026/05/05 04:19:57 [notice] 1#1: exit
+2026/05/05 04:19:57 [notice] 1#1: using the "epoll" event method
+2026/05/05 04:19:57 [notice] 1#1: nginx/1.29.8
+2026/05/05 04:19:57 [notice] 1#1: built by gcc 15.2.0 (Alpine 15.2.0) 
+2026/05/05 04:19:57 [notice] 1#1: OS: Linux 6.8.0-100-generic
+2026/05/05 04:19:57 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1024:524288
+2026/05/05 04:19:57 [notice] 1#1: start worker processes
+2026/05/05 04:19:57 [notice] 1#1: start worker process 21
+2026/05/05 04:19:57 [notice] 1#1: start worker process 22
+2026/05/05 04:26:53 [error] 21#21: *11 upstream timed out (110: Operation timed out) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "POST /api/v1/callbacks/MOCK_VENDOR HTTP/1.1", upstream: "http://172.18.0.5:8080/api/v1/callbacks/MOCK_VENDOR", host: "localhost"
+2026/05/05 04:28:36 [error] 21#21: *13 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "POST /api/v1/callbacks/MOCK_VENDOR HTTP/1.1", upstream: "http://172.18.0.5:8080/api/v1/callbacks/MOCK_VENDOR", host: "localhost"
+2026/05/05 04:38:29 [error] 21#21: *17 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "POST /api/v1/callbacks/MOCK_VENDOR HTTP/1.1", upstream: "http://172.18.0.5:8080/api/v1/callbacks/MOCK_VENDOR", host: "localhost"
+2026/05/05 05:53:42 [error] 21#21: *19 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "POST /api/v1/transactions HTTP/1.1", upstream: "http://172.18.0.5:8080/api/v1/transactions", host: "localhost"
+2026/05/05 05:57:23 [error] 21#21: *21 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "POST /api/v1/transactions HTTP/1.1", upstream: "http://172.18.0.5:8080/api/v1/transactions", host: "localhost"
+2026/05/05 05:57:46 [notice] 1#1: signal 3 (SIGQUIT) received, shutting down
+2026/05/05 05:57:46 [notice] 21#21: gracefully shutting down
+2026/05/05 05:57:46 [notice] 22#22: gracefully shutting down
+2026/05/05 05:57:46 [notice] 21#21: exiting
+2026/05/05 05:57:46 [notice] 22#22: exiting
+2026/05/05 05:57:46 [notice] 21#21: exit
+2026/05/05 05:57:46 [notice] 22#22: exit
+2026/05/05 05:57:46 [notice] 1#1: signal 17 (SIGCHLD) received from 22
+2026/05/05 05:57:46 [notice] 1#1: worker process 22 exited with code 0
+2026/05/05 05:57:46 [notice] 1#1: signal 29 (SIGIO) received
+2026/05/05 05:57:46 [notice] 1#1: signal 17 (SIGCHLD) received from 21
+2026/05/05 05:57:46 [notice] 1#1: worker process 21 exited with code 0
+2026/05/05 05:57:46 [notice] 1#1: exit
+2026/05/05 05:57:47 [notice] 1#1: using the "epoll" event method
+2026/05/05 05:57:47 [notice] 1#1: nginx/1.29.8
+2026/05/05 05:57:47 [notice] 1#1: built by gcc 15.2.0 (Alpine 15.2.0) 
+2026/05/05 05:57:47 [notice] 1#1: OS: Linux 6.8.0-100-generic
+2026/05/05 05:57:47 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1024:524288
+2026/05/05 05:57:47 [notice] 1#1: start worker processes
+2026/05/05 05:57:47 [notice] 1#1: start worker process 21
+2026/05/05 05:57:47 [notice] 1#1: start worker process 22
+2026/05/05 06:11:21 [warn] 21#21: *24 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.18.0.1, server: localhost, request: "GET /admin HTTP/1.1", upstream: "http://172.18.0.7:9000/admin", host: "localhost"
+2026/05/05 06:19:44 [warn] 22#22: *52 delaying request, excess: 0.760, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /livewire/livewire.js?id=6d832aed HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/login"
+2026/05/05 06:19:44 [warn] 22#22: *52 delaying request, excess: 0.940, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/forms/forms.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:19:44 [warn] 22#22: *40 delaying request, excess: 1.810, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:19:44 [warn] 21#21: *61 delaying request, excess: 2.750, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:19:44 [warn] 21#21: *65 delaying request, excess: 3.670, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:19:44 [warn] 22#22: *66 delaying request, excess: 4.670, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:19:44 [warn] 22#22: *64 delaying request, excess: 5.660, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:19:45 [warn] 22#22: *64 delaying request, excess: 0.420, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/login"
+2026/05/05 06:20:13 [warn] 21#21: *65 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:20:13 [warn] 21#21: *61 delaying request, excess: 2.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:20:13 [warn] 22#22: *66 delaying request, excess: 1.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/support/support.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:20:13 [warn] 22#22: *66 delaying request, excess: 1.620, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:20:13 [warn] 21#21: *65 delaying request, excess: 2.610, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:20:13 [warn] 22#22: *64 delaying request, excess: 3.610, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:20:14 [warn] 22#22: *64 delaying request, excess: 0.320, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin"
+2026/05/05 06:20:14 [warn] 21#21: *65 delaying request, excess: 2.230, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "POST /livewire/update HTTP/1.1", host: "localhost", referrer: "https://localhost/admin"
+2026/05/05 06:20:14 [warn] 22#22: *66 delaying request, excess: 1.230, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "POST /livewire/update HTTP/1.1", host: "localhost", referrer: "https://localhost/admin"
+2026/05/05 06:20:14 [warn] 21#21: *61 delaying request, excess: 3.220, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "POST /livewire/update HTTP/1.1", host: "localhost", referrer: "https://localhost/admin"
+2026/05/05 06:23:35 [warn] 21#21: *92 delaying request, excess: 0.900, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:23:35 [warn] 22#22: *100 delaying request, excess: 1.850, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/support/support.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:23:35 [warn] 22#22: *101 delaying request, excess: 2.840, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:23:35 [warn] 22#22: *104 delaying request, excess: 3.810, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:23:36 [warn] 22#22: *100 delaying request, excess: 2.950, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /livewire/livewire.js?id=6d832aed HTTP/1.1", host: "localhost", referrer: "https://localhost/admin"
+2026/05/05 06:23:36 [warn] 21#21: *92 delaying request, excess: 3.680, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:23:36 [warn] 21#21: *105 delaying request, excess: 4.670, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:23:36 [warn] 21#21: *105 delaying request, excess: 0.100, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin"
+2026/05/05 06:23:36 [warn] 22#22: *100 delaying request, excess: 1.030, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "POST /livewire/update HTTP/1.1", host: "localhost", referrer: "https://localhost/admin"
+2026/05/05 06:23:36 [warn] 21#21: *92 delaying request, excess: 2.030, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "POST /livewire/update HTTP/1.1", host: "localhost", referrer: "https://localhost/admin"
+2026/05/05 06:23:36 [warn] 22#22: *104 delaying request, excess: 3.030, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "POST /livewire/update HTTP/1.1", host: "localhost", referrer: "https://localhost/admin"
+2026/05/05 06:23:46 [warn] 21#21: *92 delaying request, excess: 0.460, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "POST /livewire/update HTTP/1.1", host: "localhost", referrer: "https://localhost/admin"
+2026/05/05 06:27:44 [warn] 21#21: *122 delaying request, excess: 0.510, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/support/support.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:27:44 [warn] 22#22: *133 delaying request, excess: 1.440, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:27:44 [warn] 22#22: *135 delaying request, excess: 2.440, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:27:44 [warn] 22#22: *134 delaying request, excess: 3.420, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:27:44 [warn] 22#22: *133 delaying request, excess: 2.880, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /livewire/livewire.js?id=6d832aed HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/ptms-users"
+2026/05/05 06:27:44 [warn] 21#21: *122 delaying request, excess: 3.390, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:27:44 [warn] 22#22: *136 delaying request, excess: 4.390, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:27:45 [warn] 22#22: *136 delaying request, excess: 0.340, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/ptms-users"
+2026/05/05 06:27:48 [warn] 21#21: *122 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/support/support.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:27:48 [warn] 22#22: *133 delaying request, excess: 2.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:27:48 [warn] 22#22: *136 delaying request, excess: 3.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/forms/forms.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:27:48 [warn] 22#22: *134 delaying request, excess: 4.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:27:48 [warn] 22#22: *135 delaying request, excess: 4.930, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:27:49 [warn] 22#22: *136 delaying request, excess: 2.730, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:27:49 [warn] 22#22: *136 delaying request, excess: 0.470, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/transactions"
+2026/05/05 06:37:42 [error] 22#22: *163 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET /admin/transactions/0c6d8179-96a2-44bc-8eb1-5841a0f3e89c HTTP/1.1", upstream: "http://172.18.0.7:9000/admin/transactions/0c6d8179-96a2-44bc-8eb1-5841a0f3e89c", host: "localhost"
+2026/05/05 06:37:42 [error] 22#22: *163 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", upstream: "http://172.18.0.7:9000/favicon.ico", host: "localhost", referrer: "https://localhost/admin/transactions/0c6d8179-96a2-44bc-8eb1-5841a0f3e89c"
+2026/05/05 06:37:45 [error] 22#22: *163 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET /admin/transactions/0c6d8179-96a2-44bc-8eb1-5841a0f3e89c HTTP/1.1", upstream: "http://172.18.0.7:9000/admin/transactions/0c6d8179-96a2-44bc-8eb1-5841a0f3e89c", host: "localhost"
+2026/05/05 06:37:45 [error] 22#22: *163 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", upstream: "http://172.18.0.7:9000/favicon.ico", host: "localhost", referrer: "https://localhost/admin/transactions/0c6d8179-96a2-44bc-8eb1-5841a0f3e89c"
+2026/05/05 06:38:52 [notice] 28#28: signal process started
+2026/05/05 06:38:52 [notice] 1#1: signal 1 (SIGHUP) received from 28, reconfiguring
+2026/05/05 06:38:52 [notice] 1#1: reconfiguring
+2026/05/05 06:38:52 [notice] 1#1: using the "epoll" event method
+2026/05/05 06:38:52 [notice] 1#1: start worker processes
+2026/05/05 06:38:52 [notice] 1#1: start worker process 34
+2026/05/05 06:38:52 [notice] 1#1: start worker process 35
+2026/05/05 06:38:52 [notice] 21#21: gracefully shutting down
+2026/05/05 06:38:52 [notice] 22#22: gracefully shutting down
+2026/05/05 06:38:52 [notice] 21#21: exiting
+2026/05/05 06:38:52 [notice] 22#22: exiting
+2026/05/05 06:38:52 [notice] 21#21: exit
+2026/05/05 06:38:52 [notice] 22#22: exit
+2026/05/05 06:38:52 [notice] 1#1: signal 17 (SIGCHLD) received from 21
+2026/05/05 06:38:52 [notice] 1#1: worker process 21 exited with code 0
+2026/05/05 06:38:52 [notice] 1#1: worker process 22 exited with code 0
+2026/05/05 06:38:52 [notice] 1#1: signal 29 (SIGIO) received
+2026/05/05 06:38:52 [notice] 1#1: signal 17 (SIGCHLD) received from 22
+2026/05/05 06:47:17 [warn] 35#35: *176 delaying request, excess: 0.910, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/support/support.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:17 [warn] 35#35: *171 delaying request, excess: 1.890, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:17 [warn] 35#35: *177 delaying request, excess: 2.760, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:17 [warn] 35#35: *179 delaying request, excess: 3.670, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:17 [warn] 35#35: *171 delaying request, excess: 2.720, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /livewire/livewire.js?id=6d832aed HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/transactions/0c6d8179-96a2-44bc-8eb1-5841a0f3e89c"
+2026/05/05 06:47:17 [warn] 35#35: *176 delaying request, excess: 3.240, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:17 [warn] 35#35: *183 delaying request, excess: 4.150, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:17 [warn] 35#35: *183 delaying request, excess: 0.210, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/transactions/0c6d8179-96a2-44bc-8eb1-5841a0f3e89c"
+2026/05/05 06:47:28 [warn] 35#35: *177 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:28 [warn] 35#35: *179 delaying request, excess: 2.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:28 [warn] 35#35: *171 delaying request, excess: 3.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:28 [warn] 35#35: *176 delaying request, excess: 4.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/support/support.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:28 [warn] 35#35: *177 delaying request, excess: 3.560, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:29 [warn] 35#35: *179 delaying request, excess: 3.960, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:29 [warn] 35#35: *179 delaying request, excess: 0.410, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/transactions"
+2026/05/05 06:47:31 [warn] 35#35: *176 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:31 [warn] 35#35: *177 delaying request, excess: 2.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/support/support.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:31 [warn] 35#35: *179 delaying request, excess: 3.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/forms/forms.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:31 [warn] 35#35: *171 delaying request, excess: 3.970, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:32 [warn] 35#35: *183 delaying request, excess: 4.710, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:32 [warn] 35#35: *179 delaying request, excess: 2.810, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:32 [warn] 35#35: *179 delaying request, excess: 0.440, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/transactions/78d5abed-9b71-4afe-83a1-61e7f3c48c35"
+2026/05/05 06:47:44 [warn] 35#35: *179 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/forms/forms.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:44 [warn] 35#35: *171 delaying request, excess: 1.930, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:44 [warn] 35#35: *177 delaying request, excess: 2.930, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:44 [warn] 35#35: *176 delaying request, excess: 3.930, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:45 [warn] 35#35: *171 delaying request, excess: 2.830, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:45 [warn] 35#35: *179 delaying request, excess: 3.820, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:45 [warn] 35#35: *179 delaying request, excess: 0.400, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/user-account-assignments"
+2026/05/05 06:47:47 [warn] 35#35: *171 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/support/support.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:47 [warn] 35#35: *183 delaying request, excess: 2.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:47 [warn] 35#35: *176 delaying request, excess: 3.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:47 [warn] 35#35: *177 delaying request, excess: 4.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:47 [warn] 35#35: *183 delaying request, excess: 2.850, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:47 [warn] 35#35: *176 delaying request, excess: 2.720, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:47 [warn] 35#35: *176 delaying request, excess: 0.370, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/vendor-accounts"
+2026/05/05 06:47:51 [warn] 35#35: *177 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:51 [warn] 35#35: *183 delaying request, excess: 2.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/support/support.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:51 [warn] 35#35: *171 delaying request, excess: 3.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:51 [warn] 35#35: *179 delaying request, excess: 3.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:51 [warn] 35#35: *177 delaying request, excess: 2.810, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:51 [warn] 35#35: *183 delaying request, excess: 3.800, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:52 [warn] 35#35: *183 delaying request, excess: 0.500, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/vendors"
+2026/05/05 06:47:57 [warn] 35#35: *179 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:57 [warn] 35#35: *183 delaying request, excess: 2.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/forms/forms.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:57 [warn] 35#35: *171 delaying request, excess: 3.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:57 [warn] 35#35: *176 delaying request, excess: 4.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:57 [warn] 35#35: *183 delaying request, excess: 2.780, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:57 [warn] 35#35: *179 delaying request, excess: 3.780, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:47:57 [warn] 35#35: *179 delaying request, excess: 0.430, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/vendor-accounts"
+2026/05/05 06:48:01 [warn] 35#35: *177 delaying request, excess: 0.980, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:48:01 [warn] 35#35: *171 delaying request, excess: 1.980, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:48:01 [warn] 35#35: *183 delaying request, excess: 2.980, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/support/support.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:48:01 [warn] 35#35: *176 delaying request, excess: 3.980, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:48:01 [warn] 35#35: *177 delaying request, excess: 3.890, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:48:01 [warn] 35#35: *171 delaying request, excess: 3.880, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:48:02 [warn] 35#35: *171 delaying request, excess: 0.420, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/vendors"
+2026/05/05 06:48:05 [warn] 35#35: *183 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:48:05 [warn] 35#35: *177 delaying request, excess: 2.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/support/support.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:48:05 [warn] 35#35: *179 delaying request, excess: 3.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:48:05 [warn] 35#35: *176 delaying request, excess: 4.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:48:05 [warn] 35#35: *183 delaying request, excess: 3.930, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:48:06 [warn] 35#35: *179 delaying request, excess: 2.830, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:48:06 [warn] 35#35: *183 delaying request, excess: 0.620, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "POST /livewire/update HTTP/1.1", host: "localhost", referrer: "https://localhost/admin"
+2026/05/05 06:48:06 [warn] 35#35: *179 delaying request, excess: 1.620, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin"
+2026/05/05 06:48:06 [warn] 35#35: *177 delaying request, excess: 2.620, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "POST /livewire/update HTTP/1.1", host: "localhost", referrer: "https://localhost/admin"
+2026/05/05 06:48:06 [warn] 35#35: *176 delaying request, excess: 3.620, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "POST /livewire/update HTTP/1.1", host: "localhost", referrer: "https://localhost/admin"
+2026/05/05 06:48:49 [warn] 35#35: *177 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/support/support.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:48:49 [warn] 35#35: *176 delaying request, excess: 2.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/forms/forms.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:48:49 [warn] 35#35: *183 delaying request, excess: 2.980, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:48:49 [warn] 35#35: *171 delaying request, excess: 3.980, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:48:49 [warn] 35#35: *176 delaying request, excess: 2.900, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /livewire/livewire.js?id=6d832aed HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/transactions"
+2026/05/05 06:48:49 [warn] 35#35: *179 delaying request, excess: 3.700, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:48:49 [warn] 35#35: *177 delaying request, excess: 4.700, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:48:49 [warn] 35#35: *176 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/2/00/0000000002 while reading upstream, client: 172.18.0.1, server: localhost, request: "GET /livewire/livewire.js?id=6d832aed HTTP/1.1", upstream: "http://172.18.0.5:9000/livewire/livewire.js?id=6d832aed", host: "localhost", referrer: "https://localhost/admin/transactions"
+2026/05/05 06:48:50 [warn] 35#35: *177 delaying request, excess: 0.270, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/transactions"
+2026/05/05 06:49:13 [warn] 35#35: *179 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/support/support.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:49:13 [warn] 35#35: *176 delaying request, excess: 1.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:49:17 [warn] 35#35: *176 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/forms/forms.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:49:17 [warn] 35#35: *177 delaying request, excess: 1.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:49:17 [warn] 35#35: *171 delaying request, excess: 2.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:49:17 [warn] 35#35: *183 delaying request, excess: 3.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:49:17 [warn] 35#35: *176 delaying request, excess: 2.700, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:49:17 [warn] 35#35: *177 delaying request, excess: 3.700, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:49:17 [warn] 35#35: *177 delaying request, excess: 0.270, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/transactions"
+2026/05/05 06:49:36 [warn] 35#35: *177 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/forms/forms.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:49:36 [warn] 35#35: *176 delaying request, excess: 2.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/support/support.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:49:36 [warn] 35#35: *171 delaying request, excess: 3.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:49:36 [warn] 35#35: *179 delaying request, excess: 3.980, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:49:36 [warn] 35#35: *176 delaying request, excess: 2.900, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /livewire/livewire.js?id=6d832aed HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/ptms-users"
+2026/05/05 06:49:36 [warn] 35#35: *177 delaying request, excess: 3.780, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:49:36 [warn] 35#35: *183 delaying request, excess: 4.780, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:49:37 [warn] 35#35: *183 delaying request, excess: 0.470, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/ptms-users"
+2026/05/05 06:51:29 [warn] 35#35: *323 delaying request, excess: 0.950, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:29 [warn] 35#35: *328 delaying request, excess: 1.900, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/support/support.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:29 [warn] 34#34: *330 delaying request, excess: 2.890, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:29 [warn] 34#34: *333 delaying request, excess: 3.870, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:29 [warn] 35#35: *328 delaying request, excess: 2.910, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /livewire/livewire.js?id=6d832aed HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/vendors"
+2026/05/05 06:51:29 [warn] 35#35: *323 delaying request, excess: 3.690, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:29 [warn] 35#35: *332 delaying request, excess: 4.690, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:30 [warn] 35#35: *328 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/3/00/0000000003 while reading upstream, client: 172.18.0.1, server: localhost, request: "GET /livewire/livewire.js?id=6d832aed HTTP/1.1", upstream: "http://172.18.0.5:9000/livewire/livewire.js?id=6d832aed", host: "localhost", referrer: "https://localhost/admin/vendors"
+2026/05/05 06:51:30 [warn] 35#35: *332 delaying request, excess: 0.430, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/vendors"
+2026/05/05 06:51:32 [warn] 34#34: *330 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:32 [warn] 34#34: *333 delaying request, excess: 3.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:32 [warn] 35#35: *332 delaying request, excess: 2.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/forms/forms.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:32 [warn] 35#35: *328 delaying request, excess: 4.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:33 [warn] 34#34: *330 delaying request, excess: 3.920, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:33 [warn] 34#34: *333 delaying request, excess: 2.940, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:33 [warn] 34#34: *333 delaying request, excess: 0.550, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/vendor-accounts"
+2026/05/05 06:51:40 [warn] 35#35: *328 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:40 [warn] 34#34: *333 delaying request, excess: 2.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/forms/forms.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:40 [warn] 35#35: *323 delaying request, excess: 3.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:40 [warn] 35#35: *332 delaying request, excess: 4.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:41 [warn] 34#34: *333 delaying request, excess: 3.890, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:41 [warn] 35#35: *328 delaying request, excess: 2.890, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:41 [warn] 34#34: *333 delaying request, excess: 0.560, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/user-account-assignments"
+2026/05/05 06:51:43 [warn] 34#34: *330 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:43 [warn] 35#35: *323 delaying request, excess: 2.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:43 [warn] 34#34: *333 delaying request, excess: 3.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/forms/forms.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:43 [warn] 35#35: *332 delaying request, excess: 4.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:43 [warn] 34#34: *330 delaying request, excess: 3.930, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:43 [warn] 35#35: *323 delaying request, excess: 3.950, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:44 [warn] 35#35: *323 delaying request, excess: 0.870, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /livewire/livewire.js?id=6d832aed HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/vendors"
+2026/05/05 06:51:46 [warn] 34#34: *330 delaying request, excess: 0.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/support/support.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:46 [warn] 35#35: *332 delaying request, excess: 1.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:46 [warn] 34#34: *333 delaying request, excess: 2.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:46 [warn] 35#35: *328 delaying request, excess: 3.980, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:46 [warn] 35#35: *332 delaying request, excess: 2.850, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /livewire/livewire.js?id=6d832aed HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/transactions"
+2026/05/05 06:51:46 [warn] 34#34: *330 delaying request, excess: 3.720, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:46 [warn] 35#35: *323 delaying request, excess: 4.720, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:47 [warn] 35#35: *323 delaying request, excess: 0.510, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/transactions"
+2026/05/05 06:51:49 [warn] 35#35: *332 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:49 [warn] 34#34: *333 delaying request, excess: 2.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:49 [warn] 35#35: *328 delaying request, excess: 3.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:49 [warn] 34#34: *330 delaying request, excess: 4.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/support/support.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:49 [warn] 34#34: *333 delaying request, excess: 2.880, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:50 [warn] 35#35: *328 delaying request, excess: 2.790, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:50 [warn] 35#35: *328 delaying request, excess: 0.620, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin"
+2026/05/05 06:51:50 [warn] 35#35: *332 delaying request, excess: 1.570, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "POST /livewire/update HTTP/1.1", host: "localhost", referrer: "https://localhost/admin"
+2026/05/05 06:51:50 [warn] 34#34: *333 delaying request, excess: 2.560, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "POST /livewire/update HTTP/1.1", host: "localhost", referrer: "https://localhost/admin"
+2026/05/05 06:51:50 [warn] 34#34: *330 delaying request, excess: 3.560, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "POST /livewire/update HTTP/1.1", host: "localhost", referrer: "https://localhost/admin"
+2026/05/05 06:51:52 [warn] 35#35: *328 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:52 [warn] 34#34: *333 delaying request, excess: 2.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/support/support.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:52 [warn] 35#35: *332 delaying request, excess: 3.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:52 [warn] 35#35: *323 delaying request, excess: 3.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:52 [warn] 35#35: *328 delaying request, excess: 3.970, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:52 [warn] 35#35: *332 delaying request, excess: 2.810, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:51:52 [warn] 35#35: *332 delaying request, excess: 0.480, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/ptms-users"
+2026/05/05 06:53:01 [warn] 35#35: *404 delaying request, excess: 0.940, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/support/support.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:53:01 [warn] 35#35: *412 delaying request, excess: 1.870, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:53:01 [warn] 35#35: *411 delaying request, excess: 2.870, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:53:01 [warn] 34#34: *413 delaying request, excess: 3.870, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:53:02 [warn] 35#35: *412 delaying request, excess: 2.940, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:53:02 [warn] 35#35: *411 delaying request, excess: 2.950, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /livewire/livewire.js?id=6d832aed HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/vendors"
+2026/05/05 06:53:02 [warn] 35#35: *404 delaying request, excess: 3.870, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:53:02 [warn] 35#35: *404 delaying request, excess: 0.460, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/vendors"
+2026/05/05 06:53:08 [warn] 34#34: *413 delaying request, excess: 0.920, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:53:08 [warn] 35#35: *412 delaying request, excess: 1.920, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:53:08 [warn] 35#35: *411 delaying request, excess: 3.920, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/support/support.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:53:08 [warn] 34#34: *414 delaying request, excess: 2.920, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:53:09 [warn] 34#34: *413 delaying request, excess: 3.900, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:53:09 [warn] 34#34: *414 delaying request, excess: 2.830, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:53:09 [warn] 34#34: *414 delaying request, excess: 0.480, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/ptms-users"
+2026/05/05 06:53:13 [warn] 34#34: *414 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/forms/forms.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:53:13 [warn] 35#35: *404 delaying request, excess: 1.980, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:53:13 [warn] 35#35: *411 delaying request, excess: 2.970, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:53:13 [warn] 35#35: *412 delaying request, excess: 3.970, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:53:14 [warn] 35#35: *404 delaying request, excess: 2.870, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:53:14 [warn] 35#35: *411 delaying request, excess: 2.760, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 06:53:14 [warn] 35#35: *411 delaying request, excess: 0.430, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/vendors"
+2026/05/05 08:14:34 [warn] 35#35: *449 delaying request, excess: 0.820, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/support/support.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:14:34 [warn] 34#34: *460 delaying request, excess: 1.780, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:14:34 [warn] 34#34: *459 delaying request, excess: 3.750, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:14:34 [warn] 35#35: *462 delaying request, excess: 2.750, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:14:34 [warn] 34#34: *460 delaying request, excess: 2.640, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /livewire/livewire.js?id=6d832aed HTTP/1.1", host: "localhost", referrer: "https://localhost/admin"
+2026/05/05 08:14:34 [warn] 34#34: *461 delaying request, excess: 3.390, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:14:34 [warn] 35#35: *449 delaying request, excess: 4.390, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:14:34 [warn] 35#35: *449 delaying request, excess: 0.540, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin"
+2026/05/05 08:14:34 [warn] 34#34: *460 delaying request, excess: 1.450, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "POST /livewire/update HTTP/1.1", host: "localhost", referrer: "https://localhost/admin"
+2026/05/05 08:14:34 [warn] 34#34: *461 delaying request, excess: 2.440, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "POST /livewire/update HTTP/1.1", host: "localhost", referrer: "https://localhost/admin"
+2026/05/05 08:14:34 [warn] 34#34: *459 delaying request, excess: 3.440, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "POST /livewire/update HTTP/1.1", host: "localhost", referrer: "https://localhost/admin"
+2026/05/05 08:14:37 [warn] 34#34: *459 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/forms/forms.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:14:37 [warn] 35#35: *462 delaying request, excess: 1.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:14:37 [warn] 35#35: *449 delaying request, excess: 3.970, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:14:37 [warn] 34#34: *460 delaying request, excess: 2.980, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:14:37 [warn] 35#35: *462 delaying request, excess: 2.880, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:14:37 [warn] 34#34: *460 delaying request, excess: 2.780, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:14:38 [warn] 34#34: *460 delaying request, excess: 0.500, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/vendors"
+2026/05/05 08:19:42 [warn] 35#35: *488 delaying request, excess: 0.660, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/support/support.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:42 [warn] 35#35: *493 delaying request, excess: 1.600, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:42 [warn] 34#34: *494 delaying request, excess: 2.590, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:42 [warn] 35#35: *497 delaying request, excess: 3.440, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:43 [warn] 35#35: *493 delaying request, excess: 2.880, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /livewire/livewire.js?id=6d832aed HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/vendor-accounts"
+2026/05/05 08:19:43 [warn] 35#35: *488 delaying request, excess: 3.640, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:43 [warn] 35#35: *501 delaying request, excess: 4.550, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:43 [warn] 35#35: *501 delaying request, excess: 0.490, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/vendor-accounts"
+2026/05/05 08:19:45 [warn] 35#35: *501 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/forms/forms.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:45 [warn] 35#35: *493 delaying request, excess: 2.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:45 [warn] 35#35: *488 delaying request, excess: 2.950, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:45 [warn] 35#35: *497 delaying request, excess: 3.940, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:45 [warn] 35#35: *501 delaying request, excess: 2.860, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:45 [warn] 35#35: *493 delaying request, excess: 3.860, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:45 [warn] 35#35: *493 delaying request, excess: 0.490, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/vendors"
+2026/05/05 08:19:47 [warn] 35#35: *501 delaying request, excess: 0.980, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/support/support.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:47 [warn] 35#35: *493 delaying request, excess: 1.980, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/forms/forms.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:47 [warn] 35#35: *497 delaying request, excess: 2.830, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:47 [warn] 35#35: *488 delaying request, excess: 3.830, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:47 [warn] 35#35: *501 delaying request, excess: 2.810, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:47 [warn] 35#35: *493 delaying request, excess: 3.810, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:48 [warn] 35#35: *493 delaying request, excess: 0.590, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/vendor-accounts"
+2026/05/05 08:19:49 [warn] 34#34: *494 delaying request, excess: 0.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:49 [warn] 35#35: *497 delaying request, excess: 1.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:49 [warn] 35#35: *493 delaying request, excess: 2.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/forms/forms.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:49 [warn] 35#35: *488 delaying request, excess: 3.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:49 [warn] 34#34: *494 delaying request, excess: 3.910, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:49 [warn] 35#35: *497 delaying request, excess: 3.940, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:49 [warn] 35#35: *497 delaying request, excess: 0.530, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/user-account-assignments"
+2026/05/05 08:19:52 [warn] 35#35: *501 delaying request, excess: 0.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:52 [warn] 34#34: *494 delaying request, excess: 1.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/support/support.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:52 [warn] 35#35: *488 delaying request, excess: 2.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:52 [warn] 35#35: *493 delaying request, excess: 3.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:52 [warn] 35#35: *501 delaying request, excess: 3.920, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:53 [warn] 35#35: *488 delaying request, excess: 2.890, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/05 08:19:53 [warn] 35#35: *488 delaying request, excess: 0.490, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/vendors"
+2026/05/05 11:17:00 [error] 35#35: *544 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "POST /api/register HTTP/1.1", upstream: "http://172.18.0.5:9000/api/register", host: "localhost"
+2026/05/05 11:17:25 [notice] 1#1: signal 3 (SIGQUIT) received, shutting down
+2026/05/05 11:17:25 [notice] 35#35: gracefully shutting down
+2026/05/05 11:17:25 [notice] 34#34: gracefully shutting down
+2026/05/05 11:17:25 [notice] 34#34: exiting
+2026/05/05 11:17:25 [notice] 35#35: exiting
+2026/05/05 11:17:25 [notice] 35#35: exit
+2026/05/05 11:17:25 [notice] 34#34: exit
+2026/05/05 11:17:25 [notice] 1#1: signal 17 (SIGCHLD) received from 35
+2026/05/05 11:17:25 [notice] 1#1: worker process 35 exited with code 0
+2026/05/05 11:17:25 [notice] 1#1: signal 17 (SIGCHLD) received from 34
+2026/05/05 11:17:25 [notice] 1#1: worker process 34 exited with code 0
+2026/05/05 11:17:25 [notice] 1#1: exit
+2026/05/05 11:17:26 [notice] 1#1: using the "epoll" event method
+2026/05/05 11:17:26 [notice] 1#1: nginx/1.29.8
+2026/05/05 11:17:26 [notice] 1#1: built by gcc 15.2.0 (Alpine 15.2.0) 
+2026/05/05 11:17:26 [notice] 1#1: OS: Linux 6.8.0-100-generic
+2026/05/05 11:17:26 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1024:524288
+2026/05/05 11:17:26 [notice] 1#1: start worker processes
+2026/05/05 11:17:26 [notice] 1#1: start worker process 21
+2026/05/05 11:17:26 [notice] 1#1: start worker process 22
+2026/05/06 13:36:00 [notice] 1#1: signal 3 (SIGQUIT) received, shutting down
+2026/05/06 13:36:00 [notice] 22#22: gracefully shutting down
+2026/05/06 13:36:00 [notice] 21#21: gracefully shutting down
+2026/05/06 13:36:00 [notice] 22#22: exiting
+2026/05/06 13:36:00 [notice] 21#21: exiting
+2026/05/06 13:36:00 [notice] 22#22: exit
+2026/05/06 13:36:00 [notice] 21#21: exit
+2026/05/06 13:36:00 [notice] 1#1: signal 17 (SIGCHLD) received from 21
+2026/05/06 13:36:00 [notice] 1#1: worker process 21 exited with code 0
+2026/05/06 13:36:00 [notice] 1#1: signal 29 (SIGIO) received
+2026/05/06 13:36:00 [notice] 1#1: signal 17 (SIGCHLD) received from 22
+2026/05/06 13:36:00 [notice] 1#1: worker process 22 exited with code 0
+2026/05/06 13:36:00 [notice] 1#1: exit
+2026/05/06 13:36:02 [notice] 1#1: using the "epoll" event method
+2026/05/06 13:36:02 [notice] 1#1: nginx/1.29.8
+2026/05/06 13:36:02 [notice] 1#1: built by gcc 15.2.0 (Alpine 15.2.0) 
+2026/05/06 13:36:02 [notice] 1#1: OS: Linux 6.8.0-100-generic
+2026/05/06 13:36:02 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1024:524288
+2026/05/06 13:36:02 [notice] 1#1: start worker processes
+2026/05/06 13:36:02 [notice] 1#1: start worker process 20
+2026/05/06 13:36:02 [notice] 1#1: start worker process 21
+2026/05/06 15:39:28 [warn] 20#20: *23 delaying request, excess: 0.860, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-DBGcoRoC.css HTTP/1.1", host: "localhost", referrer: "https://localhost/"
+2026/05/06 16:23:32 [warn] 21#21: *29 delaying request, excess: 0.500, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1", host: "localhost"
+2026/05/06 17:25:05 [warn] 21#21: *34 delaying request, excess: 0.540, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/support/support.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/06 17:25:05 [warn] 20#20: *46 delaying request, excess: 1.530, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/06 17:25:05 [warn] 20#20: *47 delaying request, excess: 2.530, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/06 17:25:05 [warn] 20#20: *48 delaying request, excess: 3.510, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/06 17:25:05 [warn] 20#20: *49 delaying request, excess: 5.510, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/06 17:25:05 [warn] 21#21: *50 delaying request, excess: 4.510, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/07 01:24:04 [warn] 20#20: *64 delaying request, excess: 0.760, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-DBGcoRoC.css HTTP/1.1", host: "localhost", referrer: "https://localhost/"
+2026/05/07 01:24:07 [warn] 21#21: *60 delaying request, excess: 0.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-DBGcoRoC.css HTTP/1.1", host: "localhost", referrer: "https://localhost/"
+2026/05/07 01:24:07 [warn] 21#21: *60 delaying request, excess: 0.590, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/"
+2026/05/07 01:24:12 [warn] 20#20: *64 delaying request, excess: 0.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-DBGcoRoC.css HTTP/1.1", host: "localhost", referrer: "https://localhost/"
+2026/05/07 01:24:12 [warn] 21#21: *60 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.18.0.1, server: localhost, request: "GET /assets/index-B4TWVOxy.js HTTP/1.1", upstream: "http://172.18.0.6:9000/assets/index-B4TWVOxy.js", host: "localhost", referrer: "https://localhost/"
+2026/05/07 01:24:27 [warn] 21#21: *60 delaying request, excess: 0.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-DBGcoRoC.css HTTP/1.1", host: "localhost", referrer: "https://localhost/"
+2026/05/07 01:24:29 [warn] 21#21: *60 delaying request, excess: 0.630, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-B4TWVOxy.js HTTP/1.1", host: "localhost", referrer: "https://localhost/"
+2026/05/07 01:24:29 [warn] 20#20: *64 delaying request, excess: 1.620, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-DBGcoRoC.css HTTP/1.1", host: "localhost", referrer: "https://localhost/"
+2026/05/07 01:24:41 [warn] 21#21: *60 delaying request, excess: 0.980, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-DBGcoRoC.css HTTP/1.1", host: "localhost", referrer: "https://localhost/"
+2026/05/07 01:36:32 [warn] 21#21: *91 delaying request, excess: 0.610, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-B33vts5c.css HTTP/1.1", host: "localhost", referrer: "https://localhost/"
+2026/05/07 01:36:32 [warn] 20#20: *85 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/2/00/0000000002 while reading upstream, client: 172.18.0.1, server: localhost, request: "GET /assets/index-B62eOtV2.js HTTP/1.1", upstream: "http://172.18.0.6:9000/assets/index-B62eOtV2.js", host: "localhost", referrer: "https://localhost/"
+2026/05/07 01:36:32 [warn] 20#20: *90 delaying request, excess: 1.550, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1", host: "localhost"

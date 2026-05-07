@@ -1,0 +1,145 @@
+package xendit_adapter
+
+import (
+	"bytes"
+	"context"
+	"encoding/base64"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"time"
+
+	"github.com/truechain/ptms/transaction-api/internal/providers"
+)
+
+type xenditAdapter struct {
+	httpClient *http.Client
+}
+
+func NewXenditAdapter() providers.VendorAdapter {
+	return &xenditAdapter{
+		httpClient: &http.Client{
+			Timeout: 5 * time.Second,
+		},
+	}
+}
+
+type credentials struct {
+	SecretKey    string `json:"secret_key"`
+	WebhookToken string `json:"webhook_token"`
+	IsProduction bool   `json:"is_production"`
+}
+
+func (a *xenditAdapter) GenerateQRIS(ctx context.Context, req providers.GenerateQRISRequest) (*providers.QRISResponse, error) {
+	var creds credentials
+	if err := json.Unmarshal([]byte(req.Credentials), &creds); err != nil {
+		return nil, fmt.Errorf("invalid credentials: %w", err)
+	}
+
+	bodyMap := map[string]interface{}{
+		"reference_id": req.TransactionID,
+		"type":         "DYNAMIC",
+		"currency":     "IDR",
+		"amount":       int(req.Amount),
+	}
+
+	bodyBytes, _ := json.Marshal(bodyMap)
+	httpReq, err := http.NewRequestWithContext(ctx, "POST", "https://api.xendit.co/qr_codes", bytes.NewBuffer(bodyBytes))
+	if err != nil {
+		return nil, err
+	}
+
+	auth := base64.StdEncoding.EncodeToString([]byte(creds.SecretKey + ":"))
+	httpReq.Header.Set("Content-Type", "application/json")
+	httpReq.Header.Set("Authorization", "Basic "+auth)
+
+	resp, err := a.httpClient.Do(httpReq)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	respBody, _ := io.ReadAll(resp.Body)
+	var result map[string]interface{}
+	if err := json.Unmarshal(respBody, &result); err != nil {
+		return nil, fmt.Errorf("xendit unmarshal error: %w", err)
+	}
+
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+		return nil, fmt.Errorf("xendit error: status %d, body %s", resp.StatusCode, string(respBody))
+	}
+
+	var expiresAt *time.Time
+	if exp, ok := result["expires_at"].(string); ok {
+		t, intErr := time.Parse(time.RFC3339, exp)
+		if intErr == nil {
+			expiresAt = &t
+		}
+	}
+
+	return &providers.QRISResponse{
+		VendorTransactionID: fmt.Sprintf("%v", result["id"]),
+		QRISCode:            fmt.Sprintf("%v", result["qr_string"]),
+		RawResponse:         respBody,
+		ExpiresAt:           expiresAt,
+	}, nil
+}
+
+func (a *xenditAdapter) Validate(ctx context.Context, credsStr string) error {
+	var creds credentials
+	if err := json.Unmarshal([]byte(credsStr), &creds); err != nil {
+		return err
+	}
+
+	httpReq, _ := http.NewRequestWithContext(ctx, "GET", "https://api.xendit.co/balance", nil)
+	auth := base64.StdEncoding.EncodeToString([]byte(creds.SecretKey + ":"))
+	httpReq.Header.Set("Authorization", "Basic "+auth)
+
+	resp, err := a.httpClient.Do(httpReq)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusUnauthorized {
+		return fmt.Errorf("invalid secret key")
+	}
+
+	return nil
+}
+
+func (a *xenditAdapter) CheckStatus(ctx context.Context, vendorTxID string, credentials string) (*providers.StatusResponse, error) {
+	return nil, fmt.Errorf("check status not implemented for xendit")
+}
+
+func (a *xenditAdapter) VerifyCallback(payload []byte, signature string, secret string) bool {
+	return signature == secret
+}
+
+func (a *xenditAdapter) NormalizeCallback(payload []byte) (*providers.NormalizedCallback, error) {
+	var data map[string]interface{}
+	if err := json.Unmarshal(payload, &data); err != nil {
+		return nil, err
+	}
+
+	event, _ := data["event"].(string)
+	status := "pending"
+	if event == "qr_code.paid" {
+		status = "paid"
+	}
+
+	qris, _ := data["data"].(map[string]interface{})
+	_amount := 0.0
+	if qris != nil {
+		fmt.Sscanf(fmt.Sprintf("%v", qris["amount"]), "%f", &_amount)
+	}
+
+	return &providers.NormalizedCallback{
+		VendorTransactionID: fmt.Sprintf("%v", qris["id"]),
+		ReferenceID:         fmt.Sprintf("%v", qris["reference_id"]),
+		Status:              status,
+		Amount:              _amount,
+		PaidAt:              time.Now(),
+	}, nil
+}

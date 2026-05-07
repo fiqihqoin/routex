@@ -1,0 +1,34 @@
+<?php
+
+return [
+    'QOINHUB' => [
+        'label' => 'Qoinhub',
+        'webhook_url' => 'https://api.routex.id/api/v1/callbacks/QOINHUB',
+        'instructions' => 'Login to Qoinhub Dashboard > Settings > Merchant Callback. Paste the URL below into the "Payment Notification URL" field.',
+        'fields' => [
+            ['key' => 'client_id', 'label' => 'Client ID', 'type' => 'text', 'required' => true, 'hint' => 'Dari halaman API di dashboard Qoinhub'],
+            ['key' => 'client_secret', 'label' => 'Client Secret', 'type' => 'password', 'required' => true],
+            ['key' => 'merchant_id', 'label' => 'Merchant ID', 'type' => 'text', 'required' => true],
+            ['key' => 'terminal_id', 'label' => 'Terminal ID', 'type' => 'text', 'required' => true],
+        ],
+    ],
+    'MIDTRANS' => [
+        'label' => 'Midtrans',
+        'webhook_url' => 'https://api.routex.id/api/v1/callbacks/MIDTRANS',
+        'instructions' => 'Login to Midtrans Dashboard > Settings > Configuration. Paste the URL below into the "Payment Notification URL" field and click Update.',
+        'fields' => [
+            ['key' => 'server_key', 'label' => 'Server Key', 'type' => 'password', 'required' => true, 'hint' => 'Settings → Access Keys di dashboard Midtrans'],
+            ['key' => 'is_production', 'label' => 'Mode Produksi', 'type' => 'boolean', 'required' => false],
+        ],
+    ],
+    'XENDIT' => [
+        'label' => 'Xendit',
+        'webhook_url' => 'https://api.routex.id/api/v1/callbacks/XENDIT',
+        'instructions' => 'Login to Xendit Dashboard > Settings > Callbacks. Find "QR Code Payment" and paste the URL below. Ensure you also set the Webhook Token here.',
+        'fields' => [
+            ['key' => 'secret_key', 'label' => 'Secret Key', 'type' => 'password', 'required' => true, 'hint' => 'Settings → API Keys di dashboard Xendit'],
+            ['key' => 'webhook_token', 'label' => 'Webhook Verification Token', 'type' => 'password', 'required' => true, 'hint' => 'Settings → Webhooks di dashboard Xendit'],
+            ['key' => 'is_production', 'label' => 'Mode Produksi', 'type' => 'boolean', 'required' => false],
+        ],
+    ],
+];
