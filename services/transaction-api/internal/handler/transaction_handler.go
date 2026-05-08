@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -29,10 +30,13 @@ func NewTransactionHandler(service domain.TransactionService) *TransactionHandle
 }
 
 func (h *TransactionHandler) GenerateQRIS(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("[HANDLER] GenerateQRIS called")
 	apiKey := r.Header.Get("X-API-Key")
 	idempotencyKey := r.Header.Get("X-Idempotency-Key")
+	fmt.Printf("[HANDLER] API Key: %s, Idempotency: %s\n", apiKey, idempotencyKey)
 
 	if apiKey == "" {
+		fmt.Println("[HANDLER] Missing API key")
 		h.respondWithError(w, r, http.StatusUnauthorized, domain.ErrMissingAPIKey)
 		return
 	}
@@ -45,12 +49,15 @@ func (h *TransactionHandler) GenerateQRIS(w http.ResponseWriter, r *http.Request
 
 	var req domain.CreateTransactionRequest
 	if err := json.Unmarshal(rawBody, &req); err != nil {
+		fmt.Printf("[HANDLER] JSON unmarshal error: %v\n", err)
 		h.respondWithError(w, r, http.StatusBadRequest, errors.New("INVALID_JSON"))
 		return
 	}
 
+	fmt.Printf("[HANDLER] Calling service.GenerateQRIS with amount=%.2f\n", req.Amount)
 	tx, err := h.service.GenerateQRIS(r.Context(), apiKey, idempotencyKey, req, rawBody)
 	if err != nil {
+		fmt.Printf("[HANDLER] Service returned error: %v\n", err)
 		status := http.StatusInternalServerError
 		if errors.Is(err, domain.ErrCurrencyNotSupported) {
 			status = http.StatusBadRequest

@@ -59,7 +59,9 @@ func NewTransactionService(
 func (s *transactionService) GenerateQRIS(ctx context.Context, apiKey string, idempotencyKey string, req domain.CreateTransactionRequest, rawBody []byte) (*domain.Transaction, error) {
 	start := time.Now()
 	var selectedVendorID string
-	
+
+	fmt.Printf("[GenerateQRIS] START - Amount: %.2f, Channel: %s\n", req.Amount, req.PaymentChannel)
+
 	defer func() {
 		if selectedVendorID != "" {
 			metrics.QRISGenerationDuration.WithLabelValues(selectedVendorID).Observe(time.Since(start).Seconds())
@@ -67,6 +69,7 @@ func (s *transactionService) GenerateQRIS(ctx context.Context, apiKey string, id
 	}()
 
 	if req.Currency != "IDR" && req.Currency != "" {
+		fmt.Printf("[GenerateQRIS] Currency not supported: %s\n", req.Currency)
 		return nil, domain.ErrCurrencyNotSupported
 	}
 
@@ -99,30 +102,48 @@ func (s *transactionService) GenerateQRIS(ctx context.Context, apiKey string, id
 	}
 
 	eligible, err := s.registry.GetEligibleVendors(ctx, userID, req.Amount, req.PaymentChannel)
-	if err != nil || len(eligible) == 0 {
+	if err != nil {
+		fmt.Printf("[GenerateQRIS] GetEligibleVendors error: %v\n", err)
 		return nil, domain.ErrNoEligibleVendor
 	}
+	if len(eligible) == 0 {
+		fmt.Printf("[GenerateQRIS] No eligible vendors found for user %s\n", userID)
+		return nil, domain.ErrNoEligibleVendor
+	}
+	fmt.Printf("[GenerateQRIS] Found %d eligible vendors\n", len(eligible))
 
 	ranked := s.router.Route(ctx, req.Amount, eligible)
+	fmt.Printf("[GenerateQRIS] After routing, %d vendors ranked\n", len(ranked))
 
 	var selectedAccount *domain.VendorAccount
 	var selectedVendor domain.Vendor
-	
-	for _, v := range ranked {
+
+	fmt.Printf("[TxService] Ranked vendors count: %d\n", len(ranked))
+	for i, v := range ranked {
+		fmt.Printf("[TxService] Trying vendor #%d: %s (ID: %s)\n", i+1, v.Code, v.ID)
 		accounts, err := s.registry.GetAccounts(ctx, v.ID)
-		if err != nil || len(accounts) == 0 {
+		if err != nil {
+			fmt.Printf("[TxService] Failed to get accounts for vendor %s: %v\n", v.Code, err)
 			continue
 		}
+		if len(accounts) == 0 {
+			fmt.Printf("[TxService] No accounts found for vendor %s\n", v.Code)
+			continue
+		}
+		fmt.Printf("[TxService] Found %d accounts for vendor %s\n", len(accounts), v.Code)
 		acc, err := s.selector.SelectAccount(ctx, v.ID, accounts)
 		if err == nil {
 			selectedAccount = acc
 			selectedVendor = v
 			selectedVendorID = v.ID
+			fmt.Printf("[TxService] Selected vendor %s, account %s\n", v.Code, acc.ID)
 			break
 		}
+		fmt.Printf("[TxService] Failed to select account for vendor %s: %v\n", v.Code, err)
 	}
 
 	if selectedAccount == nil {
+		fmt.Printf("[TxService] ERROR: No account could be selected from %d ranked vendors\n", len(ranked))
 		return nil, errors.New("failed to select an account for routing")
 	}
 
@@ -179,13 +200,17 @@ func (s *transactionService) GenerateQRIS(ctx context.Context, apiKey string, id
 func (s *transactionService) callVendorAPI(ctx context.Context, vendorObj domain.Vendor, account *domain.VendorAccount, req domain.CreateTransactionRequest) (string, error) {
 	encrypted, err := s.repo.GetEncryptedCredentials(ctx, account.ID)
 	if err != nil {
+		fmt.Printf("[TxService] Failed to get encrypted credentials for account %s: %v\n", account.ID, err)
 		return "", fmt.Errorf("failed to get account credentials: %w", err)
 	}
 
 	adapter, decryptedCreds, err := s.vendorFactory.Create(vendorObj.Code, encrypted)
 	if err != nil {
+		fmt.Printf("[TxService] Failed to create adapter for vendor %s: %v\n", vendorObj.Code, err)
 		return "", fmt.Errorf("failed to create vendor adapter: %w", err)
 	}
+
+	fmt.Printf("[TxService] Calling vendor %s (account %s) for QRIS generation\n", vendorObj.Code, account.ID)
 
 	adapterReq := providers.GenerateQRISRequest{
 		TransactionID:  uuid.New().String(),
@@ -196,9 +221,11 @@ func (s *transactionService) callVendorAPI(ctx context.Context, vendorObj domain
 
 	resp, err := adapter.GenerateQRIS(ctx, adapterReq)
 	if err != nil {
+		fmt.Printf("[TxService] Vendor %s returned error: %v\n", vendorObj.Code, err)
 		return "", err
 	}
 
+	fmt.Printf("[TxService] Vendor %s returned success\n", vendorObj.Code)
 	return resp.QRISCode, nil
 }
 

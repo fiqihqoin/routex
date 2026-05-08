@@ -20,7 +20,7 @@ type xenditAdapter struct {
 func NewXenditAdapter() providers.VendorAdapter {
 	return &xenditAdapter{
 		httpClient: &http.Client{
-			Timeout: 5 * time.Second,
+			Timeout: 30 * time.Second,
 		},
 	}
 }
@@ -37,30 +37,51 @@ func (a *xenditAdapter) GenerateQRIS(ctx context.Context, req providers.Generate
 		return nil, fmt.Errorf("invalid credentials: %w", err)
 	}
 
+	// Xendit requires minimum amount of 1500
+	amount := int(req.Amount)
+	if amount < 1500 {
+		amount = 1500
+	}
+
+	// Use reference_id (per docs) not external_id
+	// Add expires_at for 30 minutes
+	expiresAt := time.Now().Add(30 * time.Minute)
+
 	bodyMap := map[string]interface{}{
 		"reference_id": req.TransactionID,
 		"type":         "DYNAMIC",
 		"currency":     "IDR",
-		"amount":       int(req.Amount),
+		"amount":       amount,
+		"expires_at":   expiresAt.Format(time.RFC3339),
 	}
 
 	bodyBytes, _ := json.Marshal(bodyMap)
+
+	fmt.Printf("[Xendit] QRIS Request:\n")
+	fmt.Printf("  Endpoint: https://api.xendit.co/qr_codes\n")
+	fmt.Printf("  Body: %s\n", string(bodyBytes))
+
 	httpReq, err := http.NewRequestWithContext(ctx, "POST", "https://api.xendit.co/qr_codes", bytes.NewBuffer(bodyBytes))
 	if err != nil {
 		return nil, err
 	}
 
+	// Basic Auth: secretKey: (with colon, empty password)
 	auth := base64.StdEncoding.EncodeToString([]byte(creds.SecretKey + ":"))
 	httpReq.Header.Set("Content-Type", "application/json")
 	httpReq.Header.Set("Authorization", "Basic "+auth)
+	httpReq.Header.Set("api-version", "2022-07-31") // Add API version header
 
 	resp, err := a.httpClient.Do(httpReq)
 	if err != nil {
+		fmt.Printf("[Xendit] QRIS Network Error: %v\n", err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	respBody, _ := io.ReadAll(resp.Body)
+	fmt.Printf("[Xendit] QRIS Response: status=%d, body=%s\n", resp.StatusCode, string(respBody))
+
 	var result map[string]interface{}
 	if err := json.Unmarshal(respBody, &result); err != nil {
 		return nil, fmt.Errorf("xendit unmarshal error: %w", err)
@@ -70,11 +91,11 @@ func (a *xenditAdapter) GenerateQRIS(ctx context.Context, req providers.Generate
 		return nil, fmt.Errorf("xendit error: status %d, body %s", resp.StatusCode, string(respBody))
 	}
 
-	var expiresAt *time.Time
+	var expiresAtPtr *time.Time
 	if exp, ok := result["expires_at"].(string); ok {
 		t, intErr := time.Parse(time.RFC3339, exp)
 		if intErr == nil {
-			expiresAt = &t
+			expiresAtPtr = &t
 		}
 	}
 
@@ -82,7 +103,7 @@ func (a *xenditAdapter) GenerateQRIS(ctx context.Context, req providers.Generate
 		VendorTransactionID: fmt.Sprintf("%v", result["id"]),
 		QRISCode:            fmt.Sprintf("%v", result["qr_string"]),
 		RawResponse:         respBody,
-		ExpiresAt:           expiresAt,
+		ExpiresAt:           expiresAtPtr,
 	}, nil
 }
 

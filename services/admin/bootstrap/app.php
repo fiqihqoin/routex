@@ -18,7 +18,12 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->redirectTo(
-            guests: '/login',
+            guests: function (Request $request) {
+                if ($request->is('admin') || $request->is('admin/*')) {
+                    return route('filament.admin.auth.login');
+                }
+                return '/login';
+            },
             users: '/portal'
         );
     })

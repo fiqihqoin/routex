@@ -116,30 +116,42 @@ func (r *vendorRegistry) GetEligibleVendors(ctx context.Context, userID string, 
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
+	log.Printf("[Registry] GetEligibleVendors for user %s, amount %.2f, channel %s", userID, amount, channel)
+
 	assignedVendors, ok := r.userVendors[userID]
 	if !ok {
-		return nil, nil 
+		log.Printf("[Registry] No vendor assignments found for user %s", userID)
+		return nil, nil
 	}
+
+	log.Printf("[Registry] User %s has %d vendor assignments", userID, len(assignedVendors))
 
 	var eligible []domain.Vendor
 
 	for _, v := range r.vendors {
+		log.Printf("[Registry] Checking vendor %s (%s)", v.Name, v.ID)
+
 		if !assignedVendors[v.ID] {
+			log.Printf("[Registry]   - Not assigned to user")
 			continue
 		}
 
 		if !v.IsActive {
+			log.Printf("[Registry]   - Not active")
 			continue
 		}
 
 		allowed, _ := r.cb.AllowRequest(ctx, v.ID)
 		if !allowed {
+			log.Printf("[Registry]   - Circuit breaker blocked")
 			continue
 		}
 
+		log.Printf("[Registry]   - ELIGIBLE ✓")
 		eligible = append(eligible, v)
 	}
 
+	log.Printf("[Registry] Found %d eligible vendors", len(eligible))
 	return eligible, nil
 }
 
