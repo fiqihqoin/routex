@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 
 class PtmsUser extends Authenticatable
 {
@@ -41,8 +42,13 @@ class PtmsUser extends Authenticatable
         'is_active' => 'boolean',
         'email_verified_at' => 'datetime',
         'expected_monthly_volume' => 'integer',
-        'password' => 'hashed',
     ];
+
+    // Manual hash mutator instead of cast
+    protected function setPasswordAttribute($value)
+    {
+        $this->attributes['password'] = Hash::needsRehash($value) ? Hash::make($value) : $value;
+    }
 
     public function approvedBy(): BelongsTo
     {
