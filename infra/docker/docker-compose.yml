@@ -98,7 +98,7 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: ""
-      QUEUE_CONNECTION: redis
+      QUEUE_CONNECTION: database
       SESSION_DRIVER: database
       PTMS_APP_KEY: base64:H9SO6s8jlpW01g060jiWdVMCuJcK1GhxXpiutlUwzFU=
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
@@ -127,7 +127,7 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: ""
-      QUEUE_CONNECTION: redis
+      QUEUE_CONNECTION: database
     depends_on:
       postgres:
         condition: service_healthy

@@ -5,8 +5,8 @@
     <p>Terima kasih telah mendaftar di Routex.</p>
     <p>Silakan klik tombol di bawah ini untuk memverifikasi alamat email kamu:</p>
     <p>
-        <a href="{{ url('/portal/verify-email/' . $token) }}" 
-           style="background-color: #4F46E5; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+        <a href="{{ $verificationUrl }}" 
+           style="background-color: #00D4AA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
             Verifikasi Email
         </a>
     </p>

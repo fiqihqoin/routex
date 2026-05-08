@@ -76,7 +76,7 @@ func (h *VendorHandler) ValidateCredentials(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	adapter, err := h.factory.Create(vendorCode, req.Credentials)
+	adapter, _, err := h.factory.Create(vendorCode, req.Credentials)
 	if err != nil {
 		h.respondWithError(w, http.StatusBadRequest, fmt.Sprintf("unsupported vendor or invalid creds: %v", err))
 		return

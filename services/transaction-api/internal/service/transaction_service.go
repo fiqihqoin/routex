@@ -16,7 +16,6 @@ import (
 	"github.com/truechain/ptms/transaction-api/internal/domain"
 	"github.com/truechain/ptms/transaction-api/internal/factory"
 	"github.com/truechain/ptms/transaction-api/internal/providers"
-	"github.com/truechain/ptms/transaction-api/pkg/crypto"
 	"github.com/truechain/ptms/transaction-api/pkg/messaging"
 	"github.com/truechain/ptms/transaction-api/pkg/metrics"
 )

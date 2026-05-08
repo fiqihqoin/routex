@@ -13,10 +13,14 @@ class VerificationEmail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public string $verificationUrl;
+
     public function __construct(
         public PtmsUser $user,
         public string $token
-    ) {}
+    ) {
+        $this->verificationUrl = route('portal.verify-email', ['token' => $token]);
+    }
 
     public function envelope(): Envelope
     {
