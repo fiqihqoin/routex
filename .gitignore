@@ -1,0 +1,18 @@
+# Credential files - DO NOT COMMIT
+*key-digitoken.md
+qoinhubkey-digitoken.md
+sandboxmidtranskey-digitoken.md
+sandboxxenditkey-digitoken.md
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
