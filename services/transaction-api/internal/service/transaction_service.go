@@ -183,22 +183,16 @@ func (s *transactionService) callVendorAPI(ctx context.Context, vendorObj domain
 		return "", fmt.Errorf("failed to get account credentials: %w", err)
 	}
 
-	adapter, err := s.vendorFactory.Create(vendorObj.Code, encrypted)
+	adapter, decryptedCreds, err := s.vendorFactory.Create(vendorObj.Code, encrypted)
 	if err != nil {
 		return "", fmt.Errorf("failed to create vendor adapter: %w", err)
 	}
 
-	creds, err := crypto.Decrypt(encrypted)
-	if err != nil {
-		return "", fmt.Errorf("failed to decrypt credentials: %w", err)
-	}
-	credsJSON, _ := json.Marshal(creds)
-
 	adapterReq := providers.GenerateQRISRequest{
-		TransactionID:  uuid.New().String(), 
+		TransactionID:  uuid.New().String(),
 		Amount:         req.Amount,
 		PaymentChannel: req.PaymentChannel,
-		Credentials:    string(credsJSON),
+		Credentials:    decryptedCreds,
 	}
 
 	resp, err := adapter.GenerateQRIS(ctx, adapterReq)
@@ -246,9 +240,9 @@ func (s *transactionService) HandleVendorCallback(ctx context.Context, vendorID 
 		return fmt.Errorf("callback for unknown vendor: %w", err)
 	}
 
-	adapter, _ := s.vendorFactory.Create(v.Code, "") 
-	if adapter == nil {
-		return fmt.Errorf("failed to get adapter for callback")
+	adapter, err := s.vendorFactory.CreateForCallback(v.Code) 
+	if err != nil {
+		return fmt.Errorf("failed to get adapter for callback: %w", err)
 	}
 
 	normalized, err := adapter.NormalizeCallback(payload)

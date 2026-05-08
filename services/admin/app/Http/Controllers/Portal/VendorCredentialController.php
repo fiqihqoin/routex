@@ -86,9 +86,11 @@ class VendorCredentialController extends Controller
         // -----------------------
 
         DB::transaction(function () use ($user, $vendor, $validated, $credentials) {
-            $existingAssignment = DB::table('user_account_assignments')
-                ->where('user_id', $user->id)
-                ->where('vendor_id', $vendor->id)
+            $existingAssignment = DB::table('user_account_assignments as uaa')
+                ->join('vendor_accounts as va', 'uaa.account_id', '=', 'va.id')
+                ->where('uaa.user_id', $user->id)
+                ->where('va.vendor_id', $vendor->id)
+                ->select('uaa.*', 'uaa.account_id')
                 ->first();
 
             $isProduction = filter_var($credentials['is_production'] ?? false, FILTER_VALIDATE_BOOLEAN);

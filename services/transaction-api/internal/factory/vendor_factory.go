@@ -13,7 +13,8 @@ import (
 var ErrUnsupportedVendor = errors.New("ErrUnsupportedVendor: vendor code not recognized")
 
 type VendorFactory interface {
-	Create(vendorCode string, encryptedCredentials string) (providers.VendorAdapter, error)
+	Create(vendorCode string, encryptedCredentials string) (providers.VendorAdapter, string, error)
+	CreateForCallback(vendorCode string) (providers.VendorAdapter, error)
 }
 
 type vendorFactory struct{}
@@ -22,12 +23,28 @@ func NewVendorFactory() VendorFactory {
 	return &vendorFactory{}
 }
 
-func (f *vendorFactory) Create(vendorCode string, encryptedCredentials string) (providers.VendorAdapter, error) {
-	_, err := crypto.Decrypt(encryptedCredentials)
+func (f *vendorFactory) Create(vendorCode string, encryptedCredentials string) (providers.VendorAdapter, string, error) {
+	decrypted, err := crypto.DecryptRaw(encryptedCredentials)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
+	var adapter providers.VendorAdapter
+	switch vendorCode {
+	case "QOINHUB":
+		adapter = qoinhub_adapter.NewQoinhubAdapter()
+	case "MIDTRANS":
+		adapter = midtrans_adapter.NewMidtransAdapter()
+	case "XENDIT":
+		adapter = xendit_adapter.NewXenditAdapter()
+	default:
+		return nil, "", ErrUnsupportedVendor
+	}
+
+	return adapter, decrypted, nil
+}
+
+func (f *vendorFactory) CreateForCallback(vendorCode string) (providers.VendorAdapter, error) {
 	switch vendorCode {
 	case "QOINHUB":
 		return qoinhub_adapter.NewQoinhubAdapter(), nil

@@ -43,15 +43,15 @@ class RegisterController extends Controller
             ]);
 
             $rawToken = Str::random(60);
-            $token = hash('sha256', $rawToken);
+            $hashedToken = hash('sha256', $rawToken);
 
             EmailVerificationToken::create([
                 'ptms_user_id' => $user->id,
-                'token' => $token,
+                'token' => $hashedToken,
                 'expires_at' => Carbon::now()->addHours(24),
             ]);
 
-            SendVerificationEmailJob::dispatch($user, $token);
+            SendVerificationEmailJob::dispatch($user, $rawToken);
 
             return response()->json([
                 'message' => 'Registrasi berhasil. Cek email untuk verifikasi.',

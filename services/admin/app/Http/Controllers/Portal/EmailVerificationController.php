@@ -15,7 +15,9 @@ class EmailVerificationController extends Controller
 {
     public function verify(string $token)
     {
-        $verificationToken = EmailVerificationToken::where('token', $token)
+        $hashedToken = hash('sha256', $token);
+        
+        $verificationToken = EmailVerificationToken::where('token', $hashedToken)
             ->where('expires_at', '>', Carbon::now())
             ->whereNull('used_at')
             ->first();

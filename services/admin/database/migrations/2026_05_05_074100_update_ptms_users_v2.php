@@ -15,7 +15,7 @@ return new class extends Migration
             $table->text('use_case')->nullable();
             $table->bigInteger('expected_monthly_volume')->nullable();
             $table->text('approval_notes')->nullable();
-            $table->foreignId('approved_by')->nullable()->constrained('admins')->nullOnDelete();
+            $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
         });
     }
 
