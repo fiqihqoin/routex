@@ -18,18 +18,14 @@ class VendorCredentialController extends Controller
         protected VendorValidationService $validationService
     ) {}
 
-    public function index()
-    {
-        return redirect()->route('portal.dashboard');
-    }
-
-    public function show(string $vendorCode)
+    public function show(Request $request, string $vendorCode)
     {
         $user = Auth::guard('portal')->user();
         $vendor = Vendor::where('code', $vendorCode)->firstOrFail();
         $config = config("vendor_credentials.{$vendorCode}");
 
         if (!$config) {
+            if ($request->wantsJson()) return response()->json(['error' => 'Vendor config not found'], 404);
             abort(404, "Vendor configuration not found.");
         }
 
@@ -39,11 +35,15 @@ class VendorCredentialController extends Controller
                   ->where('user_id', $user->id);
         })->where('vendor_id', $vendor->id)->first();
 
-        return view('portal.vendors.form', [
-            'vendor' => $vendor,
-            'config' => $config,
-            'existingAccount' => $existingAccount,
-        ]);
+        if ($request->wantsJson()) {
+            return response()->json([
+                'vendor' => $vendor,
+                'config' => $config,
+                'account' => $existingAccount,
+            ]);
+        }
+
+        return file_get_contents(public_path('homepage.html'));
     }
 
     public function store(Request $request, string $vendorCode)
@@ -53,16 +53,17 @@ class VendorCredentialController extends Controller
         $config = config("vendor_credentials.{$vendorCode}");
 
         if (!$config) {
-            return back()->withErrors(['error' => 'Vendor configuration not found.']);
+            return response()->json(['error' => 'Vendor configuration not found.'], 404);
         }
 
         $rules = [
             'account_name' => 'required|string|max:255',
+            'credentials' => 'required|array',
         ];
+        
         foreach ($config['fields'] as $field) {
             $key = $field['key'];
             $rule = ($field['required'] ?? false) ? 'required' : 'nullable';
-            
             if ($field['type'] === 'boolean') {
                 $rule .= '|boolean';
             } else {
@@ -77,7 +78,10 @@ class VendorCredentialController extends Controller
         // --- TEST CONNECTION ---
         $validationResult = $this->validationService->validate($vendorCode, $credentials);
         if (!$validationResult->isValid) {
-            return back()->withInput()->withErrors(['credentials' => "Validation failed: " . $validationResult->message]);
+            return response()->json([
+                'message' => 'Connection test failed',
+                'errors' => ['credentials' => [$validationResult->message]]
+            ], 422);
         }
         // -----------------------
 
@@ -120,6 +124,9 @@ class VendorCredentialController extends Controller
 
         Redis::publish('config:update', "merchant-{$user->id}-{$vendorCode}");
 
-        return redirect()->route('portal.dashboard')->with('success', "Credentials for {$vendor->name} are valid and activated.");
+        return response()->json([
+            'message' => "Credentials for {$vendor->name} are valid and activated.",
+            'redirect' => '/portal/vendors'
+        ]);
     }
 }

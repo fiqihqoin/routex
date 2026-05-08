@@ -5,56 +5,47 @@ namespace App\Http\Controllers\Portal;
 use App\Http\Controllers\Controller;
 use App\Models\Vendor;
 use App\Models\VendorAccount;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class VendorController extends Controller
 {
-    public function index()
+    /**
+     * Return JSON for the React Vendor Setup page
+     */
+    public function index(Request $request)
     {
-        $user = Auth::guard('portal')->user();
-        $vendors = Vendor::where('is_active', true)->get();
-        
-        $accounts = VendorAccount::whereIn('id', function($query) use ($user) {
-            $query->select('account_id')
-                  ->from('user_account_assignments')
-                  ->where('user_id', $user->id);
-        })->get()->keyBy('vendor_id');
+        if ($request->wantsJson() || $request->is('api/*')) {
+            $user = Auth::guard('portal')->user();
+            $vendors = Vendor::where('is_active', true)->get();
+            $vendorConfig = config('vendor_credentials');
 
-        return view('portal.vendors.index', [
-            'vendors' => $vendors,
-            'accounts' => $accounts,
-        ]);
-    }
+            // Fetch accounts linked to this user
+            $userAccounts = VendorAccount::whereIn('id', function($query) use ($user) {
+                $query->select('account_id')
+                      ->from('user_account_assignments')
+                      ->where('user_id', $user->id);
+            })->get()->keyBy('vendor_id');
 
-    public function store(Request $request, Vendor $vendor)
-    {
-        $user = Auth::guard('portal')->user();
-        
-        $validated = $request->validate([
-            'credentials' => 'required|array',
-            'account_name' => 'required|string|max:255',
-        ]);
+            $data = $vendors->map(function ($vendor) use ($userAccounts, $vendorConfig) {
+                $account = $userAccounts->get($vendor->id);
+                
+                return [
+                    'id' => $vendor->id,
+                    'code' => $vendor->code,
+                    'name' => $vendor->name,
+                    'is_configured' => !!$account,
+                    'status' => $account ? $account->validation_status : 'not_configured',
+                    'environment' => $account ? $account->environment : null,
+                ];
+            });
 
-        DB::transaction(function () use ($user, $vendor, $validated) {
-            $account = VendorAccount::create([
-                'vendor_id' => $vendor->id,
-                'account_name' => $validated['account_name'],
-                'credentials' => $validated['credentials'],
-                'is_active' => true,
+            return response()->json([
+                'vendors' => $data
             ]);
+        }
 
-            DB::table('user_account_assignments')->insert([
-                'id' => \Illuminate\Support\Str::uuid(),
-                'user_id' => $user->id,
-                'vendor_id' => $vendor->id,
-                'account_id' => $account->id,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        });
-
-        return back()->with('success', 'Vendor configured successfully.');
+        // For direct browser access, serve the SPA shell
+        return file_get_contents(public_path('homepage.html'));
     }
 }

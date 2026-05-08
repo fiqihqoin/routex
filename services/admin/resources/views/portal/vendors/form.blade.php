@@ -3,7 +3,7 @@
 
     <div class="max-w-3xl mx-auto">
         <div class="mb-6">
-            <a href="/portal/dashboard" class="text-sm text-indigo-600 hover:text-indigo-900 flex items-center">
+            <a href="/portal" class="text-sm text-indigo-600 hover:text-indigo-900 flex items-center">
                 &larr; Back to Dashboard
             </a>
         </div>

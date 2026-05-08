@@ -54,7 +54,7 @@ const groups: { label: string; items: Item[] }[] = [
 ];
 
 export const PortalSidebar = () => {
-  const { user } = usePortal();
+  const { user, logout } = usePortal();
   return (
     <aside className="hidden lg:flex fixed inset-y-0 left-0 w-60 flex-col border-r border-portal-border bg-portal-surface z-40">
       <div className="px-5 pt-5 pb-4 border-b border-portal-border">
@@ -114,7 +114,10 @@ export const PortalSidebar = () => {
             <div className="text-[11px] text-portal-text-muted truncate">{user.email}</div>
           </div>
         </div>
-        <button className="mt-1 flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs text-portal-text-muted hover:text-portal-text hover:bg-portal-elev transition-colors">
+        <button 
+          onClick={logout}
+          className="mt-1 flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs text-portal-text-muted hover:text-portal-text hover:bg-portal-elev transition-colors"
+        >
           <LogOut className="h-3.5 w-3.5" />
           Sign out
         </button>

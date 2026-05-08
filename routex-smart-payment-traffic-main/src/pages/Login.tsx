@@ -75,7 +75,7 @@ const Login = () => {
       });
 
       if (response.ok) {
-        window.location.href = "/portal/dashboard";
+        window.location.href = "/portal";
         return;
       }
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Activity,
   CheckCircle2,
@@ -9,6 +9,7 @@ import {
   Settings,
   Bell,
   ArrowRight,
+  Loader2,
 } from "lucide-react";
 import {
   Area,
@@ -26,39 +27,12 @@ import { usePortal } from "@/components/portal/PortalContext";
 import { StatCard, StatusBadge, PortalCard } from "@/components/portal/ui";
 import { cn } from "@/lib/utils";
 
-/* ----- mock data ----- */
+/* ----- mock volume data ----- */
 const volumeData = Array.from({ length: 14 }, (_, i) => {
   const total = 700 + Math.round(Math.sin(i / 2) * 120 + i * 18 + Math.random() * 80);
   const success = Math.round(total * (0.96 + Math.random() * 0.03));
   return { day: `D${i + 1}`, total, success };
 });
-
-const vendors = [
-  { name: "Qoinhub", rate: 96.2, tx: 4821 },
-  { name: "Midtrans", rate: 99.1, tx: 5203 },
-  { name: "Xendit", rate: 94.8, tx: 2823 },
-];
-
-type Health = {
-  name: string;
-  status: "success" | "pending" | "failed";
-  state: string;
-  rt: string;
-  checked: string;
-};
-const health: Health[] = [
-  { name: "Qoinhub", status: "success", state: "Closed", rt: "avg 312ms", checked: "2s ago" },
-  { name: "Midtrans", status: "success", state: "Closed", rt: "avg 248ms", checked: "3s ago" },
-  { name: "Xendit", status: "pending", state: "Half-Open", rt: "avg 540ms", checked: "5s ago" },
-];
-
-const recent = [
-  { id: "ptms-7f2a91", amount: "Rp 150.000", vendor: "Midtrans", time: "2m ago", ok: true },
-  { id: "ptms-3c9b22", amount: "Rp 75.000", vendor: "Xendit", time: "5m ago", ok: true },
-  { id: "ptms-1a4d08", amount: "Rp 500.000", vendor: "Qoinhub", time: "8m ago", ok: true },
-  { id: "ptms-9e7c14", amount: "Rp 240.000", vendor: "Midtrans", time: "11m ago", ok: false },
-  { id: "ptms-5b2f47", amount: "Rp 1.200.000", vendor: "Qoinhub", time: "14m ago", ok: true },
-];
 
 const ranges = ["7d", "30d", "90d", "Custom"] as const;
 type Range = (typeof ranges)[number];
@@ -74,16 +48,42 @@ export default function PortalDashboard() {
 function DashboardContent() {
   const { user } = usePortal();
   const [range, setRange] = useState<Range>("7d");
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<any>(null);
+
   const firstName = user.name.split(" ")[0];
 
+  useEffect(() => {
+    fetch("/portal/dashboard", {
+      headers: { "Accept": "application/json" }
+    })
+      .then(res => res.json())
+      .then(json => {
+        setData(json);
+      })
+      .catch(err => console.error("Failed to fetch dashboard data:", err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading || !data) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-portal-text-muted">
+        <Loader2 className="h-8 w-8 animate-spin mb-4 text-teal" />
+        <p className="text-sm font-mono uppercase tracking-widest">Initialising Dashboard...</p>
+      </div>
+    );
+  }
+
+  const { stats, vendors, health, recent_transactions } = data;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-up">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-portal-text">Dashboard</h1>
           <p className="mt-1 text-sm text-portal-text-muted">
-            Good morning, {firstName}. Here's your payment overview.
+            Welcome, {firstName}. Here's your payment overview.
           </p>
         </div>
         <div
@@ -109,10 +109,10 @@ function DashboardContent() {
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCardIcon icon={Activity} label="Total Transactions" value="12,847" trend={{ value: "+12.4% vs last period", up: true }} />
-        <StatCardIcon icon={CheckCircle2} label="Success Rate" value="99.2%" accent trend={{ value: "+0.3% vs last period", up: true }} />
-        <StatCardIcon icon={TrendingUp} label="Total Volume" value="Rp 4.8M" trend={{ value: "+8.1% vs last period", up: true }} />
-        <StatCardIcon icon={Zap} label="Avg Response Time" value="847ms" trend={{ value: "-12ms vs last period", up: true }} />
+        <StatCardIcon icon={Activity} label="Total Transactions" value={stats.total_transactions} trend={{ value: "+12.4% vs last period", up: true }} />
+        <StatCardIcon icon={CheckCircle2} label="Success Rate" value={stats.success_rate} accent trend={{ value: "+0.3% vs last period", up: true }} />
+        <StatCardIcon icon={TrendingUp} label="Total Volume" value={stats.total_volume} trend={{ value: "+8.1% vs last period", up: true }} />
+        <StatCardIcon icon={Zap} label="Avg Response Time" value={stats.avg_response_time} trend={{ value: "-12ms vs last period", up: true }} />
       </div>
 
       {/* Main */}
@@ -155,7 +155,7 @@ function DashboardContent() {
 
           <PortalCard title="Performance by Vendor" description="Success rate across routing vendors">
             <ul className="space-y-4">
-              {vendors.map((v) => (
+              {vendors.map((v: any) => (
                 <li key={v.name} className="flex items-center gap-4">
                   <div className="h-9 w-9 rounded-lg bg-portal-elev border border-portal-border flex items-center justify-center text-[11px] font-bold text-portal-text-muted shrink-0">
                     {v.name.slice(0, 2).toUpperCase()}
@@ -185,7 +185,7 @@ function DashboardContent() {
         <div className="lg:col-span-2 space-y-6">
           <PortalCard title="Vendor Health" description="Live circuit breaker status">
             <ul className="space-y-3">
-              {health.map((h) => (
+              {health.map((h: any) => (
                 <li
                   key={h.name}
                   className="rounded-lg border border-portal-border bg-portal-elev/60 p-3"
@@ -220,7 +220,7 @@ function DashboardContent() {
             description="Latest activity across all vendors"
           >
             <ul className="divide-y divide-portal-border/60 -mx-1">
-              {recent.map((r) => (
+              {recent_transactions.map((r: any) => (
                 <li key={r.id} className="flex items-center gap-3 px-1 py-2.5">
                   <span
                     className={cn(
@@ -291,8 +291,8 @@ const StatCardIcon = ({
       {value}
     </div>
     {trend && (
-      <div className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-success">
-        <TrendingUp className="h-3 w-3" />
+      <div className={cn("mt-2 inline-flex items-center gap-1 text-[11px] font-medium", trend.up ? "text-success" : "text-danger")}>
+        {trend.up ? <TrendingUp className="h-3 w-3" /> : <TrendingUp className="h-3 w-3 rotate-180" />}
         {trend.value}
       </div>
     )}

@@ -23,7 +23,7 @@ if [ "$HTTP_STATUS" = "200" ]; then
 
     # Now access the dashboard
     echo -e "\n2. Accessing dashboard..."
-    DASHBOARD_RESPONSE=$(curl -X GET https://localhost/portal/dashboard \
+    DASHBOARD_RESPONSE=$(curl -X GET https://localhost/portal \
       -k -s \
       -b portal_cookie.txt \
       -H "Accept: text/html" \
