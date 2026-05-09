@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
@@ -85,13 +86,59 @@ func (h *TransactionHandler) GetStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tx, err := h.service.GetStatus(r.Context(), transactionID)
+	detail, err := h.service.GetTransactionDetail(r.Context(), transactionID)
 	if err != nil {
 		h.respondWithError(w, r, http.StatusNotFound, errors.New("TRANSACTION_NOT_FOUND"))
 		return
 	}
 
-	h.respondWithJSON(w, http.StatusOK, tx)
+	h.respondWithJSON(w, http.StatusOK, detail)
+}
+
+func (h *TransactionHandler) ListTransactions(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+
+	req := domain.ListTransactionRequest{
+		Page:    1,
+		PerPage: 25,
+		Status:  q.Get("status"),
+		VendorID: q.Get("vendor_id"),
+		Search:  q.Get("search"),
+	}
+
+	if p := q.Get("page"); p != "" {
+		fmt.Sscanf(p, "%d", &req.Page)
+	}
+	if pp := q.Get("per_page"); pp != "" {
+		fmt.Sscanf(pp, "%d", &req.PerPage)
+	}
+
+	if df := q.Get("date_from"); df != "" {
+		if t, err := time.Parse(time.RFC3339, df); err == nil {
+			req.DateFrom = &t
+		}
+	}
+	if dt := q.Get("date_to"); dt != "" {
+		if t, err := time.Parse(time.RFC3339, dt); err == nil {
+			req.DateTo = &t
+		}
+	}
+
+	res, err := h.service.ListTransactions(r.Context(), req)
+	if err != nil {
+		h.respondWithError(w, r, http.StatusInternalServerError, err)
+		return
+	}
+
+	h.respondWithJSON(w, http.StatusOK, res)
+}
+
+func (h *TransactionHandler) ListTransactionsInternal(w http.ResponseWriter, r *http.Request) {
+	h.ListTransactions(w, r)
+}
+
+func (h *TransactionHandler) GetTransactionDetailInternal(w http.ResponseWriter, r *http.Request) {
+	h.GetStatus(w, r)
 }
 
 func (h *TransactionHandler) respondWithError(w http.ResponseWriter, r *http.Request, status int, err error) {

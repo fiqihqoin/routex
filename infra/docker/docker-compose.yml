@@ -69,7 +69,8 @@ services:
       REDIS_URL: redis:6379
       PTMS_APP_KEY: base64:H9SO6s8jlpW01g060jiWdVMCuJcK1GhxXpiutlUwzFU=
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
-      ROUTEX_ENVIRONMENT: ${ROUTEX_ENVIRONMENT:-sandbox}
+      ROUTEX_ENVIRONMENT: \${ROUTEX_ENVIRONMENT:-sandbox}
+      INTERNAL_API_SECRET: \${INTERNAL_API_SECRET:-ptms_internal_secret_change_me}
       PORT: "8080"
     depends_on:
       postgres:
@@ -103,6 +104,7 @@ services:
       SESSION_DRIVER: database
       PTMS_APP_KEY: base64:H9SO6s8jlpW01g060jiWdVMCuJcK1GhxXpiutlUwzFU=
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      INTERNAL_API_SECRET: \${INTERNAL_API_SECRET:-ptms_internal_secret_change_me}
     depends_on:
       postgres:
         condition: service_healthy
@@ -129,6 +131,7 @@ services:
       REDIS_PORT: 6379
       REDIS_PASSWORD: ""
       QUEUE_CONNECTION: database
+      INTERNAL_API_SECRET: \${INTERNAL_API_SECRET:-ptms_internal_secret_change_me}
     depends_on:
       postgres:
         condition: service_healthy

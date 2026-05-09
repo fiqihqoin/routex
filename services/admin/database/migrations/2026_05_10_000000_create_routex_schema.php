@@ -162,6 +162,8 @@ return new class extends Migration
             status VARCHAR(20) NOT NULL DEFAULT \'pending_payment\',
             vendor_transaction_id VARCHAR(255),
             qris_code TEXT,
+            callback_delivered BOOLEAN DEFAULT false,
+            reconciliation_attempts INT DEFAULT 0,
             created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
             expires_at TIMESTAMP WITH TIME ZONE,
             paid_at TIMESTAMP WITH TIME ZONE,

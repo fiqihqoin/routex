@@ -7,6 +7,7 @@ use App\Http\Controllers\Portal\DashboardController;
 use App\Http\Controllers\Portal\VendorController;
 use App\Http\Controllers\Portal\VendorCredentialController;
 use App\Http\Controllers\Portal\ApiKeyController;
+use App\Http\Controllers\Portal\TransactionController;
 use Illuminate\Support\Facades\Route;
 
 // React SPA Routes (Frontend shell)
@@ -32,6 +33,14 @@ Route::middleware('auth:portal')->group(function () {
                 Route::post('/generate', [ApiKeyController::class, 'generate'])->name('generate');
                 Route::delete('/{keyId}/revoke', [ApiKeyController::class, 'revoke'])->name('revoke');
                 Route::patch('/{keyId}/name', [ApiKeyController::class, 'updateName'])->name('update-name');
+            });
+
+        // Transactions API
+        Route::prefix('transactions')->name('transactions.')
+            ->group(function () {
+                Route::get('/', [TransactionController::class, 'index'])->name('index');
+                Route::get('/stats', [TransactionController::class, 'stats'])->name('stats');
+                Route::get('/{transactionId}', [TransactionController::class, 'show'])->name('show');
             });
     });
 

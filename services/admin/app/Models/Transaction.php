@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Transaction extends Model
 {
@@ -25,6 +26,8 @@ class Transaction extends Model
         'status',
         'vendor_transaction_id',
         'qris_code',
+        'callback_delivered',
+        'reconciliation_attempts',
         'expires_at',
         'paid_at',
         'expired_at',
@@ -33,6 +36,8 @@ class Transaction extends Model
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'callback_delivered' => 'boolean',
+        'reconciliation_attempts' => 'integer',
         'expires_at' => 'datetime',
         'paid_at' => 'datetime',
         'expired_at' => 'datetime',
@@ -40,6 +45,8 @@ class Transaction extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    protected $appends = ['status_color'];
 
     public function merchant(): BelongsTo
     {
@@ -54,5 +61,23 @@ class Transaction extends Model
     public function vendorCredential(): BelongsTo
     {
         return $this->belongsTo(MerchantVendorCredential::class, 'vendor_credential_id');
+    }
+
+    public function events(): HasMany
+    {
+        return $this->hasMany(TransactionEvent::class, 'transaction_id', 'transaction_id')
+            ->orderBy('created_at', 'asc');
+    }
+
+    public function getStatusColorAttribute(): string
+    {
+        return match ($this->status) {
+            'paid' => 'teal',
+            'pending_payment' => 'amber',
+            'failed' => 'red',
+            'expired' => 'gray',
+            'expired_stale' => 'orange',
+            default => 'gray',
+        };
     }
 }

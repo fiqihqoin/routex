@@ -134,7 +134,15 @@ func main() {
 		r.Group(func(r chi.Router) {
 			r.Use(APIKeyMiddleware(dbPool, rdb))
 			r.Post("/transactions", txHandler.GenerateQRIS)
+			r.Get("/transactions", txHandler.ListTransactions)
 			r.Get("/transactions/{id}", txHandler.GetStatus)
+		})
+
+		// Service-to-Service Internal API
+		r.Group(func(r chi.Router) {
+			r.Use(InternalAuthMiddleware(os.Getenv("INTERNAL_API_SECRET")))
+			r.Get("/internal/transactions", txHandler.ListTransactionsInternal)
+			r.Get("/internal/transactions/{id}", txHandler.GetTransactionDetailInternal)
 		})
 	})
 
@@ -259,3 +267,27 @@ func bin2hex(n int) string {
 	rand.Read(b)
 	return hex.EncodeToString(b)
 }
+
+func InternalAuthMiddleware(secret string) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if secret == "" || r.Header.Get("X-Internal-Secret") != secret {
+				respondError(w, r, 403, "INTERNAL_AUTH_FAILED", "Invalid internal secret")
+				return
+			}
+
+			merchantID := r.Header.Get("X-Merchant-ID")
+			environment := r.Header.Get("X-Environment")
+
+			if merchantID == "" || environment == "" {
+				respondError(w, r, 400, "MISSING_HEADERS", "X-Merchant-ID and X-Environment required")
+				return
+			}
+
+			ctx := context.WithValue(r.Context(), domain.ContextKeyMerchantID, merchantID)
+			ctx = context.WithValue(ctx, domain.ContextKeyEnvironment, environment)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
+}
+

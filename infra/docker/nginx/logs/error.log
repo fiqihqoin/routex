@@ -1130,3 +1130,26 @@
 2026/05/09 15:14:23 [warn] 22#22: *89 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/api-keys HTTP/1.1", host: "localhost", referrer: "https://localhost/portal/api-keys"
 2026/05/09 15:14:24 [warn] 22#22: *89 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/api-keys HTTP/1.1", host: "localhost", referrer: "https://localhost/portal/api-keys"
 2026/05/09 15:14:30 [warn] 21#21: *84 delaying request, excess: 0.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", host: "localhost", referrer: "https://localhost/portal/api-keys"
+2026/05/09 16:06:40 [error] 21#21: *124 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "HEAD /portal/transactions HTTP/1.1", upstream: "fastcgi://172.18.0.8:9000", host: "localhost"
+2026/05/09 16:07:07 [error] 21#21: *126 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "HEAD /portal/transactions HTTP/1.1", upstream: "fastcgi://172.18.0.8:9000", host: "localhost"
+2026/05/09 16:07:27 [notice] 1#1: signal 3 (SIGQUIT) received, shutting down
+2026/05/09 16:07:27 [notice] 21#21: gracefully shutting down
+2026/05/09 16:07:27 [notice] 22#22: gracefully shutting down
+2026/05/09 16:07:27 [notice] 21#21: exiting
+2026/05/09 16:07:27 [notice] 22#22: exiting
+2026/05/09 16:07:27 [notice] 21#21: exit
+2026/05/09 16:07:27 [notice] 22#22: exit
+2026/05/09 16:07:27 [notice] 1#1: signal 17 (SIGCHLD) received from 22
+2026/05/09 16:07:27 [notice] 1#1: worker process 22 exited with code 0
+2026/05/09 16:07:27 [notice] 1#1: signal 29 (SIGIO) received
+2026/05/09 16:07:27 [notice] 1#1: signal 17 (SIGCHLD) received from 21
+2026/05/09 16:07:27 [notice] 1#1: worker process 21 exited with code 0
+2026/05/09 16:07:27 [notice] 1#1: exit
+2026/05/09 16:07:28 [notice] 1#1: using the "epoll" event method
+2026/05/09 16:07:28 [notice] 1#1: nginx/1.29.8
+2026/05/09 16:07:28 [notice] 1#1: built by gcc 15.2.0 (Alpine 15.2.0) 
+2026/05/09 16:07:28 [notice] 1#1: OS: Linux 6.8.0-100-generic
+2026/05/09 16:07:28 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1024:524288
+2026/05/09 16:07:28 [notice] 1#1: start worker processes
+2026/05/09 16:07:28 [notice] 1#1: start worker process 21
+2026/05/09 16:07:28 [notice] 1#1: start worker process 22

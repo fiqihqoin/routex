@@ -4,8 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"sync"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
 	"github.com/truechain/ptms/transaction-api/internal/domain"
@@ -226,6 +228,165 @@ func (r *postgresTransactionRepo) IncrementReconciliationAttempt(ctx context.Con
 	query := "UPDATE transactions SET reconciliation_attempts = reconciliation_attempts + 1, updated_at = NOW() WHERE transaction_id = $1 AND created_at = $2"
 	_, err := r.db.Exec(ctx, query, transactionID, createdAt)
 	return err
+}
+
+func (r *postgresTransactionRepo) ListTransactions(ctx context.Context, req domain.ListTransactionRequest) ([]domain.TransactionSummary, int, error) {
+	// Base criteria for partition pruning
+	lookback := time.Now().Add(-90 * 24 * time.Hour)
+	if req.DateFrom != nil && req.DateFrom.Before(lookback) {
+		lookback = *req.DateFrom
+	}
+
+	where := "WHERE t.merchant_id = $1 AND t.environment = $2 AND t.created_at >= $3"
+	args := []interface{}{req.MerchantID, req.Environment, lookback}
+	argCount := 3
+
+	if req.Status != "" {
+		argCount++
+		where += fmt.Sprintf(" AND t.status = $%d", argCount)
+		args = append(args, req.Status)
+	}
+
+	if req.VendorID != "" {
+		argCount++
+		where += fmt.Sprintf(" AND t.vendor_id = $%d", argCount)
+		args = append(args, req.VendorID)
+	}
+
+	if req.DateFrom != nil {
+		argCount++
+		where += fmt.Sprintf(" AND t.created_at >= $%d", argCount)
+		args = append(args, *req.DateFrom)
+	}
+
+	if req.DateTo != nil {
+		argCount++
+		where += fmt.Sprintf(" AND t.created_at <= $%d", argCount)
+		args = append(args, *req.DateTo)
+	}
+
+	if req.Search != "" {
+		argCount++
+		where += fmt.Sprintf(" AND t.transaction_id ILIKE $%d", argCount)
+		args = append(args, "%"+req.Search+"%")
+	}
+
+	var (
+		transactions []domain.TransactionSummary
+		total        int
+		errData      error
+		errCount     error
+		wg           sync.WaitGroup
+	)
+
+	// 1. Parallel Count Query
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		countQuery := "SELECT COUNT(*) FROM transactions t " + where
+		errCount = r.db.QueryRow(ctx, countQuery, args...).Scan(&total)
+	}()
+
+	// 2. Parallel Data Query
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		query := `SELECT 
+			t.id, t.transaction_id, t.amount, t.currency,
+			t.payment_channel, t.status, t.vendor_id,
+			v.code as vendor_code, t.environment,
+			t.routing_reason, t.vendor_transaction_id,
+			t.created_at, t.paid_at, t.expired_at
+		FROM transactions t
+		LEFT JOIN vendors v ON v.id = t.vendor_id ` + where + ` 
+		ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`
+		
+		offset := (req.Page - 1) * req.PerPage
+		dataArgs := append(args, req.PerPage, offset)
+		dataQuery := fmt.Sprintf(query, argCount+1, argCount+2)
+
+		var rows pgx.Rows
+		rows, errData = r.db.Query(ctx, dataQuery, dataArgs...)
+		if errData != nil {
+			return
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			var t domain.TransactionSummary
+			err := rows.Scan(
+				&t.ID, &t.TransactionID, &t.Amount, &t.Currency,
+				&t.PaymentChannel, &t.Status, &t.VendorID,
+				&t.VendorCode, &t.Environment,
+				&t.RoutingReason, &t.VendorTransactionID,
+				&t.CreatedAt, &t.PaidAt, &t.ExpiredAt,
+			)
+			if err != nil {
+				errData = err
+				return
+			}
+			transactions = append(transactions, t)
+		}
+	}()
+
+	wg.Wait()
+
+	if errCount != nil {
+		return nil, 0, errCount
+	}
+	if errData != nil {
+		return nil, 0, errData
+	}
+
+	return transactions, total, nil
+}
+
+func (r *postgresTransactionRepo) GetTransactionDetail(ctx context.Context, transactionID string, merchantID string) (*domain.TransactionDetail, error) {
+	query := `SELECT 
+		t.id, t.transaction_id, t.amount, t.currency,
+		t.payment_channel, t.status, t.vendor_id,
+		v.code as vendor_code, t.environment,
+		t.routing_reason, t.vendor_transaction_id,
+		t.created_at, t.paid_at, t.expired_at,
+		t.qris_code, t.expires_at, t.callback_delivered, t.reconciliation_attempts
+	FROM transactions t
+	LEFT JOIN vendors v ON v.id = t.vendor_id
+	WHERE t.transaction_id = $1 AND t.merchant_id = $2`
+	
+	detail := &domain.TransactionDetail{}
+	err := r.db.QueryRow(ctx, query, transactionID, merchantID).Scan(
+		&detail.ID, &detail.TransactionID, &detail.Amount, &detail.Currency,
+		&detail.PaymentChannel, &detail.Status, &detail.VendorID,
+		&detail.VendorCode, &detail.Environment,
+		&detail.RoutingReason, &detail.VendorTransactionID,
+		&detail.CreatedAt, &detail.PaidAt, &detail.ExpiredAt,
+		&detail.QRISCode, &detail.ExpiresAt, &detail.CallbackDelivered, &detail.ReconciliationAttempts,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	// Fetch Events
+	eventQuery := `SELECT id, transaction_id, event_type, event_data, created_at 
+		FROM transaction_events 
+		WHERE transaction_id = $1 
+		ORDER BY created_at ASC`
+	
+	rows, err := r.db.Query(ctx, eventQuery, transactionID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var e domain.TransactionEvent
+		if err := rows.Scan(&e.ID, &e.TransactionID, &e.EventType, &e.Payload, &e.CreatedAt); err != nil {
+			return nil, err
+		}
+		detail.Events = append(detail.Events, e)
+	}
+
+	return detail, nil
 }
 
 func (r *postgresTransactionRepo) GetMerchantVendorCredentials(ctx context.Context, credentialID string) (string, error) {

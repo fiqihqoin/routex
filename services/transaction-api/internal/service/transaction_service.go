@@ -261,9 +261,50 @@ func (s *transactionService) callVendorAPI(ctx context.Context, vendorObj domain
 	fmt.Printf("[TxService] Vendor %s returned success\n", vendorObj.Code)
 	return resp.QRISCode, nil
 }
-
 func (s *transactionService) GetStatus(ctx context.Context, transactionID string) (*domain.Transaction, error) {
 	return s.repo.GetByID(ctx, transactionID)
+}
+
+func (s *transactionService) ListTransactions(ctx context.Context, req domain.ListTransactionRequest) (*domain.ListTransactionResponse, error) {
+	merchantID, _ := ctx.Value(domain.ContextKeyMerchantID).(string)
+	env, _ := ctx.Value(domain.ContextKeyEnvironment).(string)
+
+	req.MerchantID = merchantID
+	req.Environment = env
+
+	if req.Page <= 0 {
+		req.Page = 1
+	}
+	if req.PerPage <= 0 {
+		req.PerPage = 25
+	}
+	if req.PerPage > 100 {
+		req.PerPage = 100
+	}
+
+	data, total, err := s.repo.ListTransactions(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	totalPages := (total + req.PerPage - 1) / req.PerPage
+
+	return &domain.ListTransactionResponse{
+		Data: data,
+		Meta: domain.PaginationMeta{
+			Total:      total,
+			Page:       req.Page,
+			PerPage:    req.PerPage,
+			TotalPages: totalPages,
+			HasNext:    req.Page < totalPages,
+			HasPrev:    req.Page > 1,
+		},
+	}, nil
+}
+
+func (s *transactionService) GetTransactionDetail(ctx context.Context, transactionID string) (*domain.TransactionDetail, error) {
+	merchantID, _ := ctx.Value(domain.ContextKeyMerchantID).(string)
+	return s.repo.GetTransactionDetail(ctx, transactionID, merchantID)
 }
 
 func (s *transactionService) ReconcileStatus(ctx context.Context, transactionID string) error {

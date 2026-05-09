@@ -87,6 +87,8 @@ type CallbackJob struct {
 type TransactionRepository interface {
 	Create(ctx context.Context, tx *Transaction) error
 	GetByID(ctx context.Context, transactionID string) (*Transaction, error)
+	GetTransactionDetail(ctx context.Context, transactionID string, merchantID string) (*TransactionDetail, error)
+	ListTransactions(ctx context.Context, req ListTransactionRequest) ([]TransactionSummary, int, error)
 	UpdateReadModel(ctx context.Context, tx *Transaction) error
 	StoreEvent(ctx context.Context, transactionID string, eventType EventType, data interface{}) error
 	GetUnprocessedEvents(ctx context.Context, limit int) ([]TransactionEvent, error)
@@ -102,8 +104,62 @@ type TransactionRepository interface {
 type TransactionService interface {
 	GenerateQRIS(ctx context.Context, apiKey string, idempotencyKey string, req CreateTransactionRequest, rawBody []byte) (*Transaction, error)
 	GetStatus(ctx context.Context, transactionID string) (*Transaction, error)
+	GetTransactionDetail(ctx context.Context, transactionID string) (*TransactionDetail, error)
+	ListTransactions(ctx context.Context, req ListTransactionRequest) (*ListTransactionResponse, error)
 	HandleVendorCallback(ctx context.Context, vendorID string, payload []byte, signature string) error
 	ReconcileStatus(ctx context.Context, transactionID string) error
+}
+
+type ListTransactionRequest struct {
+	MerchantID  string
+	Environment string
+	Page        int
+	PerPage     int
+	Status      string
+	VendorID    string
+	DateFrom    *time.Time
+	DateTo      *time.Time
+	Search      string
+}
+
+type ListTransactionResponse struct {
+	Data []TransactionSummary `json:"data"`
+	Meta PaginationMeta       `json:"meta"`
+}
+
+type TransactionSummary struct {
+	ID                  string     `json:"id"`
+	TransactionID       string     `json:"transaction_id"`
+	Amount              float64    `json:"amount"`
+	Currency            string     `json:"currency"`
+	PaymentChannel      string     `json:"payment_channel"`
+	Status              string     `json:"status"`
+	VendorID            string     `json:"vendor_id"`
+	VendorCode          *string    `json:"vendor_code"`
+	Environment         string     `json:"environment"`
+	RoutingReason       *string    `json:"routing_reason"`
+	VendorTransactionID *string    `json:"vendor_transaction_id,omitempty"`
+	CreatedAt           time.Time  `json:"created_at"`
+	PaidAt              *time.Time `json:"paid_at,omitempty"`
+	ExpiredAt           *time.Time `json:"expired_at,omitempty"`
+}
+
+type TransactionDetail struct {
+	TransactionSummary
+	QRISCode               *string            `json:"qris_code,omitempty"`
+	ExpiresAt              *time.Time         `json:"expires_at,omitempty"`
+	CallbackDelivered      bool               `json:"callback_delivered"`
+	ReconciliationAttempts int                `json:"reconciliation_attempts"`
+	Events                 []TransactionEvent `json:"events"`
+}
+
+type PaginationMeta struct {
+	Total      int  `json:"total"`
+	Page       int  `json:"page"`
+	PerPage    int  `json:"per_page"`
+	TotalPages int  `json:"total_pages"`
+	HasNext    bool `json:"has_next"`
+	HasPrev    bool `json:"has_prev"`
 }
 
 type EventProcessor interface {
