@@ -3,12 +3,17 @@ import { Plug, ArrowRight, Loader2, Settings2 } from "lucide-react";
 import { PortalLayout } from "@/components/portal/PortalLayout";
 import { PortalCard, StatusBadge } from "@/components/portal/ui";
 import { Link } from "react-router-dom";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 
 export default function VendorsPage() {
   const [loading, setLoading] = useState(true);
   const [vendors, setVendors] = useState<any[]>([]);
+  const [toggling, setToggling] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  useEffect(() => {
+  const fetchVendors = () => {
     fetch("/portal/vendors", {
       headers: { "Accept": "application/json" }
     })
@@ -16,7 +21,50 @@ export default function VendorsPage() {
       .then(json => setVendors(json.vendors || []))
       .catch(err => console.error("Vendors fetch error:", err))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchVendors();
   }, []);
+
+  const onToggle = async (code: string, currentStatus: boolean) => {
+    setToggling(code);
+    try {
+      const res = await fetch(`/portal/vendors/${code}/toggle`, {
+        method: "PATCH",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        }
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok) {
+        setVendors(prev => prev.map(v => 
+          v.code === code ? { ...v, is_active: data.is_active } : v
+        ));
+        toast({
+          title: "Status Updated",
+          description: data.message,
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: data.message || "Failed to toggle vendor status.",
+        });
+      }
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Could not connect to the server.",
+      });
+    } finally {
+      setToggling(null);
+    }
+  };
 
   return (
     <PortalLayout title="Vendor Setup" breadcrumb="Configuration / Vendors">
@@ -40,11 +88,13 @@ export default function VendorsPage() {
                   <div className="h-12 w-12 rounded-xl bg-portal-elev border border-portal-border flex items-center justify-center text-lg font-bold text-portal-text-muted">
                     {v.name.slice(0, 2).toUpperCase()}
                   </div>
-                  {v.is_configured ? (
-                    <StatusBadge status="success">Connected</StatusBadge>
-                  ) : (
-                    <StatusBadge status="inactive">Not Setup</StatusBadge>
-                  )}
+                  <div className="flex flex-col items-end gap-2">
+                    {v.is_configured ? (
+                      <StatusBadge status="success">Connected</StatusBadge>
+                    ) : (
+                      <StatusBadge status="inactive">Not Setup</StatusBadge>
+                    )}
+                  </div>
                 </div>
 
                 <h3 className="text-lg font-semibold text-portal-text">{v.name}</h3>
@@ -54,6 +104,33 @@ export default function VendorsPage() {
                     : `Connect your ${v.name} account to start routing QRIS traffic.`
                   }
                 </p>
+
+                {v.is_configured && (
+                  <div className="mt-6 pt-4 border-t border-portal-border">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label className="text-sm font-medium">
+                          {v.is_active ? "Active" : "Inactive"}
+                        </Label>
+                        <p className="text-[10px] text-portal-text-muted italic">
+                          {v.is_active 
+                            ? "Vendor ini akan dipakai untuk routing transaksi"
+                            : "Vendor ini tidak akan menerima transaksi"
+                          }
+                        </p>
+                      </div>
+                      <div className="flex items-center">
+                        {toggling === v.code && <Loader2 className="h-3 w-3 animate-spin mr-2 text-teal" />}
+                        <Switch 
+                          checked={v.is_active}
+                          onCheckedChange={() => onToggle(v.code, v.is_active)}
+                          disabled={toggling === v.code}
+                          className="data-[state=checked]:bg-teal"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="mt-6">
                   <Link to={`/portal/vendors/${v.code}/credentials`}>

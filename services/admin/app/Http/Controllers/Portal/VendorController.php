@@ -35,6 +35,7 @@ class VendorController extends Controller
                     'code' => $vendor->code,
                     'name' => $vendor->name,
                     'is_configured' => !!$account,
+                    'is_active' => $account ? (bool)$account->is_active : false,
                     'status' => $account ? $account->validation_status : 'not_configured',
                     'environment' => $account ? $account->environment : null,
                 ];

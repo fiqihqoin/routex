@@ -15,11 +15,16 @@ class SendApprovalNotificationJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(protected PtmsUser $user, protected string $apiKey)
-    {}
+    public function __construct(
+        protected PtmsUser $user,
+        protected string $sandboxApiKey,
+        protected string $productionApiKey
+    ) {}
 
     public function handle(): void
     {
-        Mail::to($this->user->email)->send(new ApprovalNotification($this->user, $this->apiKey));
+        Mail::to($this->user->email)->send(
+            new ApprovalNotification($this->user, $this->sandboxApiKey, $this->productionApiKey)
+        );
     }
 }

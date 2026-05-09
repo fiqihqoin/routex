@@ -15,7 +15,8 @@ class ApprovalNotification extends Mailable
 
     public function __construct(
         public PtmsUser $user,
-        public string $apiKey
+        public string $sandboxApiKey,
+        public string $productionApiKey
     ) {}
 
     public function envelope(): Envelope

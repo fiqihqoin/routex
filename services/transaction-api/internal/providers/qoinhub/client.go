@@ -34,20 +34,33 @@ func NewQoinhubAdapter() providers.VendorAdapter {
 	}
 }
 
-type credentials struct {
+type QoinhubCredentials struct {
 	ClientID     string `json:"client_id"`
 	ClientSecret string `json:"client_secret"`
 	MerchantID   string `json:"merchant_id"`
 	TerminalID   string `json:"terminal_id"`
 	PrivateKey   string `json:"private_key"`
 	PublicKey    string `json:"public_key"`
+	IsProduction bool   `json:"is_production"`
+}
+
+// getBaseURL returns the appropriate base URL based on environment
+func (c *QoinhubCredentials) getBaseURL() string {
+	if c.IsProduction {
+		return "https://api.qoinhub.id"
+	}
+	return "https://sandbox.qoinhub.id"
 }
 
 func (a *qoinhubAdapter) GenerateQRIS(ctx context.Context, req providers.GenerateQRISRequest) (*providers.QRISResponse, error) {
-	var creds credentials
+	var creds QoinhubCredentials
 	if err := json.Unmarshal([]byte(req.Credentials), &creds); err != nil {
 		return nil, fmt.Errorf("invalid credentials: %w", err)
 	}
+
+	// Switch base URL based on IsProduction
+	baseURL := creds.getBaseURL()
+	fmt.Printf("[Qoinhub] Environment: IsProduction=%v, BaseURL=%s\n", creds.IsProduction, baseURL)
 
 	// Step 1: Get B2B Access Token
 	accessToken, err := a.getAccessTokenB2B(ctx, creds)
@@ -56,8 +69,8 @@ func (a *qoinhubAdapter) GenerateQRIS(ctx context.Context, req providers.Generat
 	}
 
 	// Step 2: Generate QRIS with SNAP API
-	endpoint := "https://api.qoinhub.id/ordersnap/api/v1.0/qr/qr-mpm-generate"
 	path := "/ordersnap/api/v1.0/qr/qr-mpm-generate"
+	endpoint := baseURL + path
 
 	// Use WIB timezone (Asia/Jakarta, UTC+7)
 	wib := time.FixedZone("WIB", 7*3600)
@@ -170,7 +183,15 @@ func (a *qoinhubAdapter) Validate(ctx context.Context, credsStr string) error {
 	return err
 }
 
-func (a *qoinhubAdapter) CheckStatus(ctx context.Context, vendorTxID string, credentials string) (*providers.StatusResponse, error) {
+func (a *qoinhubAdapter) CheckStatus(ctx context.Context, vendorTxID string, credentialsStr string) (*providers.StatusResponse, error) {
+	var creds QoinhubCredentials
+	if err := json.Unmarshal([]byte(credentialsStr), &creds); err != nil {
+		return nil, fmt.Errorf("invalid credentials: %w", err)
+	}
+
+	baseURL := creds.getBaseURL()
+	fmt.Printf("[Qoinhub] CheckStatus - Environment: IsProduction=%v, BaseURL=%s\n", creds.IsProduction, baseURL)
+
 	return nil, fmt.Errorf("check status not implemented for qoinhub")
 }
 
@@ -199,8 +220,9 @@ func (a *qoinhubAdapter) NormalizeCallback(payload []byte) (*providers.Normalize
 	}, nil
 }
 
-func (a *qoinhubAdapter) getAccessTokenB2B(ctx context.Context, creds credentials) (string, error) {
-	endpoint := "https://api.qoinhub.id/ordersnap/api/v1.0/access-token/b2b"
+func (a *qoinhubAdapter) getAccessTokenB2B(ctx context.Context, creds QoinhubCredentials) (string, error) {
+	baseURL := creds.getBaseURL()
+	endpoint := baseURL + "/ordersnap/api/v1.0/access-token/b2b"
 	timestamp := time.Now().Format("2006-01-02T15:04:05-07:00")
 
 	// Create RSA signature for B2B access token

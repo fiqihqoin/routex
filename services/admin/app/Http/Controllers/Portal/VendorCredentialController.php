@@ -131,4 +131,31 @@ class VendorCredentialController extends Controller
             'redirect' => '/portal/vendors'
         ]);
     }
+
+    public function toggle(Request $request, string $vendorCode)
+    {
+        $user = Auth::guard('portal')->user();
+        $vendor = Vendor::where('code', $vendorCode)->firstOrFail();
+
+        $account = VendorAccount::whereIn('id', function($query) use ($user) {
+            $query->select('account_id')
+                  ->from('user_account_assignments')
+                  ->where('user_id', $user->id);
+        })->where('vendor_id', $vendor->id)->firstOrFail();
+
+        $account->is_active = !$account->is_active;
+        
+        if (!$account->is_active) {
+            $account->validation_status = 'unchecked';
+        }
+
+        $account->save();
+
+        Redis::publish('config:update', "merchant-{$user->id}-{$vendorCode}");
+
+        return response()->json([
+            'is_active' => $account->is_active,
+            'message' => "Vendor {$vendor->name} is now " . ($account->is_active ? 'Active' : 'Inactive') . "."
+        ]);
+    }
 }

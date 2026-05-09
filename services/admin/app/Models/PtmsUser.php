@@ -20,7 +20,8 @@ class PtmsUser extends Authenticatable
         'name',
         'email',
         'password',
-        'api_key',
+        'sandbox_api_key',
+        'production_api_key',
         'callback_url',
         'callback_enabled',
         'is_active',
@@ -43,6 +44,32 @@ class PtmsUser extends Authenticatable
         'email_verified_at' => 'datetime',
         'expected_monthly_volume' => 'integer',
     ];
+
+    public function getApiKeyForEnvironment(string $environment): ?string
+    {
+        return $environment === 'sandbox' ? $this->sandbox_api_key : $this->production_api_key;
+    }
+
+    public static function findByApiKey(string $key): ?array
+    {
+        $user = static::where('sandbox_api_key', $key)->first();
+        if ($user) {
+            return [
+                'user' => $user,
+                'detected_environment' => 'sandbox'
+            ];
+        }
+
+        $user = static::where('production_api_key', $key)->first();
+        if ($user) {
+            return [
+                'user' => $user,
+                'detected_environment' => 'production'
+            ];
+        }
+
+        return null;
+    }
 
     // Manual hash mutator instead of cast
     protected function setPasswordAttribute($value)

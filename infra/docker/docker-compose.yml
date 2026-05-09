@@ -69,6 +69,7 @@ services:
       REDIS_URL: redis:6379
       PTMS_APP_KEY: base64:H9SO6s8jlpW01g060jiWdVMCuJcK1GhxXpiutlUwzFU=
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      ROUTEX_ENVIRONMENT: ${ROUTEX_ENVIRONMENT:-sandbox}
       PORT: "8080"
     depends_on:
       postgres:

@@ -58,7 +58,7 @@ func (r *vendorRegistry) Load(ctx context.Context) error {
 	}
 
 	// 2. Load Accounts from DB
-	accRows, err := r.db.Query(ctx, "SELECT id, vendor_id, account_name, credentials, is_active FROM vendor_accounts WHERE is_active = true")
+	accRows, err := r.db.Query(ctx, "SELECT id, vendor_id, account_name, credentials, is_active, environment FROM vendor_accounts WHERE is_active = true")
 	if err != nil {
 		return fmt.Errorf("failed to query vendor accounts: %w", err)
 	}
@@ -66,7 +66,7 @@ func (r *vendorRegistry) Load(ctx context.Context) error {
 
 	for accRows.Next() {
 		var a domain.VendorAccount
-		if err := accRows.Scan(&a.ID, &a.VendorID, &a.AccountName, &a.Credentials, &a.IsActive); err != nil {
+		if err := accRows.Scan(&a.ID, &a.VendorID, &a.AccountName, &a.Credentials, &a.IsActive, &a.Environment); err != nil {
 			return err
 		}
 
@@ -112,11 +112,11 @@ func (r *vendorRegistry) Load(ctx context.Context) error {
 	return nil
 }
 
-func (r *vendorRegistry) GetEligibleVendors(ctx context.Context, userID string, amount float64, channel string) ([]domain.Vendor, error) {
+func (r *vendorRegistry) GetEligibleVendors(ctx context.Context, userID string, amount float64, channel string, environment string) ([]domain.Vendor, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	log.Printf("[Registry] GetEligibleVendors for user %s, amount %.2f, channel %s", userID, amount, channel)
+	log.Printf("[Registry] GetEligibleVendors for user %s, amount %.2f, channel %s, env %s", userID, amount, channel, environment)
 
 	assignedVendors, ok := r.userVendors[userID]
 	if !ok {
@@ -141,6 +141,21 @@ func (r *vendorRegistry) GetEligibleVendors(ctx context.Context, userID string, 
 			continue
 		}
 
+		// Filter accounts by environment
+		accounts := r.accounts[v.ID]
+		hasMatchingAccount := false
+		for _, acc := range accounts {
+			if environment == "" || acc.Environment == environment {
+				hasMatchingAccount = true
+				break
+			}
+		}
+
+		if !hasMatchingAccount {
+			log.Printf("[Registry]   - No matching account for environment %s", environment)
+			continue
+		}
+
 		allowed, _ := r.cb.AllowRequest(ctx, v.ID)
 		if !allowed {
 			log.Printf("[Registry]   - Circuit breaker blocked")
@@ -155,7 +170,7 @@ func (r *vendorRegistry) GetEligibleVendors(ctx context.Context, userID string, 
 	return eligible, nil
 }
 
-func (r *vendorRegistry) GetAccounts(ctx context.Context, vendorID string) ([]domain.VendorAccount, error) {
+func (r *vendorRegistry) GetAccounts(ctx context.Context, vendorID string, environment string) ([]domain.VendorAccount, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -164,7 +179,19 @@ func (r *vendorRegistry) GetAccounts(ctx context.Context, vendorID string) ([]do
 		return nil, nil
 	}
 
-	return accounts, nil
+	// Filter by environment if specified
+	if environment == "" {
+		return accounts, nil
+	}
+
+	var filtered []domain.VendorAccount
+	for _, acc := range accounts {
+		if acc.Environment == environment {
+			filtered = append(filtered, acc)
+		}
+	}
+
+	return filtered, nil
 }
 
 func (r *vendorRegistry) GetVendor(ctx context.Context, vendorID string) (domain.Vendor, error) {

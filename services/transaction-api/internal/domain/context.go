@@ -3,5 +3,6 @@ package domain
 type contextKey string
 
 const (
-	ContextKeyUserID contextKey = "userID"
+	ContextKeyUserID      contextKey = "userID"
+	ContextKeyEnvironment contextKey = "environment"
 )

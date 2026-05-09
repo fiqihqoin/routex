@@ -30,6 +30,11 @@ type transactionService struct {
 	rdb           *redis.Client
 	publisher     messaging.Publisher
 	db            *pgxpool.Pool
+	config        Config
+}
+
+type Config struct {
+	Environment string
 }
 
 func NewTransactionService(
@@ -42,6 +47,7 @@ func NewTransactionService(
 	rdb *redis.Client,
 	publisher messaging.Publisher,
 	db *pgxpool.Pool,
+	config Config,
 ) domain.TransactionService {
 	return &transactionService{
 		repo:          repo,
@@ -53,6 +59,7 @@ func NewTransactionService(
 		rdb:           rdb,
 		publisher:     publisher,
 		db:            db,
+		config:        config,
 	}
 }
 
@@ -60,7 +67,7 @@ func (s *transactionService) GenerateQRIS(ctx context.Context, apiKey string, id
 	start := time.Now()
 	var selectedVendorID string
 
-	fmt.Printf("[GenerateQRIS] START - Amount: %.2f, Channel: %s\n", req.Amount, req.PaymentChannel)
+	fmt.Printf("[GenerateQRIS] START - Amount: %.2f, Channel: %s, Env: %s\n", req.Amount, req.PaymentChannel, s.config.Environment)
 
 	defer func() {
 		if selectedVendorID != "" {
@@ -91,6 +98,13 @@ func (s *transactionService) GenerateQRIS(ctx context.Context, apiKey string, id
 
 	userID, _ := ctx.Value(domain.ContextKeyUserID).(string)
 
+	// Step 5: Read environment from context
+	env, _ := ctx.Value(domain.ContextKeyEnvironment).(string)
+	if env == "" {
+		env = "sandbox" // Default to sandbox for safety
+	}
+	fmt.Printf("[GenerateQRIS] Using environment: %s\n", env)
+
 	rlReq := domain.RateLimitRequest{
 		UserID: userID,
 		Amount: req.Amount,
@@ -101,7 +115,8 @@ func (s *transactionService) GenerateQRIS(ctx context.Context, apiKey string, id
 		return nil, domain.ErrRateLimited
 	}
 
-	eligible, err := s.registry.GetEligibleVendors(ctx, userID, req.Amount, req.PaymentChannel)
+	// Step 6: Filter eligible vendors by environment from context
+	eligible, err := s.registry.GetEligibleVendors(ctx, userID, req.Amount, req.PaymentChannel, env)
 	if err != nil {
 		fmt.Printf("[GenerateQRIS] GetEligibleVendors error: %v\n", err)
 		return nil, domain.ErrNoEligibleVendor
@@ -121,16 +136,17 @@ func (s *transactionService) GenerateQRIS(ctx context.Context, apiKey string, id
 	fmt.Printf("[TxService] Ranked vendors count: %d\n", len(ranked))
 	for i, v := range ranked {
 		fmt.Printf("[TxService] Trying vendor #%d: %s (ID: %s)\n", i+1, v.Code, v.ID)
-		accounts, err := s.registry.GetAccounts(ctx, v.ID)
+		// Step 7: Filter accounts by environment
+		accounts, err := s.registry.GetAccounts(ctx, v.ID, env)
 		if err != nil {
 			fmt.Printf("[TxService] Failed to get accounts for vendor %s: %v\n", v.Code, err)
 			continue
 		}
 		if len(accounts) == 0 {
-			fmt.Printf("[TxService] No accounts found for vendor %s\n", v.Code)
+			fmt.Printf("[TxService] No accounts found for vendor %s in environment %s\n", v.Code, env)
 			continue
 		}
-		fmt.Printf("[TxService] Found %d accounts for vendor %s\n", len(accounts), v.Code)
+		fmt.Printf("[TxService] Found %d accounts for vendor %s in environment %s\n", len(accounts), v.Code, env)
 		acc, err := s.selector.SelectAccount(ctx, v.ID, accounts)
 		if err == nil {
 			selectedAccount = acc

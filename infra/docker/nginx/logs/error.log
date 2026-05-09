@@ -721,3 +721,42 @@
 2026/05/08 20:24:49 [warn] 22#22: *735 delaying request, excess: 2.850, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /livewire/livewire.js?id=6d832aed HTTP/1.1", host: "localhost", referrer: "https://localhost/admin/transactions"
 2026/05/08 20:24:49 [warn] 21#21: *724 delaying request, excess: 3.060, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
 2026/05/08 20:24:49 [warn] 22#22: *734 delaying request, excess: 4.050, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/09 03:27:12 [notice] 1#1: signal 3 (SIGQUIT) received, shutting down
+2026/05/09 03:27:12 [notice] 21#21: gracefully shutting down
+2026/05/09 03:27:12 [notice] 22#22: gracefully shutting down
+2026/05/09 03:27:12 [notice] 21#21: exiting
+2026/05/09 03:27:12 [notice] 22#22: exiting
+2026/05/09 03:27:12 [notice] 21#21: exit
+2026/05/09 03:27:12 [notice] 22#22: exit
+2026/05/09 03:27:12 [notice] 1#1: signal 17 (SIGCHLD) received from 21
+2026/05/09 03:27:12 [notice] 1#1: worker process 21 exited with code 0
+2026/05/09 03:27:12 [notice] 1#1: worker process 22 exited with code 0
+2026/05/09 03:27:12 [notice] 1#1: exit
+2026/05/09 03:27:13 [notice] 1#1: using the "epoll" event method
+2026/05/09 03:27:13 [notice] 1#1: nginx/1.29.8
+2026/05/09 03:27:13 [notice] 1#1: built by gcc 15.2.0 (Alpine 15.2.0) 
+2026/05/09 03:27:13 [notice] 1#1: OS: Linux 6.8.0-100-generic
+2026/05/09 03:27:13 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1024:524288
+2026/05/09 03:27:13 [notice] 1#1: start worker processes
+2026/05/09 03:27:13 [notice] 1#1: start worker process 21
+2026/05/09 03:27:13 [notice] 1#1: start worker process 22
+2026/05/09 03:43:42 [warn] 21#21: *6 delaying request, excess: 0.340, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/forms/forms.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/09 03:43:42 [warn] 21#21: *19 delaying request, excess: 1.160, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/filament/app.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/09 03:43:42 [warn] 22#22: *20 delaying request, excess: 2.140, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /css/filament/support/support.css?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/09 03:43:42 [warn] 22#22: *21 delaying request, excess: 3.140, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/notifications/notifications.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/09 03:43:42 [warn] 21#21: *26 delaying request, excess: 4.120, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/echo.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/09 03:43:42 [warn] 21#21: *27 delaying request, excess: 5.110, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/filament/app.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/09 03:43:42 [warn] 21#21: *6 delaying request, excess: 5.920, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /js/filament/support/support.js?v=3.3.50.0 HTTP/1.1", host: "localhost"
+2026/05/09 03:43:46 [warn] 21#21: *6 delaying request, excess: 0.060, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-EbYsVzPu.js HTTP/1.1", host: "localhost", referrer: "https://localhost/"
+2026/05/09 03:43:46 [warn] 21#21: *27 delaying request, excess: 1.040, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-hra5q1hY.css HTTP/1.1", host: "localhost", referrer: "https://localhost/"
+2026/05/09 03:43:53 [warn] 21#21: *27 delaying request, excess: 0.400, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-EbYsVzPu.js HTTP/1.1", host: "localhost", referrer: "https://localhost/portal"
+2026/05/09 03:43:53 [warn] 21#21: *6 delaying request, excess: 1.350, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-hra5q1hY.css HTTP/1.1", host: "localhost", referrer: "https://localhost/portal"
+2026/05/09 03:43:53 [warn] 21#21: *6 delaying request, excess: 0.490, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal HTTP/1.1", host: "localhost", referrer: "https://localhost/portal"
+2026/05/09 03:43:54 [warn] 21#21: *27 delaying request, excess: 0.620, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal HTTP/1.1", host: "localhost", referrer: "https://localhost/portal"
+2026/05/09 03:44:07 [warn] 21#21: *6 delaying request, excess: 0.940, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-hra5q1hY.css HTTP/1.1", host: "localhost", referrer: "https://localhost/portal/api-keys-page"
+2026/05/09 03:44:37 [warn] 21#21: *27 delaying request, excess: 0.940, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-hra5q1hY.css HTTP/1.1", host: "localhost", referrer: "https://localhost/portal/api-keys-page"
+2026/05/09 04:04:44 [warn] 21#21: *65 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-EbYsVzPu.js HTTP/1.1", host: "localhost", referrer: "https://localhost/portal/api-keys-page"
+2026/05/09 04:05:24 [warn] 21#21: *76 delaying request, excess: 0.970, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-hra5q1hY.css HTTP/1.1", host: "localhost", referrer: "https://localhost/portal"
+2026/05/09 04:05:24 [warn] 21#21: *76 delaying request, excess: 0.390, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal HTTP/1.1", host: "localhost", referrer: "https://localhost/portal"
+2026/05/09 05:52:34 [warn] 22#22: *95 delaying request, excess: 0.540, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-hra5q1hY.css HTTP/1.1", host: "localhost", referrer: "https://localhost/login"
+2026/05/09 05:52:34 [warn] 21#21: *91 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.18.0.1, server: localhost, request: "GET /assets/index-EbYsVzPu.js HTTP/1.1", upstream: "http://172.18.0.7:9000/assets/index-EbYsVzPu.js", host: "localhost", referrer: "https://localhost/login"

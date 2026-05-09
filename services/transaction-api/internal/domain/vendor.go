@@ -19,6 +19,7 @@ type VendorAccount struct {
 	AccountName string    `json:"account_name"`
 	Credentials string    `json:"credentials"`
 	IsActive    bool      `json:"is_active"`
+	Environment string    `json:"environment"`
 }
 
 type RoutingRule struct {
@@ -68,8 +69,8 @@ type AccountSelector interface {
 
 type VendorRegistry interface {
 	Load(ctx context.Context) error
-	GetEligibleVendors(ctx context.Context, userID string, amount float64, channel string) ([]Vendor, error)
-	GetAccounts(ctx context.Context, vendorID string) ([]VendorAccount, error)
+	GetEligibleVendors(ctx context.Context, userID string, amount float64, channel string, environment string) ([]Vendor, error)
+	GetAccounts(ctx context.Context, vendorID string, environment string) ([]VendorAccount, error)
 	WatchConfigUpdates(ctx context.Context)
 	GetVendor(ctx context.Context, vendorID string) (Vendor, error)
 }

@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -56,7 +59,24 @@ func main() {
 	routerEngine.Load(ctx)
 	limiter.Load(ctx)
 
-	txService := service.NewTransactionService(txRepo, registry, routerEngine, selector, limiter, vendorFactory, rdb, publisher, dbPool)
+	routeEnv := os.Getenv("ROUTEX_ENVIRONMENT")
+	if routeEnv == "" {
+		routeEnv = "sandbox"
+	}
+	log.Printf("Starting with ROUTEX_ENVIRONMENT: %s", routeEnv)
+
+	txService := service.NewTransactionService(
+		txRepo,
+		registry,
+		routerEngine,
+		selector,
+		limiter,
+		vendorFactory,
+		rdb,
+		publisher,
+		dbPool,
+		service.Config{Environment: routeEnv},
+	)
 	eventProcessor := service.NewEventProcessor(txRepo)
 	callbackConsumer, _ := service.NewCallbackConsumer(os.Getenv("RABBITMQ_URL"), txRepo)
 	sweeper := service.NewReconciliationSweeper(txRepo, txService)
@@ -125,41 +145,117 @@ func APIKeyMiddleware(db *pgxpool.Pool, rdb *redis.Client) func(http.Handler) ht
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			apiKey := r.Header.Get("X-API-Key")
 			if apiKey == "" {
-				respondError(w, 401, "MISSING_API_KEY", "API key required")
+				respondError(w, r, 401, "MISSING_API_KEY", "API key required")
 				return
 			}
+
+			// Step 1: Detect environment from API key prefix
+			var prefixEnv string
+			if strings.HasPrefix(apiKey, "ptms_sb_") {
+				prefixEnv = "sandbox"
+			} else if strings.HasPrefix(apiKey, "ptms_live_") {
+				prefixEnv = "production"
+			} else {
+				respondError(w, r, 401, "INVALID_API_KEY", "Invalid API key format")
+				return
+			}
+
 			cacheKey := "apikey:" + apiKey
-			userID, err := rdb.Get(r.Context(), cacheKey).Result()
+			cached, err := rdb.Get(r.Context(), cacheKey).Result()
+			
+			var userID, detectedEnv string
+
 			if err != nil {
+				// Step 2: Query DB for validation
 				var id string
 				var isActive bool
+				var sandboxKey, productionKey *string
+
 				dbErr := db.QueryRow(r.Context(),
-					"SELECT id, is_active FROM ptms_users WHERE api_key = $1", apiKey,
-				).Scan(&id, &isActive)
+					`SELECT id, is_active, sandbox_api_key, production_api_key
+					 FROM ptms_users
+					 WHERE sandbox_api_key = $1 OR production_api_key = $1`,
+					apiKey,
+				).Scan(&id, &isActive, &sandboxKey, &productionKey)
+
 				if dbErr != nil {
-					respondError(w, 403, "INVALID_API_KEY", "Invalid API key")
+					respondError(w, r, 403, "INVALID_API_KEY", "Invalid API key")
 					return
 				}
 				if !isActive {
-					respondError(w, 403, "USER_DISABLED", "User account is disabled")
+					respondError(w, r, 403, "USER_DISABLED", "User account is disabled")
 					return
 				}
+
+				if sandboxKey != nil && *sandboxKey == apiKey {
+					detectedEnv = "sandbox"
+				} else if productionKey != nil && *productionKey == apiKey {
+					detectedEnv = "production"
+				} else {
+					respondError(w, r, 403, "INVALID_API_KEY", "Invalid API key")
+					return
+				}
+
 				userID = id
-				rdb.Set(r.Context(), cacheKey, userID, 5*time.Minute)
+				rdb.Set(r.Context(), cacheKey, userID+"|"+detectedEnv, 5*time.Minute)
+			} else {
+				parts := strings.Split(cached, "|")
+				if len(parts) == 2 {
+					userID = parts[0]
+					detectedEnv = parts[1]
+				} else {
+					userID = parts[0]
+					// Re-query to get environment if not in cache
+					db.QueryRow(r.Context(),
+						"SELECT CASE WHEN sandbox_api_key = $1 THEN 'sandbox' ELSE 'production' END FROM ptms_users WHERE id = $2",
+						apiKey, userID,
+					).Scan(&detectedEnv)
+				}
 			}
+
+			// Step 3: Compare detected env with X-Routex-Environment header
+			nginxEnv := r.Header.Get("X-Routex-Environment")
+			if nginxEnv != "" && nginxEnv != detectedEnv {
+				message := "API key ini adalah production key. Gunakan routex.id"
+				if detectedEnv == "sandbox" {
+					message = "API key ini adalah sandbox key. Gunakan sandbox.routex.id"
+				}
+				respondError(w, r, 403, "ENVIRONMENT_MISMATCH", message)
+				return
+			}
+
+			// Validate prefix matches detected environment
+			if prefixEnv != detectedEnv {
+				respondError(w, r, 403, "ENVIRONMENT_MISMATCH", "API key prefix does not match the key type")
+				return
+			}
+
+			// Step 4: Save environment to context
 			ctx := context.WithValue(r.Context(), domain.ContextKeyUserID, userID)
+			ctx = context.WithValue(ctx, domain.ContextKeyEnvironment, detectedEnv)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
 }
 
-func respondError(w http.ResponseWriter, status int, code string, message string) {
+func respondError(w http.ResponseWriter, r *http.Request, status int, code string, message string) {
+	traceID := r.Header.Get("X-Trace-ID")
+	if traceID == "" {
+		traceID = "tr_" + bin2hex(12)
+	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"error": map[string]interface{}{
-			"code":    code,
-			"message": message,
+			"code":     code,
+			"message":  message,
+			"trace_id": traceID,
 		},
 	})
+}
+
+func bin2hex(n int) string {
+	b := make([]byte, n)
+	rand.Read(b)
+	return hex.EncodeToString(b)
 }

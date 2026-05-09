@@ -65,10 +65,18 @@ class PtmsUserResource extends Resource
 
                 Forms\Components\Section::make('Admin Control')
                     ->schema([
-                        Forms\Components\TextInput::make('api_key')
+                        Forms\Components\TextInput::make('sandbox_api_key')
+                            ->label('Sandbox API Key')
                             ->password()
                             ->revealable()
-                            ->disabled(),
+                            ->disabled()
+                            ->helperText('Key untuk testing di sandbox.routex.id'),
+                        Forms\Components\TextInput::make('production_api_key')
+                            ->label('Production API Key')
+                            ->password()
+                            ->revealable()
+                            ->disabled()
+                            ->helperText('Key untuk transaksi real di api.routex.id'),
                         Forms\Components\Textarea::make('approval_notes')->columnSpanFull(),
                         Forms\Components\Select::make('approved_by')
                             ->relationship('approvedBy', 'name')
@@ -119,23 +127,25 @@ class PtmsUserResource extends Resource
                             Forms\Components\Textarea::make('approval_notes')->label('Internal Admin Notes'),
                         ])
                         ->action(function (PtmsUser $record, array $data): void {
-                            // Generate API Key: ptms_ + 32 bytes hex
-                            $apiKey = 'ptms_' . bin2hex(random_bytes(32));
+                            // Generate TWO API Keys: sandbox and production
+                            $sandboxApiKey = 'rx_sbx_' . bin2hex(random_bytes(24));
+                            $productionApiKey = 'rx_prod_' . bin2hex(random_bytes(24));
 
                             $record->update([
                                 'status' => 'active',
                                 'is_active' => true,
                                 'approved_by' => auth()->id(),
                                 'approval_notes' => $data['approval_notes'] ?? $record->approval_notes,
-                                'api_key' => $apiKey,
+                                'sandbox_api_key' => $sandboxApiKey,
+                                'production_api_key' => $productionApiKey,
                             ]);
 
-                            // Dispatch Approval Notification Job
-                            SendApprovalNotificationJob::dispatch($record, $apiKey);
+                            // Dispatch Approval Notification Job with both keys
+                            SendApprovalNotificationJob::dispatch($record, $sandboxApiKey, $productionApiKey);
 
                             Notification::make()
                                 ->title('Merchant Approved')
-                                ->body('API Key has been generated and the merchant has been notified.')
+                                ->body('Sandbox and Production API Keys have been generated and the merchant has been notified.')
                                 ->success()
                                 ->send();
                         }),
