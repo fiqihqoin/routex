@@ -15,26 +15,33 @@ import (
 
 type xenditAdapter struct {
 	httpClient *http.Client
+	baseURL    string
 }
 
-func NewXenditAdapter() providers.VendorAdapter {
+func NewXenditAdapter(baseURL string) providers.VendorAdapter {
 	return &xenditAdapter{
 		httpClient: &http.Client{
 			Timeout: 30 * time.Second,
 		},
+		baseURL: baseURL,
 	}
 }
 
 type credentials struct {
 	SecretKey    string `json:"secret_key"`
 	WebhookToken string `json:"webhook_token"`
-	IsProduction bool   `json:"is_production"`
+	IsProduction *bool  `json:"is_production,omitempty"`
 }
 
 func (a *xenditAdapter) GenerateQRIS(ctx context.Context, req providers.GenerateQRISRequest) (*providers.QRISResponse, error) {
 	var creds credentials
 	if err := json.Unmarshal([]byte(req.Credentials), &creds); err != nil {
 		return nil, fmt.Errorf("invalid credentials: %w", err)
+	}
+
+	baseURL := a.baseURL
+	if creds.IsProduction != nil {
+		baseURL = "https://api.xendit.co"
 	}
 
 	// Xendit requires minimum amount of 1500
@@ -58,10 +65,10 @@ func (a *xenditAdapter) GenerateQRIS(ctx context.Context, req providers.Generate
 	bodyBytes, _ := json.Marshal(bodyMap)
 
 	fmt.Printf("[Xendit] QRIS Request:\n")
-	fmt.Printf("  Endpoint: https://api.xendit.co/qr_codes\n")
+	fmt.Printf("  Endpoint: %s/qr_codes\n", baseURL)
 	fmt.Printf("  Body: %s\n", string(bodyBytes))
 
-	httpReq, err := http.NewRequestWithContext(ctx, "POST", "https://api.xendit.co/qr_codes", bytes.NewBuffer(bodyBytes))
+	httpReq, err := http.NewRequestWithContext(ctx, "POST", baseURL+"/qr_codes", bytes.NewBuffer(bodyBytes))
 	if err != nil {
 		return nil, err
 	}

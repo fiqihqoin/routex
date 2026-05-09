@@ -24,13 +24,15 @@ import (
 
 type qoinhubAdapter struct {
 	httpClient *http.Client
+	baseURL    string
 }
 
-func NewQoinhubAdapter() providers.VendorAdapter {
+func NewQoinhubAdapter(baseURL string) providers.VendorAdapter {
 	return &qoinhubAdapter{
 		httpClient: &http.Client{
 			Timeout: 30 * time.Second,
 		},
+		baseURL: baseURL,
 	}
 }
 
@@ -44,23 +46,14 @@ type QoinhubCredentials struct {
 	IsProduction bool   `json:"is_production"`
 }
 
-// getBaseURL returns the appropriate base URL based on environment
-func (c *QoinhubCredentials) getBaseURL() string {
-	if c.IsProduction {
-		return "https://api.qoinhub.id"
-	}
-	return "https://sandbox.qoinhub.id"
-}
-
 func (a *qoinhubAdapter) GenerateQRIS(ctx context.Context, req providers.GenerateQRISRequest) (*providers.QRISResponse, error) {
 	var creds QoinhubCredentials
 	if err := json.Unmarshal([]byte(req.Credentials), &creds); err != nil {
 		return nil, fmt.Errorf("invalid credentials: %w", err)
 	}
 
-	// Switch base URL based on IsProduction
-	baseURL := creds.getBaseURL()
-	fmt.Printf("[Qoinhub] Environment: IsProduction=%v, BaseURL=%s\n", creds.IsProduction, baseURL)
+	baseURL := a.baseURL
+	fmt.Printf("[Qoinhub] Environment: BaseURL=%s\n", baseURL)
 
 	// Step 1: Get B2B Access Token
 	accessToken, err := a.getAccessTokenB2B(ctx, creds)
@@ -184,14 +177,7 @@ func (a *qoinhubAdapter) Validate(ctx context.Context, credsStr string) error {
 }
 
 func (a *qoinhubAdapter) CheckStatus(ctx context.Context, vendorTxID string, credentialsStr string) (*providers.StatusResponse, error) {
-	var creds QoinhubCredentials
-	if err := json.Unmarshal([]byte(credentialsStr), &creds); err != nil {
-		return nil, fmt.Errorf("invalid credentials: %w", err)
-	}
-
-	baseURL := creds.getBaseURL()
-	fmt.Printf("[Qoinhub] CheckStatus - Environment: IsProduction=%v, BaseURL=%s\n", creds.IsProduction, baseURL)
-
+	fmt.Printf("[Qoinhub] CheckStatus - BaseURL=%s\n", a.baseURL)
 	return nil, fmt.Errorf("check status not implemented for qoinhub")
 }
 
@@ -221,7 +207,7 @@ func (a *qoinhubAdapter) NormalizeCallback(payload []byte) (*providers.Normalize
 }
 
 func (a *qoinhubAdapter) getAccessTokenB2B(ctx context.Context, creds QoinhubCredentials) (string, error) {
-	baseURL := creds.getBaseURL()
+	baseURL := a.baseURL
 	endpoint := baseURL + "/ordersnap/api/v1.0/access-token/b2b"
 	timestamp := time.Now().Format("2006-01-02T15:04:05-07:00")
 

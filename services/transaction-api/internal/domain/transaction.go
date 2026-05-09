@@ -26,7 +26,8 @@ type Transaction struct {
 	MerchantID             string            `json:"merchant_id"`
 	Environment            string            `json:"environment"`
 	VendorID               string            `json:"vendor_id"`
-	AccountID              string            `json:"account_id"`
+	VendorCredentialID     string            `json:"vendor_credential_id"`
+	RoutingReason          string            `json:"routing_reason"`
 	Amount                 float64           `json:"amount"`
 	Currency               string            `json:"currency"`
 	PaymentChannel         string            `json:"payment_channel"`
@@ -36,6 +37,8 @@ type Transaction struct {
 	QRISCode               string            `json:"qris_code"`
 	ExpiresAt              *time.Time        `json:"expires_at"`
 	PaidAt                 *time.Time        `json:"paid_at"`
+	ExpiredAt              *time.Time        `json:"expired_at"`
+	FailedAt               *time.Time        `json:"failed_at"`
 	CallbackDelivered      bool              `json:"callback_delivered"`
 	ReconciliationAttempts int               `json:"reconciliation_attempts"`
 	CreatedAt              time.Time         `json:"created_at"`
@@ -88,13 +91,12 @@ type TransactionRepository interface {
 	StoreEvent(ctx context.Context, transactionID string, eventType EventType, data interface{}) error
 	GetUnprocessedEvents(ctx context.Context, limit int) ([]TransactionEvent, error)
 	MarkEventProcessed(ctx context.Context, eventID string) error
-	UpdatePenalty(ctx context.Context, vendorID string, accountID string, points int) error
+	UpdatePenalty(ctx context.Context, vendorID string, credentialID string, points int) error
 	GetEffectivePenalties(ctx context.Context) (map[string]int, error)
-	DisableUserCallback(ctx context.Context, userID string) error
+	DisableMerchantCallback(ctx context.Context, merchantID string) error
 	GetPendingForReconciliation(ctx context.Context, olderThan time.Duration, limit int) ([]Transaction, error)
-	IncrementReconciliationAttempt(ctx context.Context, transactionID string) error
-	GetAccountCredentials(ctx context.Context, accountID string) (map[string]interface{}, error)
-	GetEncryptedCredentials(ctx context.Context, accountID string) (string, error)
+	IncrementReconciliationAttempt(ctx context.Context, transactionID string, createdAt time.Time) error
+	GetMerchantVendorCredentials(ctx context.Context, credentialID string) (string, error)
 }
 
 type TransactionService interface {

@@ -18,19 +18,21 @@ import (
 
 type midtransAdapter struct {
 	httpClient *http.Client
+	baseURL    string
 }
 
-func NewMidtransAdapter() providers.VendorAdapter {
+func NewMidtransAdapter(baseURL string) providers.VendorAdapter {
 	return &midtransAdapter{
 		httpClient: &http.Client{
 			Timeout: 5 * time.Second,
 		},
+		baseURL: baseURL,
 	}
 }
 
 type credentials struct {
 	ServerKey    string `json:"server_key"`
-	IsProduction bool   `json:"is_production"`
+	IsProduction *bool  `json:"is_production,omitempty"`
 }
 
 func (a *midtransAdapter) GenerateQRIS(ctx context.Context, req providers.GenerateQRISRequest) (*providers.QRISResponse, error) {
@@ -39,9 +41,13 @@ func (a *midtransAdapter) GenerateQRIS(ctx context.Context, req providers.Genera
 		return nil, fmt.Errorf("invalid credentials: %w", err)
 	}
 
-	baseURL := "https://api.sandbox.midtrans.com"
-	if creds.IsProduction {
-		baseURL = "https://api.midtrans.com"
+	baseURL := a.baseURL
+	if creds.IsProduction != nil {
+		if *creds.IsProduction {
+			baseURL = "https://api.midtrans.com"
+		} else {
+			baseURL = "https://api.sandbox.midtrans.com"
+		}
 	}
 
 	bodyMap := map[string]interface{}{
@@ -111,9 +117,13 @@ func (a *midtransAdapter) Validate(ctx context.Context, credsStr string) error {
 		return err
 	}
 
-	baseURL := "https://api.sandbox.midtrans.com"
-	if creds.IsProduction {
-		baseURL = "https://api.midtrans.com"
+	baseURL := a.baseURL
+	if creds.IsProduction != nil {
+		if *creds.IsProduction {
+			baseURL = "https://api.midtrans.com"
+		} else {
+			baseURL = "https://api.sandbox.midtrans.com"
+		}
 	}
 
 	httpReq, _ := http.NewRequestWithContext(ctx, "GET", baseURL+"/v2/pay/account", nil)

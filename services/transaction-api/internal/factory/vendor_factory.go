@@ -13,7 +13,7 @@ import (
 var ErrUnsupportedVendor = errors.New("ErrUnsupportedVendor: vendor code not recognized")
 
 type VendorFactory interface {
-	Create(vendorCode string, encryptedCredentials string) (providers.VendorAdapter, string, error)
+	Create(vendorCode string, encryptedCredentials string, baseURL string) (providers.VendorAdapter, string, error)
 	CreateForCallback(vendorCode string) (providers.VendorAdapter, error)
 }
 
@@ -23,7 +23,7 @@ func NewVendorFactory() VendorFactory {
 	return &vendorFactory{}
 }
 
-func (f *vendorFactory) Create(vendorCode string, encryptedCredentials string) (providers.VendorAdapter, string, error) {
+func (f *vendorFactory) Create(vendorCode string, encryptedCredentials string, baseURL string) (providers.VendorAdapter, string, error) {
 	decrypted, err := crypto.DecryptRaw(encryptedCredentials)
 	if err != nil {
 		return nil, "", err
@@ -32,11 +32,11 @@ func (f *vendorFactory) Create(vendorCode string, encryptedCredentials string) (
 	var adapter providers.VendorAdapter
 	switch vendorCode {
 	case "QOINHUB":
-		adapter = qoinhub_adapter.NewQoinhubAdapter()
+		adapter = qoinhub_adapter.NewQoinhubAdapter(baseURL)
 	case "MIDTRANS":
-		adapter = midtrans_adapter.NewMidtransAdapter()
+		adapter = midtrans_adapter.NewMidtransAdapter(baseURL)
 	case "XENDIT":
-		adapter = xendit_adapter.NewXenditAdapter()
+		adapter = xendit_adapter.NewXenditAdapter(baseURL)
 	default:
 		return nil, "", ErrUnsupportedVendor
 	}
@@ -45,13 +45,17 @@ func (f *vendorFactory) Create(vendorCode string, encryptedCredentials string) (
 }
 
 func (f *vendorFactory) CreateForCallback(vendorCode string) (providers.VendorAdapter, error) {
+	// For callback validation, we don't usually need the baseURL for outbound calls,
+	// but the constructor requires it now.
+	dummyBaseURL := ""
+
 	switch vendorCode {
 	case "QOINHUB":
-		return qoinhub_adapter.NewQoinhubAdapter(), nil
+		return qoinhub_adapter.NewQoinhubAdapter(dummyBaseURL), nil
 	case "MIDTRANS":
-		return midtrans_adapter.NewMidtransAdapter(), nil
+		return midtrans_adapter.NewMidtransAdapter(dummyBaseURL), nil
 	case "XENDIT":
-		return xendit_adapter.NewXenditAdapter(), nil
+		return xendit_adapter.NewXenditAdapter(dummyBaseURL), nil
 	default:
 		return nil, ErrUnsupportedVendor
 	}

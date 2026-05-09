@@ -13,6 +13,8 @@ class ApiKey extends Model
 
     protected $table = 'api_keys';
 
+    const UPDATED_AT = null;
+
     protected $fillable = [
         'merchant_id',
         'key_hash',

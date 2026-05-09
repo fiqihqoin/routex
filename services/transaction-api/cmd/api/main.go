@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
 	"log"
@@ -72,6 +73,7 @@ func main() {
 		selector,
 		limiter,
 		vendorFactory,
+		cb,
 		rdb,
 		publisher,
 		dbPool,
@@ -149,71 +151,59 @@ func APIKeyMiddleware(db *pgxpool.Pool, rdb *redis.Client) func(http.Handler) ht
 				return
 			}
 
-			// Step 1: Detect environment from API key prefix
-			var prefixEnv string
-			if strings.HasPrefix(apiKey, "ptms_sb_") {
-				prefixEnv = "sandbox"
-			} else if strings.HasPrefix(apiKey, "ptms_live_") {
-				prefixEnv = "production"
-			} else {
+			// Detect environment from API key prefix
+			if !strings.HasPrefix(apiKey, "ptms_sb_") && !strings.HasPrefix(apiKey, "ptms_live_") {
 				respondError(w, r, 401, "INVALID_API_KEY", "Invalid API key format")
 				return
 			}
 
-			cacheKey := "apikey:" + apiKey
+			keyHash := sha256.Sum256([]byte(apiKey))
+			keyHashHex := hex.EncodeToString(keyHash[:])
+
+			cacheKey := "apikey:" + keyHashHex
 			cached, err := rdb.Get(r.Context(), cacheKey).Result()
 			
-			var userID, detectedEnv string
+			var merchantID, detectedEnv, keyID string
 
 			if err != nil {
-				// Step 2: Query DB for validation
-				var id string
-				var isActive bool
-				var sandboxKey, productionKey *string
+				// Query api_keys table
+				err = db.QueryRow(r.Context(),
+					`SELECT merchant_id, environment, id 
+					 FROM api_keys 
+					 WHERE key_hash = $1 
+					   AND revoked_at IS NULL 
+					   AND (expires_at IS NULL OR expires_at > NOW())`,
+					keyHashHex,
+				).Scan(&merchantID, &detectedEnv, &keyID)
 
-				dbErr := db.QueryRow(r.Context(),
-					`SELECT id, is_active, sandbox_api_key, production_api_key
-					 FROM merchants
-					 WHERE sandbox_api_key = $1 OR production_api_key = $1`,
-					apiKey,
-				).Scan(&id, &isActive, &sandboxKey, &productionKey)
-
-				if dbErr != nil {
-					respondError(w, r, 403, "INVALID_API_KEY", "Invalid API key")
-					return
-				}
-				if !isActive {
-					respondError(w, r, 403, "USER_DISABLED", "User account is disabled")
-					return
-				}
-
-				if sandboxKey != nil && *sandboxKey == apiKey {
-					detectedEnv = "sandbox"
-				} else if productionKey != nil && *productionKey == apiKey {
-					detectedEnv = "production"
-				} else {
+				if err != nil {
 					respondError(w, r, 403, "INVALID_API_KEY", "Invalid API key")
 					return
 				}
 
-				userID = id
-				rdb.Set(r.Context(), cacheKey, userID+"|"+detectedEnv, 5*time.Minute)
+				// Check merchant status
+				var mStatus string
+				err = db.QueryRow(r.Context(),
+					"SELECT status FROM merchants WHERE id = $1 AND deleted_at IS NULL",
+					merchantID,
+				).Scan(&mStatus)
+
+				if err != nil || mStatus != "active" {
+					respondError(w, r, 403, "MERCHANT_NOT_ACTIVE", "Merchant account is not active")
+					return
+				}
+
+				rdb.Set(r.Context(), cacheKey, merchantID+"|"+detectedEnv+"|"+keyID, 5*time.Minute)
 			} else {
 				parts := strings.Split(cached, "|")
-				if len(parts) == 2 {
-					userID = parts[0]
+				if len(parts) == 3 {
+					merchantID = parts[0]
 					detectedEnv = parts[1]
-				} else {
-					userID = parts[0]
-					// Re-query to get environment if not in cache
-					db.QueryRow(r.Context(),
-						"SELECT CASE WHEN sandbox_api_key = $1 THEN 'sandbox' ELSE 'production' END FROM merchants WHERE id = $2",
-						apiKey, userID,
-					).Scan(&detectedEnv)
+					keyID = parts[2]
 				}
 			}
 
-			// Step 3: Compare detected env with X-Routex-Environment header
+			// Compare detected env with X-Routex-Environment header
 			nginxEnv := r.Header.Get("X-Routex-Environment")
 			if nginxEnv != "" && nginxEnv != detectedEnv {
 				message := "API key ini adalah production key. Gunakan routex.id"
@@ -224,14 +214,13 @@ func APIKeyMiddleware(db *pgxpool.Pool, rdb *redis.Client) func(http.Handler) ht
 				return
 			}
 
-			// Validate prefix matches detected environment
-			if prefixEnv != detectedEnv {
-				respondError(w, r, 403, "ENVIRONMENT_MISMATCH", "API key prefix does not match the key type")
-				return
-			}
+			// Update last_used_at async
+			go func(kID string) {
+				db.Exec(context.Background(), "UPDATE api_keys SET last_used_at = NOW() WHERE id = $1", kID)
+			}(keyID)
 
-			// Step 4: Save environment to context
-			ctx := context.WithValue(r.Context(), domain.ContextKeyMerchantID, userID)
+			// Step 4: Save environment and merchantID to context
+			ctx := context.WithValue(r.Context(), domain.ContextKeyMerchantID, merchantID)
 			ctx = context.WithValue(ctx, domain.ContextKeyEnvironment, detectedEnv)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})

@@ -3,19 +3,19 @@ import { useNavigate } from "react-router-dom";
 
 type Env = "sandbox" | "production";
 
-type User = {
+type Merchant = {
+  id?: string;
   name: string;
   email: string;
   company: string;
-  sandbox_api_key?: string;
-  production_api_key?: string;
+  merchant_id?: string;
 };
 
 type PortalCtx = {
   env: Env;
   setEnv: (e: Env) => void;
-  user: User;
-  setUser: (u: User) => void;
+  user: Merchant;
+  setUser: (u: Merchant) => void;
   loading: boolean;
   logout: () => Promise<void>;
 };
@@ -31,12 +31,10 @@ function getCookie(name: string) {
 export const PortalProvider = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
   const [env, setEnv] = useState<Env>("sandbox");
-  const [user, setUser] = useState<User>({ 
+  const [user, setUser] = useState<Merchant>({ 
     name: "Loading...", 
     email: "", 
     company: "",
-    sandbox_api_key: "",
-    production_api_key: ""
   });
   const [loading, setLoading] = useState(true);
 

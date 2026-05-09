@@ -30,32 +30,31 @@ class RegisterController extends Controller
         ]);
 
         return DB::transaction(function () use ($validated) {
-            $user = Merchant::create([
+            $merchant = Merchant::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
-                'password' => $validated['password'],
+                'password_hash' => $validated['password'], 
                 'company_name' => $validated['company_name'],
                 'use_case' => $validated['use_case'],
                 'expected_monthly_volume' => $validated['expected_monthly_volume'],
                 'status' => 'pending_verification',
-                'is_active' => false,
-                'api_key' => Str::random(32),
             ]);
 
             $rawToken = Str::random(60);
             $hashedToken = hash('sha256', $rawToken);
 
             EmailVerificationToken::create([
-                'merchant_id' => $user->id,
-                'token' => $hashedToken,
+                'merchant_id' => $merchant->id,
+                'token_hash' => $hashedToken,
                 'expires_at' => Carbon::now()->addHours(24),
+                'created_at' => now(),
             ]);
 
-            SendVerificationEmailJob::dispatch($user, $rawToken);
+            SendVerificationEmailJob::dispatch($merchant, $rawToken);
 
             return response()->json([
                 'message' => 'Registrasi berhasil. Cek email untuk verifikasi.',
-                'user_id' => $user->id
+                'merchant_id' => $merchant->id
             ], 201);
         });
     }

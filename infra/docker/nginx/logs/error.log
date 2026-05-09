@@ -876,3 +876,67 @@
 2026/05/09 07:48:00 [warn] 22#22: *501 delaying request, excess: 0.970, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/vendors/QOINHUB/credentials HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/vendors/QOINHUB/credentials"
 2026/05/09 07:48:02 [warn] 21#21: *505 delaying request, excess: 0.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/vendors/QOINHUB/credentials HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/vendors/QOINHUB/credentials"
 2026/05/09 07:48:04 [warn] 22#22: *509 delaying request, excess: 0.980, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/vendors/QOINHUB/credentials"
+2026/05/09 10:28:36 [warn] 21#21: *512 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/vendors/QOINHUB/credentials HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/vendors/QOINHUB/credentials"
+2026/05/09 11:21:52 [warn] 22#22: *520 delaying request, excess: 0.580, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-EbYsVzPu.js HTTP/1.1", host: "localhost", referrer: "https://localhost/login"
+2026/05/09 11:21:52 [warn] 22#22: *524 delaying request, excess: 1.370, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-hra5q1hY.css HTTP/1.1", host: "localhost", referrer: "https://localhost/login"
+2026/05/09 11:24:59 [notice] 1#1: signal 3 (SIGQUIT) received, shutting down
+2026/05/09 11:24:59 [notice] 21#21: gracefully shutting down
+2026/05/09 11:24:59 [notice] 22#22: gracefully shutting down
+2026/05/09 11:24:59 [notice] 21#21: exiting
+2026/05/09 11:24:59 [notice] 22#22: exiting
+2026/05/09 11:24:59 [notice] 22#22: exit
+2026/05/09 11:24:59 [notice] 21#21: exit
+2026/05/09 11:24:59 [notice] 1#1: signal 17 (SIGCHLD) received from 21
+2026/05/09 11:24:59 [notice] 1#1: worker process 21 exited with code 0
+2026/05/09 11:24:59 [notice] 1#1: worker process 22 exited with code 0
+2026/05/09 11:24:59 [notice] 1#1: exit
+2026/05/09 11:34:55 [notice] 1#1: using the "epoll" event method
+2026/05/09 11:34:55 [notice] 1#1: nginx/1.29.8
+2026/05/09 11:34:55 [notice] 1#1: built by gcc 15.2.0 (Alpine 15.2.0) 
+2026/05/09 11:34:55 [notice] 1#1: OS: Linux 6.8.0-100-generic
+2026/05/09 11:34:55 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1024:524288
+2026/05/09 11:34:55 [notice] 1#1: start worker processes
+2026/05/09 11:34:55 [notice] 1#1: start worker process 21
+2026/05/09 11:34:55 [notice] 1#1: start worker process 22
+2026/05/09 11:39:19 [error] 22#22: *1 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "POST /portal/register HTTP/1.1", upstream: "http://172.18.0.6:9000/portal/register", host: "localhost"
+2026/05/09 11:41:58 [error] 21#21: *3 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "POST /portal/register HTTP/1.1", upstream: "http://172.18.0.6:9000/portal/register", host: "localhost"
+2026/05/09 11:44:44 [error] 22#22: *5 recv() failed (104: Connection reset by peer) while reading response header from upstream, client: 172.18.0.1, server: localhost, request: "POST /portal/register HTTP/1.1", upstream: "http://172.18.0.6:9000/portal/register", host: "localhost"
+2026/05/09 11:46:02 [notice] 40#40: signal process started
+2026/05/09 11:46:02 [notice] 1#1: signal 1 (SIGHUP) received from 40, reconfiguring
+2026/05/09 11:46:02 [notice] 1#1: reconfiguring
+2026/05/09 11:46:02 [notice] 1#1: using the "epoll" event method
+2026/05/09 11:46:02 [notice] 1#1: start worker processes
+2026/05/09 11:46:02 [notice] 1#1: start worker process 46
+2026/05/09 11:46:02 [notice] 1#1: start worker process 47
+2026/05/09 11:46:02 [notice] 21#21: gracefully shutting down
+2026/05/09 11:46:02 [notice] 22#22: gracefully shutting down
+2026/05/09 11:46:02 [notice] 21#21: exiting
+2026/05/09 11:46:02 [notice] 22#22: exiting
+2026/05/09 11:46:02 [notice] 21#21: exit
+2026/05/09 11:46:02 [notice] 22#22: exit
+2026/05/09 11:46:02 [notice] 1#1: signal 17 (SIGCHLD) received from 21
+2026/05/09 11:46:02 [notice] 1#1: worker process 21 exited with code 0
+2026/05/09 11:46:02 [notice] 1#1: worker process 22 exited with code 0
+2026/05/09 11:46:02 [notice] 1#1: signal 29 (SIGIO) received
+2026/05/09 11:46:02 [notice] 1#1: signal 17 (SIGCHLD) received from 22
+2026/05/09 11:50:11 [notice] 1#1: signal 3 (SIGQUIT) received, shutting down
+2026/05/09 11:50:11 [notice] 47#47: gracefully shutting down
+2026/05/09 11:50:11 [notice] 46#46: gracefully shutting down
+2026/05/09 11:50:11 [notice] 46#46: exiting
+2026/05/09 11:50:11 [notice] 46#46: exit
+2026/05/09 11:50:11 [notice] 47#47: exiting
+2026/05/09 11:50:11 [notice] 47#47: exit
+2026/05/09 11:50:11 [notice] 1#1: signal 17 (SIGCHLD) received from 46
+2026/05/09 11:50:11 [notice] 1#1: worker process 46 exited with code 0
+2026/05/09 11:50:11 [notice] 1#1: signal 29 (SIGIO) received
+2026/05/09 11:50:11 [notice] 1#1: signal 17 (SIGCHLD) received from 47
+2026/05/09 11:50:11 [notice] 1#1: worker process 47 exited with code 0
+2026/05/09 11:50:11 [notice] 1#1: exit
+2026/05/09 11:50:34 [notice] 1#1: using the "epoll" event method
+2026/05/09 11:50:34 [notice] 1#1: nginx/1.29.8
+2026/05/09 11:50:34 [notice] 1#1: built by gcc 15.2.0 (Alpine 15.2.0) 
+2026/05/09 11:50:34 [notice] 1#1: OS: Linux 6.8.0-100-generic
+2026/05/09 11:50:34 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1024:524288
+2026/05/09 11:50:34 [notice] 1#1: start worker processes
+2026/05/09 11:50:34 [notice] 1#1: start worker process 21
+2026/05/09 11:50:34 [notice] 1#1: start worker process 22

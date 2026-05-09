@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\MerchantResource\Pages;
 use App\Models\Merchant;
+use App\Models\ApiKey;
 use App\Jobs\SendApprovalNotificationJob;
 use App\Jobs\SendRejectionNotificationJob;
 use Filament\Forms;
@@ -46,10 +47,9 @@ class MerchantResource extends Resource
                                 'pending_verification' => 'Pending Verification',
                                 'pending_approval' => 'Pending Approval',
                                 'active' => 'Active',
+                                'suspended' => 'Suspended',
                                 'rejected' => 'Rejected',
                             ])->required(),
-                        Forms\Components\Toggle::make('is_active')
-                            ->label('System Access Enabled'),
                     ])->columns(2),
 
                 Forms\Components\Section::make('Registration Details')
@@ -57,30 +57,21 @@ class MerchantResource extends Resource
                         Forms\Components\Textarea::make('use_case')->columnSpanFull(),
                         Forms\Components\TextInput::make('expected_monthly_volume')
                             ->numeric()
-                            ->prefix('IDR')
-                            ->helperText('Estimated monthly transaction volume'),
+                            ->prefix('IDR'),
+                        Forms\Components\TextInput::make('industry'),
+                        Forms\Components\TextInput::make('phone_number'),
                         Forms\Components\DateTimePicker::make('email_verified_at')->disabled(),
-                        Forms\Components\DateTimePicker::make('created_at')->disabled(),
                     ])->columns(2),
 
                 Forms\Components\Section::make('Admin Control')
                     ->schema([
-                        Forms\Components\TextInput::make('sandbox_api_key')
-                            ->label('Sandbox API Key')
-                            ->password()
-                            ->revealable()
-                            ->disabled()
-                            ->helperText('Key untuk testing di sandbox.routex.id'),
-                        Forms\Components\TextInput::make('production_api_key')
-                            ->label('Production API Key')
-                            ->password()
-                            ->revealable()
-                            ->disabled()
-                            ->helperText('Key untuk transaksi real di api.routex.id'),
                         Forms\Components\Textarea::make('approval_notes')->columnSpanFull(),
                         Forms\Components\Select::make('approved_by')
                             ->relationship('approvedBy', 'name')
                             ->disabled(),
+                        Forms\Components\DateTimePicker::make('approved_at')->disabled(),
+                        Forms\Components\DateTimePicker::make('suspended_at')->disabled(),
+                        Forms\Components\Textarea::make('suspension_reason')->columnSpanFull(),
                     ])->columns(2),
             ]);
     }
@@ -90,6 +81,7 @@ class MerchantResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('email')->searchable(),
                 Tables\Columns\TextColumn::make('company_name')->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
@@ -97,10 +89,9 @@ class MerchantResource extends Resource
                         'pending_verification' => 'gray',
                         'pending_approval' => 'amber',
                         'active' => 'green',
+                        'suspended' => 'warning',
                         'rejected' => 'red',
                     }),
-                Tables\Columns\IconColumn::make('is_active')->boolean(),
-                Tables\Columns\TextColumn::make('expected_monthly_volume')->money('IDR'),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
             ])
             ->filters([
@@ -109,6 +100,7 @@ class MerchantResource extends Resource
                         'pending_verification' => 'Pending Verification',
                         'pending_approval' => 'Pending Approval',
                         'active' => 'Active',
+                        'suspended' => 'Suspended',
                         'rejected' => 'Rejected',
                     ]),
             ])
@@ -127,25 +119,23 @@ class MerchantResource extends Resource
                             Forms\Components\Textarea::make('approval_notes')->label('Internal Admin Notes'),
                         ])
                         ->action(function (Merchant $record, array $data): void {
-                            // Generate TWO API Keys: sandbox and production
-                            $sandboxApiKey = 'rx_sbx_' . bin2hex(random_bytes(24));
-                            $productionApiKey = 'rx_prod_' . bin2hex(random_bytes(24));
+                            // Generate API Keys
+                            $sbResult = ApiKey::generate($record->id, 'sandbox', 'Default Sandbox');
+                            $prodResult = ApiKey::generate($record->id, 'production', 'Default Production');
 
                             $record->update([
                                 'status' => 'active',
-                                'is_active' => true,
                                 'approved_by' => auth()->id(),
+                                'approved_at' => now(),
                                 'approval_notes' => $data['approval_notes'] ?? $record->approval_notes,
-                                'sandbox_api_key' => $sandboxApiKey,
-                                'production_api_key' => $productionApiKey,
                             ]);
 
-                            // Dispatch Approval Notification Job with both keys
-                            SendApprovalNotificationJob::dispatch($record, $sandboxApiKey, $productionApiKey);
+                            // Dispatch Approval Notification Job with plain keys
+                            SendApprovalNotificationJob::dispatch($record, $sbResult['plain'], $prodResult['plain']);
 
                             Notification::make()
                                 ->title('Merchant Approved')
-                                ->body('Sandbox and Production API Keys have been generated and the merchant has been notified.')
+                                ->body('API Keys have been generated and the merchant has been notified.')
                                 ->success()
                                 ->send();
                         }),
@@ -164,7 +154,6 @@ class MerchantResource extends Resource
                         ->action(function (Merchant $record, array $data): void {
                             $record->update([
                                 'status' => 'rejected',
-                                'is_active' => false,
                                 'approved_by' => auth()->id(),
                                 'approval_notes' => $data['approval_notes'],
                             ]);

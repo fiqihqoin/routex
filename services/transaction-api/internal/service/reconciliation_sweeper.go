@@ -58,7 +58,7 @@ func (s *reconciliationSweeper) sweep(ctx context.Context) {
 		}
 
 		// 3. Increment Attempt Count
-		s.repo.IncrementReconciliationAttempt(ctx, tx.TransactionID)
+		s.repo.IncrementReconciliationAttempt(ctx, tx.TransactionID, tx.CreatedAt)
 		s.repo.StoreEvent(ctx, tx.TransactionID, domain.EventSweeperChecked, nil)
 
 		// 4. Reconcile with Vendor

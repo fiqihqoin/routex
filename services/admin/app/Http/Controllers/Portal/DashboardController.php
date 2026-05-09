@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
-use App\Models\UserAccountAssignment;
+use App\Models\MerchantVendorCredential;
 use App\Models\Vendor;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -18,21 +18,26 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         if ($request->wantsJson() || $request->is('api/*')) {
-            $user = Auth::guard('portal')->user();
+            $merchant = Auth::guard('portal')->user();
             $environment = $request->header('X-Routex-Environment', 'sandbox');
+
+            // Fetch API keys for display
+            $apiKeys = $merchant->apiKeys()
+                ->whereNull('revoked_at')
+                ->get();
 
             return response()->json([
                 'user' => [
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'company' => $user->company_name,
-                    'sandbox_api_key' => $user->sandbox_api_key,
-                    'production_api_key' => $user->production_api_key,
+                    'name' => $merchant->name,
+                    'email' => $merchant->email,
+                    'company' => $merchant->company_name,
+                    'sandbox_api_key' => $apiKeys->where('environment', 'sandbox')->first()?->key_prefix . '...',
+                    'production_api_key' => $apiKeys->where('environment', 'production')->first()?->key_prefix . '...',
                 ],
-                'stats' => $this->getStats($user, $environment),
-                'vendors' => $this->getVendorPerformance($user, $environment),
+                'stats' => $this->getStats($merchant, $environment),
+                'vendors' => $this->getVendorPerformance($merchant, $environment),
                 'health' => $this->getVendorHealth(),
-                'recent_transactions' => $this->getRecentTransactions($user, $environment),
+                'recent_transactions' => $this->getRecentTransactions($merchant, $environment),
             ]);
         }
 
@@ -40,15 +45,14 @@ class DashboardController extends Controller
         return file_get_contents(public_path('homepage.html'));
     }
 
-    private function getStats($user, $environment)
+    private function getStats($merchant, $environment)
     {
-        $accountIds = UserAccountAssignment::where('user_id', $user->id)
-            ->whereIn('account_id', function($query) use ($environment) {
-                $query->select('id')->from('vendor_accounts')->where('environment', $environment);
-            })
-            ->pluck('account_id');
+        $txQuery = Transaction::where('merchant_id', $merchant->id)
+            ->where('environment', $environment);
 
-        if ($accountIds->isEmpty()) {
+        $total = $txQuery->count();
+        
+        if ($total === 0) {
             return [
                 'total_transactions' => '0',
                 'success_rate' => '0%',
@@ -57,16 +61,12 @@ class DashboardController extends Controller
             ];
         }
 
-        $txQuery = Transaction::whereIn('account_id', $accountIds);
-
-        $total = $txQuery->count();
         $paid = $txQuery->clone()->where('status', 'paid')->count();
-        $successRate = $total > 0 ? round(($paid / $total) * 100, 1) : 0;
+        $successRate = round(($paid / $total) * 100, 1);
         $volume = $txQuery->clone()->where('status', 'paid')->sum('amount');
 
-        // Note: Real latency data is currently only in Go service/Redis.
-        // We'll return a sensible default or mock for now.
-        $avgRT = $total > 0 ? '425ms' : '-';
+        // Latency placeholder
+        $avgRT = '425ms';
 
         return [
             'total_transactions' => number_format($total),
@@ -76,21 +76,12 @@ class DashboardController extends Controller
         ];
     }
 
-    private function getVendorPerformance($user, $environment)
+    private function getVendorPerformance($merchant, $environment)
     {
-        $accountIds = UserAccountAssignment::where('user_id', $user->id)
-            ->whereIn('account_id', function($query) use ($environment) {
-                $query->select('id')->from('vendor_accounts')->where('environment', $environment);
-            })
-            ->pluck('account_id');
-
-        if ($accountIds->isEmpty()) {
-            return [];
-        }
-
         $vendorStats = DB::table('transactions')
             ->join('vendors', 'transactions.vendor_id', '=', 'vendors.id')
-            ->whereIn('transactions.account_id', $accountIds)
+            ->where('transactions.merchant_id', $merchant->id)
+            ->where('transactions.environment', $environment)
             ->select(
                 'vendors.name',
                 DB::raw('COUNT(*) as tx'),
@@ -110,7 +101,7 @@ class DashboardController extends Controller
 
     private function getVendorHealth()
     {
-        $vendors = Vendor::all();
+        $vendors = Vendor::where('is_active', true)->get();
 
         return $vendors->map(function ($vendor) {
             return [
@@ -123,20 +114,11 @@ class DashboardController extends Controller
         })->toArray();
     }
 
-    private function getRecentTransactions($user, $environment)
+    private function getRecentTransactions($merchant, $environment)
     {
-        $accountIds = UserAccountAssignment::where('user_id', $user->id)
-            ->whereIn('account_id', function($query) use ($environment) {
-                $query->select('id')->from('vendor_accounts')->where('environment', $environment);
-            })
-            ->pluck('account_id');
-
-        if ($accountIds->isEmpty()) {
-            return [];
-        }
-
         $transactions = Transaction::with('vendor')
-            ->whereIn('account_id', $accountIds)
+            ->where('merchant_id', $merchant->id)
+            ->where('environment', $environment)
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get();

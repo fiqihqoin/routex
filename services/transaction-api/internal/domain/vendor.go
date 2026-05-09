@@ -13,14 +13,23 @@ type Vendor struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-type VendorAccount struct {
-	ID          string    `json:"id"`
-	MerchantID  string    `json:"merchant_id"`
-	VendorID    string    `json:"vendor_id"`
-	AccountName string    `json:"account_name"`
-	Credentials string    `json:"credentials"`
-	IsActive    bool      `json:"is_active"`
-	Environment string    `json:"environment"`
+type MerchantVendorCredential struct {
+	ID                string `json:"id"`
+	MerchantID        string `json:"merchant_id"`
+	VendorID          string `json:"vendor_id"`
+	Environment       string `json:"environment"`
+	Credentials       string `json:"credentials"`
+	SandboxBaseURL    string `json:"sandbox_base_url"`
+	ProductionBaseURL string `json:"production_base_url"`
+	IsEnabled         bool   `json:"is_enabled"`
+	Priority          int    `json:"priority"`
+}
+
+func (c *MerchantVendorCredential) GetBaseURL() string {
+	if c.Environment == "production" {
+		return c.ProductionBaseURL
+	}
+	return c.SandboxBaseURL
 }
 
 type RoutingRule struct {
@@ -52,9 +61,9 @@ type VendorHealth struct {
 }
 
 type CircuitBreaker interface {
-	GetState(ctx context.Context, vendorID string) (CircuitState, error)
-	AllowRequest(ctx context.Context, vendorID string) (bool, error)
-	RecordResult(ctx context.Context, vendorID string, success bool) error
+	GetState(ctx context.Context, vendorID string, env string) (CircuitState, error)
+	AllowRequest(ctx context.Context, vendorID string, env string) (bool, error)
+	RecordResult(ctx context.Context, vendorID string, env string, success bool) error
 }
 
 type Router interface {
@@ -63,7 +72,7 @@ type Router interface {
 }
 
 type AccountSelector interface {
-	SelectAccount(ctx context.Context, vendorID string, accounts []VendorAccount) (*VendorAccount, error)
+	SelectAccount(ctx context.Context, vendorID string, accounts []MerchantVendorCredential) (*MerchantVendorCredential, error)
 	TrackInFlight(ctx context.Context, accountID string, delta int) error
 	TrackLatency(ctx context.Context, accountID string, latency time.Duration) error
 }
@@ -71,7 +80,7 @@ type AccountSelector interface {
 type VendorRegistry interface {
 	Load(ctx context.Context) error
 	GetEligibleVendors(ctx context.Context, merchantID string, amount float64, channel string, environment string) ([]Vendor, error)
-	GetAccounts(ctx context.Context, vendorID string, environment string) ([]VendorAccount, error)
+	GetAccounts(ctx context.Context, vendorID string, environment string) ([]MerchantVendorCredential, error)
 	WatchConfigUpdates(ctx context.Context)
 	GetVendor(ctx context.Context, vendorID string) (Vendor, error)
 }

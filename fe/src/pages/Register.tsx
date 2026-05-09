@@ -9,6 +9,8 @@ import {
   CheckCircle2,
   Check,
   Mail,
+  Building2,
+  Phone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +33,8 @@ const schema = z
     password: z.string().min(8, "Password must be at least 8 characters").max(200),
     confirm: z.string().min(1, "Please confirm your password"),
     company: z.string().trim().min(2, "Company name is required").max(150),
+    industry: z.string().trim().min(2, "Industry is required").max(100),
+    phone: z.string().trim().min(8, "Enter a valid phone number").max(20),
     useCase: z.string().trim().min(2, "Tell us your use case").max(200),
     volume: z.string().min(1, "Select expected volume"),
     terms: z.boolean(),
@@ -72,6 +76,8 @@ const Register = () => {
     password: "",
     confirm: "",
     company: "",
+    industry: "",
+    phone: "",
     useCase: "",
     volume: "",
     terms: false,
@@ -126,6 +132,8 @@ const Register = () => {
       password: form.password,
       password_confirmation: form.confirm,
       company_name: form.company,
+      industry: form.industry,
+      phone_number: form.phone,
       use_case: form.useCase,
       expected_monthly_volume: volumeMap[form.volume] || 0,
     };
@@ -152,6 +160,8 @@ const Register = () => {
         if (data.errors.email) laravelErrors.email = data.errors.email[0];
         if (data.errors.name) laravelErrors.name = data.errors.name[0];
         if (data.errors.password) laravelErrors.password = data.errors.password[0];
+        if (data.errors.industry) laravelErrors.industry = data.errors.industry[0];
+        if (data.errors.phone_number) laravelErrors.phone = data.errors.phone_number[0];
         setErrors(laravelErrors);
       } else {
         setGeneralError(data.message || "Registration failed.");
@@ -250,8 +260,8 @@ const Register = () => {
             <Logo />
           </div>
 
-          <div className="relative flex-1 flex items-center justify-center px-6 py-12 lg:p-12">
-            <div className="w-full max-w-sm animate-fade-up">
+          <div className="relative flex-1 flex items-center justify-center px-6 py-12 lg:p-12 overflow-y-auto">
+            <div className="w-full max-w-sm animate-fade-up py-10">
               {success ? (
                 <SuccessState
                   email={form.email}
@@ -265,7 +275,7 @@ const Register = () => {
                   </div>
                   <h2 className="mt-2 text-2xl font-bold tracking-tight">Get started for free</h2>
                   <p className="mt-3 text-[11px] font-mono text-muted-foreground">
-                    Step 1 of 1 — account details
+                    Final step — account details
                   </p>
 
                   {generalError && (
@@ -275,7 +285,7 @@ const Register = () => {
                     </div>
                   )}
 
-                  <form onSubmit={onSubmit} noValidate className="mt-6 space-y-4 pb-24 lg:pb-0">
+                  <form onSubmit={onSubmit} noValidate className="mt-6 space-y-4">
                     <Field
                       id="name"
                       label="Full name"
@@ -311,64 +321,44 @@ const Register = () => {
                       )}
                     </div>
 
-                    <div className="space-y-1.5">
-                      <Label htmlFor="password" title="Password must be at least 8 characters" className="text-xs text-muted-foreground">Password</Label>
-                      <Input
-                        id="password"
-                        type="password"
-                        autoComplete="new-password"
-                        placeholder="Create a password"
-                        value={form.password}
-                        onChange={(e) => update("password", e.target.value)}
-                        className={fieldClass(errors.password)}
-                        aria-invalid={!!errors.password}
-                      />
-                      <div className="mt-2 flex items-center gap-2">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                            <Label htmlFor="password" title="Password must be at least 8 characters" className="text-xs text-muted-foreground">Password</Label>
+                            <Input
+                                id="password"
+                                type="password"
+                                autoComplete="new-password"
+                                placeholder="Create password"
+                                value={form.password}
+                                onChange={(e) => update("password", e.target.value)}
+                                className={fieldClass(errors.password)}
+                                aria-invalid={!!errors.password}
+                            />
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label htmlFor="confirm" className="text-xs text-muted-foreground">Confirm</Label>
+                            <Input
+                                id="confirm"
+                                type="password"
+                                autoComplete="new-password"
+                                placeholder="Repeat"
+                                value={form.confirm}
+                                onChange={(e) => update("confirm", e.target.value)}
+                                onBlur={() => blur("confirm")}
+                                className={fieldClass(errors.confirm)}
+                                aria-invalid={!!errors.confirm}
+                            />
+                        </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 mb-4">
                         <div className="flex-1 h-1 rounded-full bg-border overflow-hidden">
-                          <div
+                            <div
                             className={`h-full transition-all duration-300 ${strength.color}`}
                             style={{ width: `${(strength.score / 3) * 100}%` }}
-                          />
+                            />
                         </div>
-                        <span
-                          className={`text-[10px] font-mono w-10 text-right ${
-                            strength.score === 3
-                              ? "text-teal"
-                              : strength.score === 2
-                              ? "text-yellow-500"
-                              : strength.score === 1
-                              ? "text-destructive"
-                              : "text-muted-foreground"
-                          }`}
-                        >
-                          {strength.label || "—"}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <Label htmlFor="confirm" className="text-xs text-muted-foreground">Confirm password</Label>
-                      <div className="relative">
-                        <Input
-                          id="confirm"
-                          type="password"
-                          autoComplete="new-password"
-                          placeholder="Confirm your password"
-                          value={form.confirm}
-                          onChange={(e) => update("confirm", e.target.value)}
-                          onBlur={() => blur("confirm")}
-                          className={`${fieldClass(errors.confirm)} pr-10`}
-                          aria-invalid={!!errors.confirm}
-                        />
-                        {confirmMatches && (
-                          <Check className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-teal" />
-                        )}
-                      </div>
-                      {errors.confirm && (
-                        <p className="flex items-center gap-1 text-[11px] text-destructive">
-                          <AlertCircle className="h-3 w-3" /> {errors.confirm}
-                        </p>
-                      )}
+                        <span className="text-[9px] font-mono text-muted-foreground uppercase">{strength.label || "—"}</span>
                     </div>
 
                     <Field
@@ -381,10 +371,31 @@ const Register = () => {
                       className={fieldClass(errors.company)}
                     />
 
+                    <div className="grid grid-cols-2 gap-4">
+                        <Field
+                            id="industry"
+                            label="Industry"
+                            placeholder="e.g. Retail"
+                            value={form.industry}
+                            onChange={(v: string) => update("industry", v)}
+                            error={errors.industry}
+                            className={fieldClass(errors.industry)}
+                        />
+                        <Field
+                            id="phone"
+                            label="Phone Number"
+                            placeholder="08..."
+                            value={form.phone}
+                            onChange={(v: string) => update("phone", v)}
+                            error={errors.phone}
+                            className={fieldClass(errors.phone)}
+                        />
+                    </div>
+
                     <Field
                       id="useCase"
                       label="Use case"
-                      placeholder="e.g. Payment gateway"
+                      placeholder="e.g. E-commerce Website"
                       value={form.useCase}
                       onChange={(v: string) => update("useCase", v)}
                       error={errors.useCase}
@@ -416,7 +427,7 @@ const Register = () => {
                     </div>
 
                     <div className="pt-2">
-                      <label className="flex items-start gap-2 text-xs text-muted-foreground cursor-pointer select-none">
+                      <label className="flex items-start gap-2 text-[10px] text-muted-foreground cursor-pointer select-none">
                         <Checkbox
                           checked={form.terms}
                           onCheckedChange={(v) => update("terms", !!v)}
@@ -431,11 +442,6 @@ const Register = () => {
                           <a href="#" className="text-teal hover:text-teal-glow">Privacy Policy</a>
                         </span>
                       </label>
-                      {errors.terms && (
-                        <p className="mt-1.5 flex items-center gap-1 text-[11px] text-destructive">
-                          <AlertCircle className="h-3 w-3" /> {errors.terms}
-                        </p>
-                      )}
                     </div>
 
                     <Button

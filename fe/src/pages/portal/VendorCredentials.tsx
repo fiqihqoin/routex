@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Save, Loader2, AlertCircle, CheckCircle2, ShieldCheck, ExternalLink, Globe, Beaker } from "lucide-react";
+import { ArrowLeft, Save, Loader2, AlertCircle, CheckCircle2, ShieldCheck, ExternalLink, Globe, Beaker, Clock } from "lucide-react";
 import { PortalLayout } from "@/components/portal/PortalLayout";
 import { PortalCard } from "@/components/portal/ui";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { usePortal } from "@/components/portal/PortalContext";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 
 function getCookie(name: string) {
   const value = "; " + document.cookie;
@@ -21,22 +22,22 @@ export default function VendorCredentialsPage() {
   const { vendorCode } = useParams();
   const { env } = usePortal();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [vendor, setVendor] = useState<any>(null);
   const [config, setConfig] = useState<any>(null);
-  const [formData, setFormData] = useState<any>({ account_name: "", credentials: {} });
+  const [formData, setFormData] = useState<any>({ credentials: {} });
+  const [lastValidated, setLastValidated] = useState<string | null>(null);
+  const [valStatus, setValStatus] = useState<string | null>(null);
   const [errors, setErrors] = useState<any>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
-    // Reset state when environment or vendor changes
-    setFormData({ account_name: "", credentials: {} });
+    setFormData({ credentials: {} });
     setErrors(null);
     setSuccess(null);
     setLoading(true);
-
-    console.log('[VendorCredentials] Fetching for:', { vendorCode, env });
 
     fetch(`/portal/vendors/${vendorCode}/credentials`, {
       headers: {
@@ -46,25 +47,15 @@ export default function VendorCredentialsPage() {
     })
       .then(res => res.json())
       .then(json => {
-        console.log('[VendorCredentials] Response:', {
-          vendor: json.vendor?.name,
-          hasAccount: !!json.account,
-          accountEnv: json.account?.environment
-        });
-
         setVendor(json.vendor);
         setConfig(json.config);
 
         if (json.account) {
           setFormData({
-            account_name: json.account.account_name,
             credentials: json.account.credentials || {}
           });
-        } else {
-          setFormData({
-            account_name: `${json.vendor.name} ${env === 'production' ? 'Live' : 'Sandbox'}`,
-            credentials: {}
-          });
+          setLastValidated(json.account.last_validated_at);
+          setValStatus(json.account.validation_status);
         }
       })
       .catch(err => console.error("Fetch error:", err))
@@ -93,13 +84,21 @@ export default function VendorCredentialsPage() {
           "X-XSRF-TOKEN": getCookie("XSRF-TOKEN") || "",
           "X-Routex-Environment": env
         },
-        body: JSON.stringify(formData),
+        // We only send credentials now, account_name is gone
+        body: JSON.stringify({
+            credentials: formData.credentials,
+            account_name: "Legacy Field" // API might still expect it in some logic, but we won't show it
+        }),
       });
 
       const json = await res.json();
       if (res.ok) {
         setSuccess(json.message);
-        setTimeout(() => navigate("/portal/vendors"), 2000);
+        toast({
+          title: "Success",
+          description: json.message,
+        });
+        setTimeout(() => navigate("/portal/vendors"), 1500);
       } else {
         setErrors(json.errors || { general: json.message });
       }
@@ -144,6 +143,29 @@ export default function VendorCredentialsPage() {
           </div>
         </header>
 
+        {valStatus && (
+           <div className={`p-4 rounded-lg border flex items-center justify-between ${
+             valStatus === 'valid' ? 'bg-green-500/5 border-green-500/20' : 'bg-red-500/5 border-red-500/20'
+           }`}>
+              <div className="flex items-center gap-3">
+                 {valStatus === 'valid' ? <CheckCircle2 className="h-5 w-5 text-green-500" /> : <AlertCircle className="h-5 w-5 text-red-500" />}
+                 <div>
+                    <div className={`text-sm font-semibold ${valStatus === 'valid' ? 'text-green-500' : 'text-red-500'}`}>
+                       Status: {valStatus.toUpperCase()}
+                    </div>
+                    {lastValidated && (
+                       <div className="text-[10px] text-portal-text-dim flex items-center gap-1">
+                          <Clock className="h-3 w-3" /> Last checked: {new Date(lastValidated).toLocaleString()}
+                       </div>
+                    )}
+                 </div>
+              </div>
+              <Badge variant="outline" className={valStatus === 'valid' ? 'text-green-500 border-green-500/20' : 'text-red-500 border-red-500/20'}>
+                 {valStatus}
+              </Badge>
+           </div>
+        )}
+
         {errors?.general && (
            <div className="p-4 rounded-lg border border-danger/40 bg-danger/10 text-danger text-sm flex items-start gap-3">
               <AlertCircle className="h-5 w-5 shrink-0" />
@@ -151,32 +173,10 @@ export default function VendorCredentialsPage() {
            </div>
         )}
 
-        {success && (
-           <div className="p-4 rounded-lg border border-teal/40 bg-teal/10 text-teal text-sm flex items-start gap-3 animate-fade-up">
-              <CheckCircle2 className="h-5 w-5 shrink-0" />
-              {success}
-           </div>
-        )}
-
         <form onSubmit={onSubmit} className="space-y-6 pb-20">
-          <PortalCard title="Account Information" description="Label for this account in your dashboard.">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="account_name">Account Name</Label>
-                <Input 
-                  id="account_name" 
-                  value={formData.account_name} 
-                  onChange={e => setFormData({...formData, account_name: e.target.value})}
-                  className="bg-portal-elev border-portal-border focus-visible:ring-teal"
-                  required
-                />
-              </div>
-            </div>
-          </PortalCard>
-
           <PortalCard 
             title="Gateway Credentials" 
-            description={`Credentials provided by ${vendor.name}.`}
+            description={`Credentials provided by ${vendor.name} for ${env.toUpperCase()} environment.`}
             action={
               <a href={config.help_url || "#"} target="_blank" rel="noreferrer" className="text-xs text-teal hover:underline flex items-center gap-1">
                 Where do I find this? <ExternalLink className="h-3 w-3" />
@@ -244,16 +244,16 @@ export default function VendorCredentialsPage() {
              <div>
                 <h4 className="text-sm font-semibold text-portal-text">Pre-flight Validation</h4>
                 <p className="mt-1 text-xs text-portal-text-muted leading-relaxed">
-                  When you save, we will perform a real-time connection test with {vendor.name} to ensure your credentials are valid. No configuration is stored unless the test passes.
+                  When you save, we will perform a real-time connection test with {vendor.name} ({env.toUpperCase()}) to ensure your credentials are valid.
                 </p>
              </div>
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
              <Link to="/portal/vendors">
-                <Button type="button" variant="heroOutline" disabled={submitting}>Cancel</Button>
+                <Button type="button" variant="ghost" disabled={submitting}>Cancel</Button>
              </Link>
-             <Button type="submit" variant="hero" className="min-w-[160px]" disabled={submitting}>
+             <Button type="submit" className="min-w-[160px] bg-teal hover:bg-teal/90 text-white" disabled={submitting}>
                 {submitting ? (
                   <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Testing...</>
                 ) : (

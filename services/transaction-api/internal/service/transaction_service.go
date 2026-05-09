@@ -27,6 +27,7 @@ type transactionService struct {
 	selector      domain.AccountSelector
 	limiter       domain.RateLimiter
 	vendorFactory factory.VendorFactory
+	cb            domain.CircuitBreaker
 	rdb           *redis.Client
 	publisher     messaging.Publisher
 	db            *pgxpool.Pool
@@ -44,6 +45,7 @@ func NewTransactionService(
 	selector domain.AccountSelector,
 	limiter domain.RateLimiter,
 	vendorFactory factory.VendorFactory,
+	cb domain.CircuitBreaker,
 	rdb *redis.Client,
 	publisher messaging.Publisher,
 	db *pgxpool.Pool,
@@ -56,6 +58,7 @@ func NewTransactionService(
 		selector:      selector,
 		limiter:       limiter,
 		vendorFactory: vendorFactory,
+		cb:            cb,
 		rdb:           rdb,
 		publisher:     publisher,
 		db:            db,
@@ -130,7 +133,7 @@ func (s *transactionService) GenerateQRIS(ctx context.Context, apiKey string, id
 	ranked := s.router.Route(ctx, req.Amount, eligible)
 	fmt.Printf("[GenerateQRIS] After routing, %d vendors ranked\n", len(ranked))
 
-	var selectedAccount *domain.VendorAccount
+	var selectedAccount *domain.MerchantVendorCredential
 	var selectedVendor domain.Vendor
 
 	for i, v := range ranked {
@@ -143,7 +146,7 @@ func (s *transactionService) GenerateQRIS(ctx context.Context, apiKey string, id
 		}
 		
 		// Filter for accounts owned by this merchant
-		var ownedAccounts []domain.VendorAccount
+		var ownedAccounts []domain.MerchantVendorCredential
 		for _, acc := range accounts {
 			if acc.MerchantID == merchantID {
 				ownedAccounts = append(ownedAccounts, acc)
@@ -181,6 +184,9 @@ func (s *transactionService) GenerateQRIS(ctx context.Context, apiKey string, id
 	s.selector.TrackInFlight(cleanupCtx, selectedAccount.ID, -1)
 	s.selector.TrackLatency(cleanupCtx, selectedAccount.ID, time.Since(callStart))
 
+	// Record Result to Circuit Breaker
+	s.cb.RecordResult(cleanupCtx, selectedVendor.ID, env, err == nil)
+
 	if err != nil {
 		metrics.QRISGenerationTotal.WithLabelValues(selectedVendor.ID, "failure").Inc()
 		
@@ -200,7 +206,7 @@ func (s *transactionService) GenerateQRIS(ctx context.Context, apiKey string, id
 		MerchantID:     merchantID,
 		Environment:    env,
 		VendorID:       selectedVendor.ID,
-		AccountID:      selectedAccount.ID,
+		VendorCredentialID: selectedAccount.ID,
 		Amount:         req.Amount,
 		Currency:       "IDR",
 		PaymentChannel: "qris",
@@ -224,20 +230,20 @@ func (s *transactionService) GenerateQRIS(ctx context.Context, apiKey string, id
 	return tx, nil
 }
 
-func (s *transactionService) callVendorAPI(ctx context.Context, vendorObj domain.Vendor, account *domain.VendorAccount, req domain.CreateTransactionRequest) (string, error) {
-	encrypted, err := s.repo.GetEncryptedCredentials(ctx, account.ID)
+func (s *transactionService) callVendorAPI(ctx context.Context, vendorObj domain.Vendor, creds *domain.MerchantVendorCredential, req domain.CreateTransactionRequest) (string, error) {
+	encrypted, err := s.repo.GetMerchantVendorCredentials(ctx, creds.ID)
 	if err != nil {
-		fmt.Printf("[TxService] Failed to get encrypted credentials for account %s: %v\n", account.ID, err)
+		fmt.Printf("[TxService] Failed to get encrypted credentials for record %s: %v\n", creds.ID, err)
 		return "", fmt.Errorf("failed to get account credentials: %w", err)
 	}
 
-	adapter, decryptedCreds, err := s.vendorFactory.Create(vendorObj.Code, encrypted)
+	adapter, decryptedCreds, err := s.vendorFactory.Create(vendorObj.Code, encrypted, creds.GetBaseURL())
 	if err != nil {
 		fmt.Printf("[TxService] Failed to create adapter for vendor %s: %v\n", vendorObj.Code, err)
 		return "", fmt.Errorf("failed to create vendor adapter: %w", err)
 	}
 
-	fmt.Printf("[TxService] Calling vendor %s (account %s) for QRIS generation\n", vendorObj.Code, account.ID)
+	fmt.Printf("[TxService] Calling vendor %s (credential %s) for QRIS generation\n", vendorObj.Code, creds.ID)
 
 	adapterReq := providers.GenerateQRISRequest{
 		TransactionID:  uuid.New().String(),
@@ -308,19 +314,24 @@ func (s *transactionService) HandleVendorCallback(ctx context.Context, vendorID 
 		return fmt.Errorf("transaction not found for callback: %w", err)
 	}
 
-	creds, err := s.repo.GetAccountCredentials(ctx, tx.AccountID)
+	creds, err := s.repo.GetMerchantVendorCredentials(ctx, tx.VendorCredentialID)
 	if err != nil {
 		return fmt.Errorf("failed to get credentials for verification: %w", err)
+	}
+
+	var credsMap map[string]interface{}
+	if err := json.Unmarshal([]byte(creds), &credsMap); err != nil {
+		return fmt.Errorf("failed to unmarshal credentials: %w", err)
 	}
 
 	var secret string
 	switch v.Code {
 	case "MIDTRANS":
-		secret = fmt.Sprintf("%v", creds["server_key"]) 
+		secret = fmt.Sprintf("%v", credsMap["server_key"]) 
 	case "XENDIT":
-		secret = fmt.Sprintf("%v", creds["webhook_token"]) 
+		secret = fmt.Sprintf("%v", credsMap["webhook_token"]) 
 	case "QOINHUB":
-		secret = fmt.Sprintf("%v", creds["client_secret"]) 
+		secret = fmt.Sprintf("%v", credsMap["client_secret"]) 
 	}
 
 	if !adapter.VerifyCallback(payload, signature, secret) {
@@ -337,7 +348,7 @@ func (s *transactionService) HandleVendorCallback(ctx context.Context, vendorID 
 
 	if tx.MerchantID != "" {
 		var callbackURL string
-		err := s.db.QueryRow(ctx, "SELECT callback_url FROM merchants WHERE id = $1 AND callback_enabled = true", tx.MerchantID).Scan(&callbackURL)
+		err := s.db.QueryRow(ctx, "SELECT url FROM merchant_webhooks WHERE merchant_id = $1 AND environment = $2 AND is_enabled = true", tx.MerchantID, tx.Environment).Scan(&callbackURL)
 		if err == nil && callbackURL != "" {
 			s.forwardToUser(ctx, callbackURL, normalized)
 		}

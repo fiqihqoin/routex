@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
 use App\Models\Vendor;
-use App\Models\VendorAccount;
+use App\Models\MerchantVendorCredential;
 use App\Services\VendorValidationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,7 +20,7 @@ class VendorCredentialController extends Controller
 
     public function show(Request $request, string $vendorCode)
     {
-        $user = Auth::guard('portal')->user();
+        $merchant = Auth::guard('portal')->user();
         $vendor = Vendor::where('code', $vendorCode)->firstOrFail();
         $config = config("vendor_credentials.{$vendorCode}");
         $environment = $request->header('X-Routex-Environment', 'sandbox');
@@ -30,30 +30,16 @@ class VendorCredentialController extends Controller
             abort(404, "Vendor configuration not found.");
         }
 
-        $existingAccount = VendorAccount::whereIn('id', function($query) use ($user) {
-            $query->select('account_id')
-                  ->from('user_account_assignments')
-                  ->where('user_id', $user->id);
-        })->where('vendor_id', $vendor->id)
-          ->where('environment', $environment)
-          ->first();
-
-        \Illuminate\Support\Facades\Log::info('VendorCredential Show Debug', [
-            'user_id' => $user->id,
-            'vendor_code' => $vendorCode,
-            'vendor_id' => $vendor->id,
-            'environment' => $environment,
-            'account_found' => $existingAccount ? 'YES' : 'NO',
-            'account_id' => $existingAccount?->id,
-            'account_name' => $existingAccount?->account_name,
-            'account_environment' => $existingAccount?->environment,
-        ]);
+        $existingCredential = $merchant->vendorCredentials()
+            ->where('vendor_id', $vendor->id)
+            ->where('environment', $environment)
+            ->first();
 
         if ($request->wantsJson()) {
             return response()->json([
                 'vendor' => $vendor,
                 'config' => $config,
-                'account' => $existingAccount,
+                'account' => $existingCredential,
             ]);
         }
 
@@ -62,7 +48,7 @@ class VendorCredentialController extends Controller
 
     public function store(Request $request, string $vendorCode)
     {
-        $user = Auth::guard('portal')->user();
+        $merchant = Auth::guard('portal')->user();
         $vendor = Vendor::where('code', $vendorCode)->firstOrFail();
         $config = config("vendor_credentials.{$vendorCode}");
 
@@ -100,79 +86,52 @@ class VendorCredentialController extends Controller
         }
         // -----------------------
 
-        DB::transaction(function () use ($user, $vendor, $validated, $credentials, $environment) {
-            $existingAssignment = DB::table('user_account_assignments as uaa')
-                ->join('vendor_accounts as va', 'uaa.account_id', '=', 'va.id')
-                ->where('uaa.user_id', $user->id)
-                ->where('va.vendor_id', $vendor->id)
-                ->where('va.environment', $environment)
-                ->select('uaa.*', 'uaa.account_id')
-                ->first();
-
-            $data = [
-                'account_name' => $validated['account_name'],
-                'credentials' => $credentials,
+        $merchant->vendorCredentials()->updateOrCreate(
+            [
+                'vendor_id' => $vendor->id,
+                'environment' => $environment,
+            ],
+            [
+                'credentials_encrypted' => $credentials, // Handled by trait
                 'validation_status' => 'valid',
                 'last_validated_at' => now(),
                 'validation_error' => null,
-                'environment' => $environment,
-            ];
+                'is_enabled' => true,
+            ]
+        );
 
-            if ($existingAssignment) {
-                $account = VendorAccount::find($existingAssignment->account_id);
-                $account->update($data);
-            } else {
-                $account = VendorAccount::create(array_merge($data, [
-                    'vendor_id' => $vendor->id,
-                    'is_active' => true,
-                ]));
-
-                DB::table('user_account_assignments')->insert([
-                    'id' => \Illuminate\Support\Str::uuid(),
-                    'user_id' => $user->id,
-                    'vendor_id' => $vendor->id,
-                    'account_id' => $account->id,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
-        });
-
-        Redis::publish('config:update', "merchant-{$user->id}-{$vendorCode}");
+        Redis::publish('config:update', "merchant-{$merchant->id}-{$vendorCode}");
 
         return response()->json([
-            'message' => "Credentials for {$vendor->name} are valid and activated.",
+            'message' => "Credentials for {$vendor->name} in " . ucfirst($environment) . " are valid and activated.",
             'redirect' => '/portal/vendors'
         ]);
     }
 
     public function toggle(Request $request, string $vendorCode)
     {
-        $user = Auth::guard('portal')->user();
+        $merchant = Auth::guard('portal')->user();
         $vendor = Vendor::where('code', $vendorCode)->firstOrFail();
         $environment = $request->header('X-Routex-Environment', 'sandbox');
 
-        $account = VendorAccount::whereIn('id', function($query) use ($user) {
-            $query->select('account_id')
-                  ->from('user_account_assignments')
-                  ->where('user_id', $user->id);
-        })->where('vendor_id', $vendor->id)
-          ->where('environment', $environment)
-          ->firstOrFail();
+        $credential = $merchant->vendorCredentials()
+            ->where('vendor_id', $vendor->id)
+            ->where('environment', $environment)
+            ->firstOrFail();
 
-        $account->is_active = !$account->is_active;
+        $credential->is_enabled = !$credential->is_enabled;
         
-        if (!$account->is_active) {
-            $account->validation_status = 'unchecked';
+        if (!$credential->is_enabled) {
+            $credential->validation_status = 'unchecked';
         }
 
-        $account->save();
+        $credential->save();
 
-        Redis::publish('config:update', "merchant-{$user->id}-{$vendorCode}");
+        Redis::publish('config:update', "merchant-{$merchant->id}-{$vendorCode}");
 
         return response()->json([
-            'is_active' => $account->is_active,
-            'message' => "Vendor {$vendor->name} is now " . ($account->is_active ? 'Active' : 'Inactive') . "."
+            'is_active' => $credential->is_enabled,
+            'message' => "Vendor {$vendor->name} is now " . ($credential->is_enabled ? 'Active' : 'Inactive') . " for " . ucfirst($environment) . "."
         ]);
     }
 }

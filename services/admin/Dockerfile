@@ -17,4 +17,4 @@ COPY . .
 RUN rm -f .env
 RUN php artisan storage:link 2>/dev/null || true
 EXPOSE 9000
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=9000"]
+CMD ["php-fpm"]

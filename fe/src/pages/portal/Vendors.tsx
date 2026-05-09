@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plug, ArrowRight, Loader2, Settings2, Globe, Beaker } from "lucide-react";
+import { Plug, ArrowRight, Loader2, Settings2, Globe, Beaker, CheckCircle2, XCircle } from "lucide-react";
 import { PortalLayout } from "@/components/portal/PortalLayout";
 import { PortalCard, StatusBadge } from "@/components/portal/ui";
 import { Link } from "react-router-dom";
@@ -8,9 +8,10 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { usePortal } from "@/components/portal/PortalContext";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function VendorsPage() {
-  const { env } = usePortal();
+  const { env, setEnv } = usePortal();
   const [loading, setLoading] = useState(true);
   const [vendors, setVendors] = useState<any[]>([]);
   const [toggling, setToggling] = useState<string | null>(null);
@@ -18,7 +19,7 @@ export default function VendorsPage() {
 
   const fetchVendors = () => {
     setLoading(true);
-    fetch(`/portal/vendors?env=${env}`, {
+    fetch(`/portal/vendors`, {
       headers: { 
         "Accept": "application/json",
         "X-Routex-Environment": env
@@ -42,7 +43,8 @@ export default function VendorsPage() {
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
-          "X-Routex-Environment": env
+          "X-Routex-Environment": env,
+          "X-XSRF-TOKEN": document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] || ""
         }
       });
       
@@ -77,12 +79,27 @@ export default function VendorsPage() {
   return (
     <PortalLayout title="Vendor Setup" breadcrumb="Configuration / Vendors">
       <div className="space-y-6">
-        <header>
-          <h1 className="text-2xl font-bold tracking-tight text-portal-text">Vendor Setup</h1>
-          <p className="mt-1 text-sm text-portal-text-muted">
-            Connect and manage your payment gateway credentials.
-          </p>
-        </header>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <header>
+            <h1 className="text-2xl font-bold tracking-tight text-portal-text">Vendor Setup</h1>
+            <p className="mt-1 text-sm text-portal-text-muted">
+              Connect and manage your payment gateway credentials.
+            </p>
+          </header>
+
+          <Tabs value={env} onValueChange={(v: any) => setEnv(v)} className="w-full md:w-auto">
+            <TabsList className="bg-portal-elev border border-portal-border">
+              <TabsTrigger value="sandbox" className="data-[state=active]:bg-amber-500 data-[state=active]:text-white">
+                <Beaker className="h-4 w-4 mr-2" />
+                Sandbox
+              </TabsTrigger>
+              <TabsTrigger value="production" className="data-[state=active]:bg-teal data-[state=active]:text-white">
+                <Globe className="h-4 w-4 mr-2" />
+                Production
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
 
         {loading ? (
           <div className="flex flex-col items-center justify-center min-h-[40vh]">
@@ -91,7 +108,7 @@ export default function VendorsPage() {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {vendors.map((v) => (
-              <PortalCard key={v.code} className="hover:border-teal/30 transition-colors group flex flex-col h-full">
+              <PortalCard key={v.code} className="hover:border-teal/30 transition-colors group flex flex-col h-full bg-portal-surface">
                 <div className="flex items-start justify-between mb-4">
                   <div className="h-12 w-12 rounded-xl bg-portal-elev border border-portal-border flex items-center justify-center text-lg font-bold text-portal-text-muted">
                     {v.name.slice(0, 2).toUpperCase()}
@@ -99,13 +116,13 @@ export default function VendorsPage() {
                   <div className="flex flex-col items-end gap-2">
                     {v.is_configured ? (
                       <div className="flex items-center gap-2">
-                        {v.environment === "production" ? (
-                          <Badge variant="outline" className="bg-teal/10 text-teal border-teal/20 gap-1 px-2 py-0.5">
-                            <Globe className="h-3 w-3" /> Live
+                        {v.status === "valid" ? (
+                          <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20 gap-1 px-2 py-0.5">
+                            <CheckCircle2 className="h-3 w-3" /> Valid
                           </Badge>
                         ) : (
-                          <Badge variant="outline" className="bg-amber/10 text-amber-500 border-amber/20 gap-1 px-2 py-0.5">
-                            <Beaker className="h-3 w-3" /> Sandbox
+                          <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500/20 gap-1 px-2 py-0.5">
+                            <XCircle className="h-3 w-3" /> Error
                           </Badge>
                         )}
                         <StatusBadge status="success">Connected</StatusBadge>
@@ -120,8 +137,8 @@ export default function VendorsPage() {
                   <h3 className="text-lg font-semibold text-portal-text">{v.name}</h3>
                   <p className="mt-1 text-xs text-portal-text-muted leading-relaxed">
                     {v.is_configured 
-                      ? `Vendor ini terkonfigurasi dalam mode ${v.environment}.`
-                      : `Hubungkan akun ${v.name} Anda untuk mulai menerima pembayaran QRIS.`
+                      ? `Vendor ini terkonfigurasi dalam mode ${env.toUpperCase()}.`
+                      : `Hubungkan akun ${v.name} Anda untuk mulai menerima pembayaran di ${env}.`
                     }
                   </p>
                 </div>
@@ -137,8 +154,8 @@ export default function VendorsPage() {
                               Active
                             </span>
                           ) : (
-                            <span className="flex items-center gap-1.5 text-muted-foreground">
-                              <div className="h-1.5 w-1.5 rounded-full bg-muted-foreground" />
+                            <span className="flex items-center gap-1.5 text-portal-text-muted">
+                              <div className="h-1.5 w-1.5 rounded-full bg-portal-text-dim" />
                               Inactive
                             </span>
                           )}
@@ -165,7 +182,7 @@ export default function VendorsPage() {
 
                 <div className="mt-6">
                   <Link to={`/portal/vendors/${v.code}/credentials`}>
-                    <div className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-portal-elev border border-portal-border px-4 py-2.5 text-sm font-medium text-portal-text hover:bg-teal hover:text-primary-foreground hover:border-teal transition-all cursor-pointer">
+                    <div className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-portal-elev border border-portal-border px-4 py-2.5 text-sm font-medium text-portal-text hover:bg-teal hover:text-white hover:border-teal transition-all cursor-pointer group-hover:shadow-lg group-hover:shadow-teal/10">
                       {v.is_configured ? (
                         <>
                           <Settings2 className="h-4 w-4" />

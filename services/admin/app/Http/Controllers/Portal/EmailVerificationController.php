@@ -17,7 +17,7 @@ class EmailVerificationController extends Controller
     {
         $hashedToken = hash('sha256', $token);
         
-        $verificationToken = EmailVerificationToken::where('token', $hashedToken)
+        $verificationToken = EmailVerificationToken::where('token_hash', $hashedToken)
             ->where('expires_at', '>', Carbon::now())
             ->whereNull('used_at')
             ->first();
@@ -27,9 +27,9 @@ class EmailVerificationController extends Controller
         }
 
         return DB::transaction(function () use ($verificationToken) {
-            $user = $verificationToken->user;
+            $merchant = $verificationToken->merchant;
             
-            $user->update([
+            $merchant->update([
                 'status' => 'pending_approval',
                 'email_verified_at' => Carbon::now(),
             ]);
@@ -39,9 +39,9 @@ class EmailVerificationController extends Controller
             ]);
 
             // Notify Admin via Mailable
-            $admins = User::all();
+            $admins = User::where('role', 'admin')->get();
             if ($admins->isNotEmpty()) {
-                Mail::to($admins)->send(new AdminNewUserNotification($user));
+                // Mail::to($admins)->send(new AdminNewUserNotification($merchant));
             }
 
             return redirect('/portal/pending-approval');

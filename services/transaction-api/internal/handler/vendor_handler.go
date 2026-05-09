@@ -34,13 +34,18 @@ func (h *VendorHandler) GetVendorHealth(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	state, err := h.cb.GetState(r.Context(), vendorID)
+	env := r.Header.Get("X-Routex-Environment")
+	if env == "" {
+		env = "sandbox"
+	}
+
+	state, err := h.cb.GetState(r.Context(), vendorID, env)
 	if err != nil {
 		h.respondWithError(w, http.StatusInternalServerError, "failed to get circuit breaker state")
 		return
 	}
 
-	counterKey := fmt.Sprintf("cb:vendor:%s:stats", vendorID)
+	counterKey := fmt.Sprintf("cb:vendor:%s:env:%s:stats", vendorID, env)
 	failures, _ := h.rdb.ZCard(r.Context(), counterKey+":failure").Result()
 	successes, _ := h.rdb.ZCard(r.Context(), counterKey+":success").Result()
 	
@@ -70,13 +75,14 @@ func (h *VendorHandler) ValidateCredentials(w http.ResponseWriter, r *http.Reque
 
 	var req struct {
 		Credentials string `json:"credentials"`
+		BaseURL     string `json:"base_url"`
 	}
 	if err := json.Unmarshal(body, &req); err != nil {
 		h.respondWithError(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
 
-	adapter, _, err := h.factory.Create(vendorCode, req.Credentials)
+	adapter, _, err := h.factory.Create(vendorCode, req.Credentials, req.BaseURL)
 	if err != nil {
 		h.respondWithError(w, http.StatusBadRequest, fmt.Sprintf("unsupported vendor or invalid creds: %v", err))
 		return

@@ -7,7 +7,6 @@ use App\Models\Merchant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class PortalLoginController extends Controller
@@ -24,43 +23,27 @@ class PortalLoginController extends Controller
             'password' => ['required'],
         ]);
 
-        $user = Merchant::where('email', $credentials['email'])->first();
+        $merchant = Merchant::where('email', $credentials['email'])->first();
         
-        if (!$user) {
-            Log::info("Portal Login: User not found: " . $credentials['email']);
+        if (!$merchant || !Hash::check($credentials['password'], $merchant->password_hash)) {
             throw ValidationException::withMessages(['email' => [trans('auth.failed')]]);
         }
 
-        // Extremely detailed debug
-        $inputPass = $credentials['password'];
-        $dbPass = $user->password;
-        $check = Hash::check($inputPass, $dbPass);
-        
-        Log::info("Portal Login Debug:", [
-            'email' => $user->email,
-            'input_len' => strlen($inputPass),
-            'db_pass_start' => substr($dbPass, 0, 10),
-            'db_pass_len' => strlen($dbPass),
-            'check_result' => $check ? 'TRUE' : 'FALSE'
-        ]);
-
-        if (!$check) {
-            throw ValidationException::withMessages(['email' => [trans('auth.failed')]]);
-        }
-
-        switch ($user->status) {
+        switch ($merchant->status) {
             case 'pending_verification':
-                throw ValidationException::withMessages(['email' => ['Silakan verifikasi email dulu']]);
+                throw ValidationException::withMessages(['email' => ['Silakan verifikasi email Anda terlebih dahulu.']]);
             case 'pending_approval':
-                throw ValidationException::withMessages(['email' => ['Akun sedang menunggu persetujuan admin']]);
+                throw ValidationException::withMessages(['email' => ['Akun Anda sedang menunggu persetujuan admin.']]);
+            case 'suspended':
+                throw ValidationException::withMessages(['email' => ['Akun Anda ditangguhkan: ' . ($merchant->suspension_reason ?? 'Tidak ada alasan spesifik.')]]);
             case 'rejected':
-                throw ValidationException::withMessages(['email' => ['Akun ditolak. Hubungi support']]);
+                throw ValidationException::withMessages(['email' => ['Pendaftaran akun Anda ditolak.']]);
             case 'active':
-                Auth::guard('portal')->login($user);
+                Auth::guard('portal')->login($merchant);
                 $request->session()->regenerate();
                 return response()->json([
                     'message' => 'Login successful',
-                    'redirect' => route('portal.dashboard')
+                    'redirect' => '/portal'
                 ]);
             default:
                 throw ValidationException::withMessages(['email' => ['Status akun tidak dikenal.']]);

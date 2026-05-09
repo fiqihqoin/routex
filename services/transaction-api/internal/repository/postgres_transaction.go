@@ -9,7 +9,6 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
 	"github.com/truechain/ptms/transaction-api/internal/domain"
-	"github.com/truechain/ptms/transaction-api/pkg/crypto"
 	"github.com/truechain/ptms/transaction-api/pkg/messaging"
 )
 
@@ -24,8 +23,16 @@ func NewPostgresTransactionRepo(db *pgxpool.Pool, rdb *redis.Client, publisher m
 }
 
 func (r *postgresTransactionRepo) Create(ctx context.Context, tx *domain.Transaction) error {
-	query := "INSERT INTO transactions (id, transaction_id, merchant_id, environment, vendor_id, account_id, amount, currency, payment_channel, status, idempotency_key, request_hash, qris_code, expires_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)"
-	_, err := r.db.Exec(ctx, query, tx.ID, tx.TransactionID, tx.MerchantID, tx.Environment, tx.VendorID, tx.AccountID, tx.Amount, tx.Currency, tx.PaymentChannel, tx.Status, tx.IdempotencyKey, tx.RequestHash, tx.QRISCode, tx.ExpiresAt)
+	query := `INSERT INTO transactions (
+		id, transaction_id, merchant_id, environment, vendor_id, vendor_credential_id, 
+		routing_reason, amount, currency, payment_channel, status, idempotency_key, 
+		request_hash, qris_code, created_at, expires_at
+	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`
+	_, err := r.db.Exec(ctx, query, 
+		tx.ID, tx.TransactionID, tx.MerchantID, tx.Environment, tx.VendorID, tx.VendorCredentialID, 
+		tx.RoutingReason, tx.Amount, tx.Currency, tx.PaymentChannel, tx.Status, tx.IdempotencyKey, 
+		tx.RequestHash, tx.QRISCode, tx.CreatedAt, tx.ExpiresAt,
+	)
 	return err
 }
 
@@ -39,11 +46,17 @@ func (r *postgresTransactionRepo) GetByID(ctx context.Context, transactionID str
 		}
 	}
 
-	query := "SELECT id, transaction_id, merchant_id, environment, vendor_id, account_id, amount, currency, payment_channel, status, idempotency_key, request_hash, qris_code, expires_at, paid_at, callback_delivered, created_at, updated_at FROM transactions WHERE transaction_id = $1"
+	query := `SELECT 
+		id, transaction_id, merchant_id, environment, vendor_id, vendor_credential_id, 
+		routing_reason, amount, currency, payment_channel, status, idempotency_key, 
+		request_hash, qris_code, expires_at, paid_at, callback_delivered, created_at, updated_at 
+		FROM transactions WHERE transaction_id = $1`
 	
 	tx := &domain.Transaction{}
 	err = r.db.QueryRow(ctx, query, transactionID).Scan(
-		&tx.ID, &tx.TransactionID, &tx.MerchantID, &tx.Environment, &tx.VendorID, &tx.AccountID, &tx.Amount, &tx.Currency, &tx.PaymentChannel, &tx.Status, &tx.IdempotencyKey, &tx.RequestHash, &tx.QRISCode, &tx.ExpiresAt, &tx.PaidAt, &tx.CallbackDelivered, &tx.CreatedAt, &tx.UpdatedAt,
+		&tx.ID, &tx.TransactionID, &tx.MerchantID, &tx.Environment, &tx.VendorID, &tx.VendorCredentialID, 
+		&tx.RoutingReason, &tx.Amount, &tx.Currency, &tx.PaymentChannel, &tx.Status, &tx.IdempotencyKey, 
+		&tx.RequestHash, &tx.QRISCode, &tx.ExpiresAt, &tx.PaidAt, &tx.CallbackDelivered, &tx.CreatedAt, &tx.UpdatedAt,
 	)
 	if err != nil {
 		return nil, err
@@ -68,14 +81,24 @@ func (r *postgresTransactionRepo) CacheTransaction(ctx context.Context, tx *doma
 
 func (r *postgresTransactionRepo) StoreEvent(ctx context.Context, transactionID string, eventType domain.EventType, data interface{}) error {
 	payload, _ := json.Marshal(data)
-	query := "INSERT INTO transaction_events (transaction_id, event_type, event_data) VALUES ($1, $2, $3)"
-	_, err := r.db.Exec(ctx, query, transactionID, eventType, payload)
+	
+	// We need merchant_id and transaction_created_at for partition key
+	var merchantID string
+	var createdAt time.Time
+	err := r.db.QueryRow(ctx, "SELECT merchant_id, created_at FROM transactions WHERE transaction_id = $1", transactionID).Scan(&merchantID, &createdAt)
+	if err != nil {
+		// Fallback for events that might not have a transaction yet or if pruning isn't used
+		createdAt = time.Now()
+	}
+
+	query := "INSERT INTO transaction_events (transaction_id, transaction_created_at, merchant_id, event_type, event_data) VALUES ($1, $2, $3, $4, $5)"
+	_, err = r.db.Exec(ctx, query, transactionID, createdAt, merchantID, eventType, payload)
 	return err
 }
 
 func (r *postgresTransactionRepo) UpdateReadModel(ctx context.Context, tx *domain.Transaction) error {
-	query := "UPDATE transactions SET status = $1, paid_at = $2, callback_delivered = $3, updated_at = NOW() WHERE transaction_id = $4"
-	_, err := r.db.Exec(ctx, query, tx.Status, tx.PaidAt, tx.CallbackDelivered, tx.TransactionID)
+	query := "UPDATE transactions SET status = $1, paid_at = $2, callback_delivered = $3, updated_at = NOW() WHERE transaction_id = $4 AND created_at = $5"
+	_, err := r.db.Exec(ctx, query, tx.Status, tx.PaidAt, tx.CallbackDelivered, tx.TransactionID, tx.CreatedAt)
 	if err == nil {
 		r.CacheTransaction(ctx, tx)
 	}
@@ -89,6 +112,7 @@ func (r *postgresTransactionRepo) GetUnprocessedEvents(ctx context.Context, limi
 	}
 	defer tx.Rollback(ctx)
 
+	// Partition aware: querying without created_at will scan all partitions, but here we only want unprocessed ones
 	query := "SELECT id, transaction_id, event_type, event_data, created_at FROM transaction_events WHERE processed_at IS NULL ORDER BY created_at ASC LIMIT $1 FOR UPDATE SKIP LOCKED"
 	rows, err := tx.Query(ctx, query, limit)
 	if err != nil {
@@ -114,14 +138,15 @@ func (r *postgresTransactionRepo) GetUnprocessedEvents(ctx context.Context, limi
 }
 
 func (r *postgresTransactionRepo) MarkEventProcessed(ctx context.Context, eventID string) error {
+	// Note: in high scale production, we'd need the partition key (transaction_created_at) here too.
 	query := "UPDATE transaction_events SET processed_at = NOW() WHERE id = $1"
 	_, err := r.db.Exec(ctx, query, eventID)
 	return err
 }
 
-func (r *postgresTransactionRepo) UpdatePenalty(ctx context.Context, vendorID string, accountID string, points int) error {
-	query := "INSERT INTO vendor_penalties (vendor_id, account_id, penalty_points, last_updated_at) VALUES ($1, $2, $3, NOW()) ON CONFLICT (vendor_id, account_id) DO UPDATE SET penalty_points = vendor_penalties.penalty_points + EXCLUDED.penalty_points, last_updated_at = NOW()"
-	_, err := r.db.Exec(ctx, query, vendorID, accountID, points)
+func (r *postgresTransactionRepo) UpdatePenalty(ctx context.Context, vendorID string, credentialID string, points int) error {
+	query := "INSERT INTO vendor_penalties (vendor_id, merchant_credential_id, penalty_points, last_updated_at) VALUES ($1, $2, $3, NOW()) ON CONFLICT (vendor_id, merchant_credential_id) DO UPDATE SET penalty_points = vendor_penalties.penalty_points + EXCLUDED.penalty_points, last_updated_at = NOW()"
+	_, err := r.db.Exec(ctx, query, vendorID, credentialID, points)
 	if err != nil {
 		return err
 	}
@@ -129,7 +154,7 @@ func (r *postgresTransactionRepo) UpdatePenalty(ctx context.Context, vendorID st
 	if r.publisher != nil {
 		r.publisher.Publish(ctx, "ptms.events", "vendor.penalty.updated", map[string]interface{}{
 			"vendor_id":  vendorID,
-			"account_id": accountID,
+			"credential_id": credentialID,
 			"points":     points,
 			"timestamp":  time.Now(),
 		})
@@ -159,15 +184,21 @@ func (r *postgresTransactionRepo) GetEffectivePenalties(ctx context.Context) (ma
 	return penalties, nil
 }
 
-func (r *postgresTransactionRepo) DisableUserCallback(ctx context.Context, userID string) error {
-	query := "UPDATE merchants SET callback_enabled = false WHERE id = $1"
-	_, err := r.db.Exec(ctx, query, userID)
+func (r *postgresTransactionRepo) DisableMerchantCallback(ctx context.Context, merchantID string) error {
+	query := "UPDATE merchant_webhooks SET is_enabled = false WHERE merchant_id = $1"
+	_, err := r.db.Exec(ctx, query, merchantID)
 	return err
 }
 
 func (r *postgresTransactionRepo) GetPendingForReconciliation(ctx context.Context, olderThan time.Duration, limit int) ([]domain.Transaction, error) {
 	threshold := time.Now().Add(-olderThan)
-	query := "SELECT id, transaction_id, merchant_id, environment, vendor_id, account_id, amount, currency, payment_channel, status, idempotency_key, request_hash, qris_code, expires_at, paid_at, callback_delivered, reconciliation_attempts, created_at, updated_at FROM transactions WHERE status = 'pending_payment' AND created_at < $1 LIMIT $2"
+	// Pruning: created_at > now - 24h
+	query := `SELECT 
+		id, transaction_id, merchant_id, environment, vendor_id, vendor_credential_id, 
+		amount, currency, payment_channel, status, idempotency_key, request_hash, qris_code, 
+		expires_at, paid_at, callback_delivered, reconciliation_attempts, created_at, updated_at 
+		FROM transactions 
+		WHERE status = 'pending_payment' AND created_at > NOW() - interval '24 hours' AND created_at < $1 LIMIT $2`
 	
 	rows, err := r.db.Query(ctx, query, threshold, limit)
 	if err != nil {
@@ -179,7 +210,9 @@ func (r *postgresTransactionRepo) GetPendingForReconciliation(ctx context.Contex
 	for rows.Next() {
 		var tx domain.Transaction
 		err = rows.Scan(
-			&tx.ID, &tx.TransactionID, &tx.MerchantID, &tx.Environment, &tx.VendorID, &tx.AccountID, &tx.Amount, &tx.Currency, &tx.PaymentChannel, &tx.Status, &tx.IdempotencyKey, &tx.RequestHash, &tx.QRISCode, &tx.ExpiresAt, &tx.PaidAt, &tx.CallbackDelivered, &tx.ReconciliationAttempts, &tx.CreatedAt, &tx.UpdatedAt,
+			&tx.ID, &tx.TransactionID, &tx.MerchantID, &tx.Environment, &tx.VendorID, &tx.VendorCredentialID, 
+			&tx.Amount, &tx.Currency, &tx.PaymentChannel, &tx.Status, &tx.IdempotencyKey, &tx.RequestHash, &tx.QRISCode, 
+			&tx.ExpiresAt, &tx.PaidAt, &tx.CallbackDelivered, &tx.ReconciliationAttempts, &tx.CreatedAt, &tx.UpdatedAt,
 		)
 		if err != nil {
 			return nil, err
@@ -189,24 +222,15 @@ func (r *postgresTransactionRepo) GetPendingForReconciliation(ctx context.Contex
 	return transactions, nil
 }
 
-func (r *postgresTransactionRepo) IncrementReconciliationAttempt(ctx context.Context, transactionID string) error {
-	query := "UPDATE transactions SET reconciliation_attempts = reconciliation_attempts + 1, updated_at = NOW() WHERE transaction_id = $1"
-	_, err := r.db.Exec(ctx, query, transactionID)
+func (r *postgresTransactionRepo) IncrementReconciliationAttempt(ctx context.Context, transactionID string, createdAt time.Time) error {
+	query := "UPDATE transactions SET reconciliation_attempts = reconciliation_attempts + 1, updated_at = NOW() WHERE transaction_id = $1 AND created_at = $2"
+	_, err := r.db.Exec(ctx, query, transactionID, createdAt)
 	return err
 }
 
-func (r *postgresTransactionRepo) GetAccountCredentials(ctx context.Context, accountID string) (map[string]interface{}, error) {
-	encrypted, err := r.GetEncryptedCredentials(ctx, accountID)
-	if err != nil {
-		return nil, err
-	}
-
-	return crypto.Decrypt(encrypted)
-}
-
-func (r *postgresTransactionRepo) GetEncryptedCredentials(ctx context.Context, accountID string) (string, error) {
+func (r *postgresTransactionRepo) GetMerchantVendorCredentials(ctx context.Context, credentialID string) (string, error) {
 	var encrypted string
-	query := "SELECT credentials FROM vendor_accounts WHERE id = $1"
-	err := r.db.QueryRow(ctx, query, accountID).Scan(&encrypted)
+	query := "SELECT credentials_encrypted FROM merchant_vendor_credentials WHERE id = $1"
+	err := r.db.QueryRow(ctx, query, credentialID).Scan(&encrypted)
 	return encrypted, err
 }
