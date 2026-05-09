@@ -23,6 +23,7 @@ class VendorCredentialController extends Controller
         $user = Auth::guard('portal')->user();
         $vendor = Vendor::where('code', $vendorCode)->firstOrFail();
         $config = config("vendor_credentials.{$vendorCode}");
+        $environment = $request->header('X-Routex-Environment', 'sandbox');
 
         if (!$config) {
             if ($request->wantsJson()) return response()->json(['error' => 'Vendor config not found'], 404);
@@ -33,7 +34,9 @@ class VendorCredentialController extends Controller
             $query->select('account_id')
                   ->from('user_account_assignments')
                   ->where('user_id', $user->id);
-        })->where('vendor_id', $vendor->id)->first();
+        })->where('vendor_id', $vendor->id)
+          ->where('environment', $environment)
+          ->first();
 
         if ($request->wantsJson()) {
             return response()->json([
@@ -74,6 +77,7 @@ class VendorCredentialController extends Controller
 
         $validated = $request->validate($rules);
         $credentials = $validated['credentials'];
+        $environment = $request->header('X-Routex-Environment', 'sandbox');
 
         // --- TEST CONNECTION ---
         $validationResult = $this->validationService->validate($vendorCode, $credentials);
@@ -85,15 +89,14 @@ class VendorCredentialController extends Controller
         }
         // -----------------------
 
-        DB::transaction(function () use ($user, $vendor, $validated, $credentials) {
+        DB::transaction(function () use ($user, $vendor, $validated, $credentials, $environment) {
             $existingAssignment = DB::table('user_account_assignments as uaa')
                 ->join('vendor_accounts as va', 'uaa.account_id', '=', 'va.id')
                 ->where('uaa.user_id', $user->id)
                 ->where('va.vendor_id', $vendor->id)
+                ->where('va.environment', $environment)
                 ->select('uaa.*', 'uaa.account_id')
                 ->first();
-
-            $isProduction = filter_var($credentials['is_production'] ?? false, FILTER_VALIDATE_BOOLEAN);
 
             $data = [
                 'account_name' => $validated['account_name'],
@@ -101,7 +104,7 @@ class VendorCredentialController extends Controller
                 'validation_status' => 'valid',
                 'last_validated_at' => now(),
                 'validation_error' => null,
-                'environment' => $isProduction ? 'production' : 'sandbox',
+                'environment' => $environment,
             ];
 
             if ($existingAssignment) {
@@ -114,7 +117,7 @@ class VendorCredentialController extends Controller
                 ]));
 
                 DB::table('user_account_assignments')->insert([
-                    'id' => Str::uuid(),
+                    'id' => \Illuminate\Support\Str::uuid(),
                     'user_id' => $user->id,
                     'vendor_id' => $vendor->id,
                     'account_id' => $account->id,
@@ -136,12 +139,15 @@ class VendorCredentialController extends Controller
     {
         $user = Auth::guard('portal')->user();
         $vendor = Vendor::where('code', $vendorCode)->firstOrFail();
+        $environment = $request->header('X-Routex-Environment', 'sandbox');
 
         $account = VendorAccount::whereIn('id', function($query) use ($user) {
             $query->select('account_id')
                   ->from('user_account_assignments')
                   ->where('user_id', $user->id);
-        })->where('vendor_id', $vendor->id)->firstOrFail();
+        })->where('vendor_id', $vendor->id)
+          ->where('environment', $environment)
+          ->firstOrFail();
 
         $account->is_active = !$account->is_active;
         

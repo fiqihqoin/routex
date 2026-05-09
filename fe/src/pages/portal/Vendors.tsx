@@ -1,21 +1,28 @@
 import { useState, useEffect } from "react";
-import { Plug, ArrowRight, Loader2, Settings2 } from "lucide-react";
+import { Plug, ArrowRight, Loader2, Settings2, Globe, Beaker } from "lucide-react";
 import { PortalLayout } from "@/components/portal/PortalLayout";
 import { PortalCard, StatusBadge } from "@/components/portal/ui";
 import { Link } from "react-router-dom";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
+import { usePortal } from "@/components/portal/PortalContext";
 
 export default function VendorsPage() {
+  const { env } = usePortal();
   const [loading, setLoading] = useState(true);
   const [vendors, setVendors] = useState<any[]>([]);
   const [toggling, setToggling] = useState<string | null>(null);
   const { toast } = useToast();
 
   const fetchVendors = () => {
-    fetch("/portal/vendors", {
-      headers: { "Accept": "application/json" }
+    setLoading(true);
+    fetch(`/portal/vendors?env=${env}`, {
+      headers: { 
+        "Accept": "application/json",
+        "X-Routex-Environment": env
+      }
     })
       .then(res => res.json())
       .then(json => setVendors(json.vendors || []))
@@ -25,9 +32,9 @@ export default function VendorsPage() {
 
   useEffect(() => {
     fetchVendors();
-  }, []);
+  }, [env]);
 
-  const onToggle = async (code: string, currentStatus: boolean) => {
+  const onToggle = async (code: string) => {
     setToggling(code);
     try {
       const res = await fetch(`/portal/vendors/${code}/toggle`, {
@@ -35,6 +42,7 @@ export default function VendorsPage() {
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
+          "X-Routex-Environment": env
         }
       });
       
@@ -83,47 +91,70 @@ export default function VendorsPage() {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {vendors.map((v) => (
-              <PortalCard key={v.code} className="hover:border-teal/30 transition-colors group">
+              <PortalCard key={v.code} className="hover:border-teal/30 transition-colors group flex flex-col h-full">
                 <div className="flex items-start justify-between mb-4">
                   <div className="h-12 w-12 rounded-xl bg-portal-elev border border-portal-border flex items-center justify-center text-lg font-bold text-portal-text-muted">
                     {v.name.slice(0, 2).toUpperCase()}
                   </div>
                   <div className="flex flex-col items-end gap-2">
                     {v.is_configured ? (
-                      <StatusBadge status="success">Connected</StatusBadge>
+                      <div className="flex items-center gap-2">
+                        {v.environment === "production" ? (
+                          <Badge variant="outline" className="bg-teal/10 text-teal border-teal/20 gap-1 px-2 py-0.5">
+                            <Globe className="h-3 w-3" /> Live
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="bg-amber/10 text-amber-500 border-amber/20 gap-1 px-2 py-0.5">
+                            <Beaker className="h-3 w-3" /> Sandbox
+                          </Badge>
+                        )}
+                        <StatusBadge status="success">Connected</StatusBadge>
+                      </div>
                     ) : (
                       <StatusBadge status="inactive">Not Setup</StatusBadge>
                     )}
                   </div>
                 </div>
 
-                <h3 className="text-lg font-semibold text-portal-text">{v.name}</h3>
-                <p className="mt-1 text-xs text-portal-text-muted leading-relaxed">
-                  {v.is_configured 
-                    ? `Active in ${v.environment} mode.`
-                    : `Connect your ${v.name} account to start routing QRIS traffic.`
-                  }
-                </p>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-portal-text">{v.name}</h3>
+                  <p className="mt-1 text-xs text-portal-text-muted leading-relaxed">
+                    {v.is_configured 
+                      ? `Vendor ini terkonfigurasi dalam mode ${v.environment}.`
+                      : `Hubungkan akun ${v.name} Anda untuk mulai menerima pembayaran QRIS.`
+                    }
+                  </p>
+                </div>
 
                 {v.is_configured && (
                   <div className="mt-6 pt-4 border-t border-portal-border">
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
-                        <Label className="text-sm font-medium">
-                          {v.is_active ? "Active" : "Inactive"}
+                        <Label className="text-sm font-medium flex items-center gap-2">
+                          {v.is_active ? (
+                            <span className="flex items-center gap-1.5 text-teal">
+                              <div className="h-1.5 w-1.5 rounded-full bg-teal animate-pulse" />
+                              Active
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-1.5 text-muted-foreground">
+                              <div className="h-1.5 w-1.5 rounded-full bg-muted-foreground" />
+                              Inactive
+                            </span>
+                          )}
                         </Label>
                         <p className="text-[10px] text-portal-text-muted italic">
                           {v.is_active 
-                            ? "Vendor ini akan dipakai untuk routing transaksi"
-                            : "Vendor ini tidak akan menerima transaksi"
+                            ? "Dipakai untuk routing transaksi"
+                            : "Tidak akan menerima transaksi"
                           }
                         </p>
                       </div>
                       <div className="flex items-center">
                         {toggling === v.code && <Loader2 className="h-3 w-3 animate-spin mr-2 text-teal" />}
-                        <Switch 
+                        <Switch
                           checked={v.is_active}
-                          onCheckedChange={() => onToggle(v.code, v.is_active)}
+                          onCheckedChange={() => onToggle(v.code)}
                           disabled={toggling === v.code}
                           className="data-[state=checked]:bg-teal"
                         />

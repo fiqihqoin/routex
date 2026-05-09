@@ -46,7 +46,7 @@ export default function PortalDashboard() {
 }
 
 function DashboardContent() {
-  const { user } = usePortal();
+  const { user, env } = usePortal();
   const [range, setRange] = useState<Range>("7d");
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
@@ -54,8 +54,12 @@ function DashboardContent() {
   const firstName = user.name.split(" ")[0];
 
   useEffect(() => {
-    fetch("/portal/dashboard", {
-      headers: { "Accept": "application/json" }
+    setLoading(true);
+    fetch(`/portal/dashboard?env=${env}`, {
+      headers: { 
+        "Accept": "application/json",
+        "X-Routex-Environment": env
+      }
     })
       .then(res => res.json())
       .then(json => {
@@ -63,7 +67,7 @@ function DashboardContent() {
       })
       .catch(err => console.error("Failed to fetch dashboard data:", err))
       .finally(() => setLoading(false));
-  }, []);
+  }, [env]);
 
   if (loading || !data) {
     return (

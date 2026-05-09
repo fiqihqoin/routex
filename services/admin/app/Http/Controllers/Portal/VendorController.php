@@ -17,15 +17,24 @@ class VendorController extends Controller
     {
         if ($request->wantsJson() || $request->is('api/*')) {
             $user = Auth::guard('portal')->user();
-            $vendors = Vendor::where('is_active', true)->get();
+            $environment = $request->header('X-Routex-Environment', 'sandbox');
+            $vendors = Vendor::all();
             $vendorConfig = config('vendor_credentials');
 
-            // Fetch accounts linked to this user
-            $userAccounts = VendorAccount::whereIn('id', function($query) use ($user) {
-                $query->select('account_id')
-                      ->from('user_account_assignments')
-                      ->where('user_id', $user->id);
-            })->get()->keyBy('vendor_id');
+            // Fetch accounts linked to this user for the specific environment
+            $userAccounts = VendorAccount::where('environment', $environment)
+                ->whereIn('id', function($query) use ($user) {
+                    $query->select('account_id')
+                        ->from('user_account_assignments')
+                        ->where('user_id', $user->id);
+                })->get()->keyBy('vendor_id');
+
+            \Illuminate\Support\Facades\Log::info('Vendor List Debug', [
+                'user_id' => $user->id,
+                'vendors_count' => $vendors->count(),
+                'accounts_count' => $userAccounts->count(),
+                'account_keys' => $userAccounts->keys()->toArray()
+            ]);
 
             $data = $vendors->map(function ($vendor) use ($userAccounts, $vendorConfig) {
                 $account = $userAccounts->get($vendor->id);

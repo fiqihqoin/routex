@@ -10,6 +10,8 @@ return [
             ['key' => 'client_secret', 'label' => 'Client Secret', 'type' => 'password', 'required' => true],
             ['key' => 'merchant_id', 'label' => 'Merchant ID', 'type' => 'text', 'required' => true],
             ['key' => 'terminal_id', 'label' => 'Terminal ID', 'type' => 'text', 'required' => true],
+            ['key' => 'private_key', 'label' => 'Private Key (RSA)', 'type' => 'textarea', 'required' => true, 'hint' => 'Begin with -----BEGIN RSA PRIVATE KEY-----'],
+            ['key' => 'public_key', 'label' => 'Public Key (RSA)', 'type' => 'textarea', 'required' => true, 'hint' => 'Begin with -----BEGIN PUBLIC KEY-----'],
         ],
     ],
     'MIDTRANS' => [
@@ -18,7 +20,6 @@ return [
         'instructions' => 'Login to Midtrans Dashboard > Settings > Configuration. Paste the URL below into the "Payment Notification URL" field and click Update.',
         'fields' => [
             ['key' => 'server_key', 'label' => 'Server Key', 'type' => 'password', 'required' => true, 'hint' => 'Settings → Access Keys di dashboard Midtrans'],
-            ['key' => 'is_production', 'label' => 'Mode Produksi', 'type' => 'boolean', 'required' => false],
         ],
     ],
     'XENDIT' => [
@@ -28,7 +29,6 @@ return [
         'fields' => [
             ['key' => 'secret_key', 'label' => 'Secret Key', 'type' => 'password', 'required' => true, 'hint' => 'Settings → API Keys di dashboard Xendit'],
             ['key' => 'webhook_token', 'label' => 'Webhook Verification Token', 'type' => 'password', 'required' => true, 'hint' => 'Settings → Webhooks di dashboard Xendit'],
-            ['key' => 'is_production', 'label' => 'Mode Produksi', 'type' => 'boolean', 'required' => false],
         ],
     ],
 ];

@@ -19,17 +19,20 @@ class DashboardController extends Controller
     {
         if ($request->wantsJson() || $request->is('api/*')) {
             $user = Auth::guard('portal')->user();
+            $environment = $request->header('X-Routex-Environment', 'sandbox');
 
             return response()->json([
                 'user' => [
                     'name' => $user->name,
                     'email' => $user->email,
                     'company' => $user->company_name,
+                    'sandbox_api_key' => $user->sandbox_api_key,
+                    'production_api_key' => $user->production_api_key,
                 ],
-                'stats' => $this->getStats($user),
-                'vendors' => $this->getVendorPerformance($user),
+                'stats' => $this->getStats($user, $environment),
+                'vendors' => $this->getVendorPerformance($user, $environment),
                 'health' => $this->getVendorHealth(),
-                'recent_transactions' => $this->getRecentTransactions($user),
+                'recent_transactions' => $this->getRecentTransactions($user, $environment),
             ]);
         }
 
@@ -37,9 +40,13 @@ class DashboardController extends Controller
         return file_get_contents(public_path('homepage.html'));
     }
 
-    private function getStats($user)
+    private function getStats($user, $environment)
     {
-        $accountIds = UserAccountAssignment::where('user_id', $user->id)->pluck('account_id');
+        $accountIds = UserAccountAssignment::where('user_id', $user->id)
+            ->whereIn('account_id', function($query) use ($environment) {
+                $query->select('id')->from('vendor_accounts')->where('environment', $environment);
+            })
+            ->pluck('account_id');
 
         if ($accountIds->isEmpty()) {
             return [
@@ -69,9 +76,13 @@ class DashboardController extends Controller
         ];
     }
 
-    private function getVendorPerformance($user)
+    private function getVendorPerformance($user, $environment)
     {
-        $accountIds = UserAccountAssignment::where('user_id', $user->id)->pluck('account_id');
+        $accountIds = UserAccountAssignment::where('user_id', $user->id)
+            ->whereIn('account_id', function($query) use ($environment) {
+                $query->select('id')->from('vendor_accounts')->where('environment', $environment);
+            })
+            ->pluck('account_id');
 
         if ($accountIds->isEmpty()) {
             return [];
@@ -112,9 +123,13 @@ class DashboardController extends Controller
         })->toArray();
     }
 
-    private function getRecentTransactions($user)
+    private function getRecentTransactions($user, $environment)
     {
-        $accountIds = UserAccountAssignment::where('user_id', $user->id)->pluck('account_id');
+        $accountIds = UserAccountAssignment::where('user_id', $user->id)
+            ->whereIn('account_id', function($query) use ($environment) {
+                $query->select('id')->from('vendor_accounts')->where('environment', $environment);
+            })
+            ->pluck('account_id');
 
         if ($accountIds->isEmpty()) {
             return [];

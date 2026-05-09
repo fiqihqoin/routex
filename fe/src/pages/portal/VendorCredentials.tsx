@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Save, Loader2, AlertCircle, CheckCircle2, ShieldCheck, ExternalLink } from "lucide-react";
+import { ArrowLeft, Save, Loader2, AlertCircle, CheckCircle2, ShieldCheck, ExternalLink, Globe, Beaker } from "lucide-react";
 import { PortalLayout } from "@/components/portal/PortalLayout";
 import { PortalCard } from "@/components/portal/ui";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { usePortal } from "@/components/portal/PortalContext";
+import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 
 function getCookie(name: string) {
   const value = "; " + document.cookie;
@@ -16,6 +19,7 @@ function getCookie(name: string) {
 
 export default function VendorCredentialsPage() {
   const { vendorCode } = useParams();
+  const { env } = usePortal();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -26,8 +30,12 @@ export default function VendorCredentialsPage() {
   const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
+    setLoading(true);
     fetch(`/portal/vendors/${vendorCode}/credentials`, {
-      headers: { "Accept": "application/json" }
+      headers: { 
+        "Accept": "application/json",
+        "X-Routex-Environment": env
+      }
     })
       .then(res => res.json())
       .then(json => {
@@ -40,14 +48,14 @@ export default function VendorCredentialsPage() {
           });
         } else {
           setFormData({
-            account_name: `${json.vendor.name} Primary`,
+            account_name: `${json.vendor.name} ${env === 'production' ? 'Live' : 'Sandbox'}`,
             credentials: {}
           });
         }
       })
       .catch(err => console.error("Fetch error:", err))
       .finally(() => setLoading(false));
-  }, [vendorCode]);
+  }, [vendorCode, env]);
 
   const updateCred = (key: string, val: any) => {
     setFormData((prev: any) => ({
@@ -69,6 +77,7 @@ export default function VendorCredentialsPage() {
           "Content-Type": "application/json",
           "Accept": "application/json",
           "X-XSRF-TOKEN": getCookie("XSRF-TOKEN") || "",
+          "X-Routex-Environment": env
         },
         body: JSON.stringify(formData),
       });
@@ -102,7 +111,18 @@ export default function VendorCredentialsPage() {
 
         <header className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-portal-text">{vendor.name} Configuration</h1>
+            <div className="flex items-center gap-2 mb-1">
+              <h1 className="text-2xl font-bold tracking-tight text-portal-text">{vendor.name} Configuration</h1>
+              {env === 'production' ? (
+                <Badge className="bg-teal/10 text-teal border-teal/20 gap-1">
+                  <Globe className="h-3 w-3" /> Live
+                </Badge>
+              ) : (
+                <Badge className="bg-amber/10 text-amber-500 border-amber/20 gap-1">
+                  <Beaker className="h-3 w-3" /> Sandbox
+                </Badge>
+              )}
+            </div>
             <p className="mt-1 text-sm text-portal-text-muted">Enter your API credentials to enable this gateway.</p>
           </div>
           <div className="h-12 w-12 rounded-xl bg-portal-elev border border-portal-border flex items-center justify-center text-lg font-bold text-teal">
@@ -169,6 +189,15 @@ export default function VendorCredentialsPage() {
                          {f.description || "Enable this option"}
                        </label>
                     </div>
+                  ) : f.type === 'textarea' ? (
+                    <Textarea 
+                      id={f.key}
+                      value={formData.credentials[f.key] || ""}
+                      onChange={e => updateCred(f.key, e.target.value)}
+                      placeholder={f.placeholder}
+                      className="bg-portal-elev border-portal-border focus-visible:ring-teal font-mono text-xs h-32"
+                      required={f.required}
+                    />
                   ) : (
                     <Input 
                       id={f.key} 

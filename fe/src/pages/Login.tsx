@@ -75,7 +75,7 @@ const Login = () => {
       });
 
       if (response.ok) {
-        window.location.href = "/portal";
+        navigate("/portal");
         return;
       }
 

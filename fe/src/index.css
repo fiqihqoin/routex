@@ -70,6 +70,45 @@
     --sidebar-border: 222 30% 14%;
     --sidebar-ring: 168 100% 42%;
   }
+
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 5%;
+
+    --card: 0 0% 98%;
+    --card-foreground: 222 47% 5%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 5%;
+
+    --primary: 168 100% 42%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 168 100% 42%;
+
+    /* Portal light tokens */
+    --portal-bg: 210 40% 98%;
+    --portal-surface: 0 0% 100%;
+    --portal-elev: 210 40% 96%;
+    --portal-border: 214 32% 91%;
+    --portal-text: 222 47% 11%;
+    --portal-text-muted: 215 16% 47%;
+    --portal-text-dim: 215 16% 65%;
+  }
 }
 
 @layer base {
