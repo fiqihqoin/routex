@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PtmsUserResource\Pages;
-use App\Models\PtmsUser;
+use App\Filament\Resources\MerchantResource\Pages;
+use App\Models\Merchant;
 use App\Jobs\SendApprovalNotificationJob;
 use App\Jobs\SendRejectionNotificationJob;
 use Filament\Forms;
@@ -15,9 +15,9 @@ use Filament\Notifications\Notification;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Builder;
 
-class PtmsUserResource extends Resource
+class MerchantResource extends Resource
 {
-    protected static ?string $model = PtmsUser::class;
+    protected static ?string $model = Merchant::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
@@ -121,12 +121,12 @@ class PtmsUserResource extends Resource
                         ->label('Approve Merchant')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->visible(fn (PtmsUser $record) => $record->status === 'pending_approval')
+                        ->visible(fn (Merchant $record) => $record->status === 'pending_approval')
                         ->requiresConfirmation()
                         ->form([
                             Forms\Components\Textarea::make('approval_notes')->label('Internal Admin Notes'),
                         ])
-                        ->action(function (PtmsUser $record, array $data): void {
+                        ->action(function (Merchant $record, array $data): void {
                             // Generate TWO API Keys: sandbox and production
                             $sandboxApiKey = 'rx_sbx_' . bin2hex(random_bytes(24));
                             $productionApiKey = 'rx_prod_' . bin2hex(random_bytes(24));
@@ -154,14 +154,14 @@ class PtmsUserResource extends Resource
                         ->label('Reject Merchant')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
-                        ->visible(fn (PtmsUser $record) => $record->status === 'pending_approval')
+                        ->visible(fn (Merchant $record) => $record->status === 'pending_approval')
                         ->requiresConfirmation()
                         ->form([
                             Forms\Components\Textarea::make('approval_notes')
                                 ->label('Reason for Rejection')
                                 ->required(),
                         ])
-                        ->action(function (PtmsUser $record, array $data): void {
+                        ->action(function (Merchant $record, array $data): void {
                             $record->update([
                                 'status' => 'rejected',
                                 'is_active' => false,
@@ -185,9 +185,9 @@ class PtmsUserResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPtmsUsers::route('/'),
-            'create' => Pages\CreatePtmsUser::route('/create'),
-            'edit' => Pages\EditPtmsUser::route('/{record}/edit'),
+            'index' => Pages\ListMerchants::route('/'),
+            'create' => Pages\CreateMerchant::route('/create'),
+            'edit' => Pages\EditMerchant::route('/{record}/edit'),
         ];
     }
 }

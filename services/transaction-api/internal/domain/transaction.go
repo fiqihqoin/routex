@@ -14,7 +14,6 @@ const (
 	StatusExpired        TransactionStatus = "expired"
 	StatusExpiredStale   TransactionStatus = "expired_stale"
 )
-
 type CreateTransactionRequest struct {
 	Amount         float64 `json:"amount"`
 	Currency       string  `json:"currency"`
@@ -24,7 +23,8 @@ type CreateTransactionRequest struct {
 type Transaction struct {
 	ID                     string            `json:"id"`
 	TransactionID          string            `json:"transaction_id"`
-	UserID                 string            `json:"user_id"`
+	MerchantID             string            `json:"merchant_id"`
+	Environment            string            `json:"environment"`
 	VendorID               string            `json:"vendor_id"`
 	AccountID              string            `json:"account_id"`
 	Amount                 float64           `json:"amount"`
@@ -32,6 +32,7 @@ type Transaction struct {
 	PaymentChannel         string            `json:"payment_channel"`
 	Status                 TransactionStatus `json:"status"`
 	IdempotencyKey         string            `json:"idempotency_key"`
+	RequestHash            string            `json:"request_hash"`
 	QRISCode               string            `json:"qris_code"`
 	ExpiresAt              *time.Time        `json:"expires_at"`
 	PaidAt                 *time.Time        `json:"paid_at"`

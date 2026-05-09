@@ -2,12 +2,12 @@
 
 namespace App\Console\Commands;
 
-use App\Models\PtmsUser;
+use App\Models\Merchant;
 use App\Models\User;
 use App\Models\UserAccountAssignment;
 use App\Models\Vendor;
 use App\Models\VendorAccount;
-use App\Policies\PtmsUserPolicy;
+use App\Policies\MerchantPolicy;
 use App\Policies\UserAccountAssignmentPolicy;
 use App\Policies\VendorAccountPolicy;
 use App\Policies\VendorPolicy;
@@ -31,7 +31,7 @@ class VerifyAccessControl extends Command
         $policyChecks = [
             Vendor::class => VendorPolicy::class,
             VendorAccount::class => VendorAccountPolicy::class,
-            PtmsUser::class => PtmsUserPolicy::class,
+            Merchant::class => MerchantPolicy::class,
             UserAccountAssignment::class => UserAccountAssignmentPolicy::class,
         ];
 
@@ -61,9 +61,9 @@ class VerifyAccessControl extends Command
         // Check portal guard
         $portalProvider = Auth::guard('portal')->getProvider();
         $portalModel = $portalProvider->getModel();
-        $isPortalOk = $portalModel === PtmsUser::class;
+        $isPortalOk = $portalModel === Merchant::class;
         $portalStatus = $isPortalOk ? "✓" : "✗";
-        $this->line("  {$portalStatus} Guard 'portal' uses Model: PtmsUser");
+        $this->line("  {$portalStatus} Guard 'portal' uses Model: Merchant");
 
         if ($isWebOk && $isPortalOk) $passed++;
 

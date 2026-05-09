@@ -24,8 +24,8 @@ func NewPostgresTransactionRepo(db *pgxpool.Pool, rdb *redis.Client, publisher m
 }
 
 func (r *postgresTransactionRepo) Create(ctx context.Context, tx *domain.Transaction) error {
-	query := "INSERT INTO transactions (id, transaction_id, user_id, vendor_id, account_id, amount, currency, payment_channel, status, idempotency_key, qris_code, expires_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)"
-	_, err := r.db.Exec(ctx, query, tx.ID, tx.TransactionID, tx.UserID, tx.VendorID, tx.AccountID, tx.Amount, tx.Currency, tx.PaymentChannel, tx.Status, tx.IdempotencyKey, tx.QRISCode, tx.ExpiresAt)
+	query := "INSERT INTO transactions (id, transaction_id, merchant_id, environment, vendor_id, account_id, amount, currency, payment_channel, status, idempotency_key, request_hash, qris_code, expires_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)"
+	_, err := r.db.Exec(ctx, query, tx.ID, tx.TransactionID, tx.MerchantID, tx.Environment, tx.VendorID, tx.AccountID, tx.Amount, tx.Currency, tx.PaymentChannel, tx.Status, tx.IdempotencyKey, tx.RequestHash, tx.QRISCode, tx.ExpiresAt)
 	return err
 }
 
@@ -39,11 +39,11 @@ func (r *postgresTransactionRepo) GetByID(ctx context.Context, transactionID str
 		}
 	}
 
-	query := "SELECT id, transaction_id, user_id, vendor_id, account_id, amount, currency, payment_channel, status, qris_code, expires_at, paid_at, callback_delivered, created_at, updated_at FROM transactions WHERE transaction_id = $1"
+	query := "SELECT id, transaction_id, merchant_id, environment, vendor_id, account_id, amount, currency, payment_channel, status, idempotency_key, request_hash, qris_code, expires_at, paid_at, callback_delivered, created_at, updated_at FROM transactions WHERE transaction_id = $1"
 	
 	tx := &domain.Transaction{}
 	err = r.db.QueryRow(ctx, query, transactionID).Scan(
-		&tx.ID, &tx.TransactionID, &tx.UserID, &tx.VendorID, &tx.AccountID, &tx.Amount, &tx.Currency, &tx.PaymentChannel, &tx.Status, &tx.QRISCode, &tx.ExpiresAt, &tx.PaidAt, &tx.CallbackDelivered, &tx.CreatedAt, &tx.UpdatedAt,
+		&tx.ID, &tx.TransactionID, &tx.MerchantID, &tx.Environment, &tx.VendorID, &tx.AccountID, &tx.Amount, &tx.Currency, &tx.PaymentChannel, &tx.Status, &tx.IdempotencyKey, &tx.RequestHash, &tx.QRISCode, &tx.ExpiresAt, &tx.PaidAt, &tx.CallbackDelivered, &tx.CreatedAt, &tx.UpdatedAt,
 	)
 	if err != nil {
 		return nil, err
@@ -160,14 +160,14 @@ func (r *postgresTransactionRepo) GetEffectivePenalties(ctx context.Context) (ma
 }
 
 func (r *postgresTransactionRepo) DisableUserCallback(ctx context.Context, userID string) error {
-	query := "UPDATE ptms_users SET callback_enabled = false WHERE id = $1"
+	query := "UPDATE merchants SET callback_enabled = false WHERE id = $1"
 	_, err := r.db.Exec(ctx, query, userID)
 	return err
 }
 
 func (r *postgresTransactionRepo) GetPendingForReconciliation(ctx context.Context, olderThan time.Duration, limit int) ([]domain.Transaction, error) {
 	threshold := time.Now().Add(-olderThan)
-	query := "SELECT id, transaction_id, user_id, vendor_id, account_id, amount, currency, payment_channel, status, qris_code, expires_at, paid_at, callback_delivered, reconciliation_attempts, created_at, updated_at FROM transactions WHERE status = 'pending_payment' AND created_at < $1 LIMIT $2"
+	query := "SELECT id, transaction_id, merchant_id, environment, vendor_id, account_id, amount, currency, payment_channel, status, idempotency_key, request_hash, qris_code, expires_at, paid_at, callback_delivered, reconciliation_attempts, created_at, updated_at FROM transactions WHERE status = 'pending_payment' AND created_at < $1 LIMIT $2"
 	
 	rows, err := r.db.Query(ctx, query, threshold, limit)
 	if err != nil {
@@ -179,7 +179,7 @@ func (r *postgresTransactionRepo) GetPendingForReconciliation(ctx context.Contex
 	for rows.Next() {
 		var tx domain.Transaction
 		err = rows.Scan(
-			&tx.ID, &tx.TransactionID, &tx.UserID, &tx.VendorID, &tx.AccountID, &tx.Amount, &tx.Currency, &tx.PaymentChannel, &tx.Status, &tx.QRISCode, &tx.ExpiresAt, &tx.PaidAt, &tx.CallbackDelivered, &tx.ReconciliationAttempts, &tx.CreatedAt, &tx.UpdatedAt,
+			&tx.ID, &tx.TransactionID, &tx.MerchantID, &tx.Environment, &tx.VendorID, &tx.AccountID, &tx.Amount, &tx.Currency, &tx.PaymentChannel, &tx.Status, &tx.IdempotencyKey, &tx.RequestHash, &tx.QRISCode, &tx.ExpiresAt, &tx.PaidAt, &tx.CallbackDelivered, &tx.ReconciliationAttempts, &tx.CreatedAt, &tx.UpdatedAt,
 		)
 		if err != nil {
 			return nil, err

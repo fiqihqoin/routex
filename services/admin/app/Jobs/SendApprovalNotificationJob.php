@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\PtmsUser;
+use App\Models\Merchant;
 use App\Mail\ApprovalNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -16,7 +16,7 @@ class SendApprovalNotificationJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public function __construct(
-        protected PtmsUser $user,
+        protected Merchant $user,
         protected string $sandboxApiKey,
         protected string $productionApiKey
     ) {}

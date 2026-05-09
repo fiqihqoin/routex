@@ -2,7 +2,7 @@
 
 namespace App\Notifications;
 
-use App\Models\PtmsUser;
+use App\Models\Merchant;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
@@ -11,7 +11,7 @@ class NewMerchantWaitingApproval extends Notification
 {
     use Queueable;
 
-    public function __construct(protected PtmsUser $merchant)
+    public function __construct(protected Merchant $merchant)
     {}
 
     public function via(object $notifiable): array
@@ -26,7 +26,7 @@ class NewMerchantWaitingApproval extends Notification
             ->line('A new merchant has verified their email and is waiting for approval.')
             ->line('Merchant Name: ' . $this->merchant->name)
             ->line('Company: ' . $this->merchant->company_name)
-            ->action('View Merchant', url('/admin/ptms-users/' . $this->merchant->id . '/edit'))
+            ->action('View Merchant', url('/admin/merchants/' . $this->merchant->id . '/edit'))
             ->line('Please review and approve the application.');
     }
 }

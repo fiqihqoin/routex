@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
-use App\Models\PtmsUser;
+use App\Models\Merchant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -24,7 +24,7 @@ class PortalLoginController extends Controller
             'password' => ['required'],
         ]);
 
-        $user = PtmsUser::where('email', $credentials['email'])->first();
+        $user = Merchant::where('email', $credentials['email'])->first();
         
         if (!$user) {
             Log::info("Portal Login: User not found: " . $credentials['email']);

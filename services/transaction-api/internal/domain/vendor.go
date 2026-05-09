@@ -15,6 +15,7 @@ type Vendor struct {
 
 type VendorAccount struct {
 	ID          string    `json:"id"`
+	MerchantID  string    `json:"merchant_id"`
 	VendorID    string    `json:"vendor_id"`
 	AccountName string    `json:"account_name"`
 	Credentials string    `json:"credentials"`
@@ -69,7 +70,7 @@ type AccountSelector interface {
 
 type VendorRegistry interface {
 	Load(ctx context.Context) error
-	GetEligibleVendors(ctx context.Context, userID string, amount float64, channel string, environment string) ([]Vendor, error)
+	GetEligibleVendors(ctx context.Context, merchantID string, amount float64, channel string, environment string) ([]Vendor, error)
 	GetAccounts(ctx context.Context, vendorID string, environment string) ([]VendorAccount, error)
 	WatchConfigUpdates(ctx context.Context)
 	GetVendor(ctx context.Context, vendorID string) (Vendor, error)

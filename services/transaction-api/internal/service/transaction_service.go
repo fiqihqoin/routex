@@ -96,33 +96,33 @@ func (s *transactionService) GenerateQRIS(ctx context.Context, apiKey string, id
 		}
 	}
 
-	userID, _ := ctx.Value(domain.ContextKeyUserID).(string)
+	merchantID, _ := ctx.Value(domain.ContextKeyMerchantID).(string)
 
 	// Step 5: Read environment from context
 	env, _ := ctx.Value(domain.ContextKeyEnvironment).(string)
 	if env == "" {
-		env = "sandbox" // Default to sandbox for safety
+		env = s.config.Environment
 	}
-	fmt.Printf("[GenerateQRIS] Using environment: %s\n", env)
+	fmt.Printf("[GenerateQRIS] Using environment: %s for merchant: %s\n", env, merchantID)
 
 	rlReq := domain.RateLimitRequest{
-		UserID: userID,
-		Amount: req.Amount,
+		MerchantID: merchantID,
+		Amount:     req.Amount,
 	}
 	rlRes, _ := s.limiter.Check(ctx, rlReq)
 	if rlRes != nil && !rlRes.Allowed {
-		metrics.RateLimitRejections.WithLabelValues("user", userID, rlRes.Reason).Inc()
+		metrics.RateLimitRejections.WithLabelValues("user", merchantID, rlRes.Reason).Inc()
 		return nil, domain.ErrRateLimited
 	}
 
 	// Step 6: Filter eligible vendors by environment from context
-	eligible, err := s.registry.GetEligibleVendors(ctx, userID, req.Amount, req.PaymentChannel, env)
+	eligible, err := s.registry.GetEligibleVendors(ctx, merchantID, req.Amount, req.PaymentChannel, env)
 	if err != nil {
 		fmt.Printf("[GenerateQRIS] GetEligibleVendors error: %v\n", err)
 		return nil, domain.ErrNoEligibleVendor
 	}
 	if len(eligible) == 0 {
-		fmt.Printf("[GenerateQRIS] No eligible vendors found for user %s\n", userID)
+		fmt.Printf("[GenerateQRIS] No eligible vendors found for merchant %s in env %s\n", merchantID, env)
 		return nil, domain.ErrNoEligibleVendor
 	}
 	fmt.Printf("[GenerateQRIS] Found %d eligible vendors\n", len(eligible))
@@ -133,7 +133,6 @@ func (s *transactionService) GenerateQRIS(ctx context.Context, apiKey string, id
 	var selectedAccount *domain.VendorAccount
 	var selectedVendor domain.Vendor
 
-	fmt.Printf("[TxService] Ranked vendors count: %d\n", len(ranked))
 	for i, v := range ranked {
 		fmt.Printf("[TxService] Trying vendor #%d: %s (ID: %s)\n", i+1, v.Code, v.ID)
 		// Step 7: Filter accounts by environment
@@ -142,12 +141,22 @@ func (s *transactionService) GenerateQRIS(ctx context.Context, apiKey string, id
 			fmt.Printf("[TxService] Failed to get accounts for vendor %s: %v\n", v.Code, err)
 			continue
 		}
-		if len(accounts) == 0 {
-			fmt.Printf("[TxService] No accounts found for vendor %s in environment %s\n", v.Code, env)
+		
+		// Filter for accounts owned by this merchant
+		var ownedAccounts []domain.VendorAccount
+		for _, acc := range accounts {
+			if acc.MerchantID == merchantID {
+				ownedAccounts = append(ownedAccounts, acc)
+			}
+		}
+
+		if len(ownedAccounts) == 0 {
+			fmt.Printf("[TxService] No accounts owned by merchant %s for vendor %s in environment %s\n", merchantID, v.Code, env)
 			continue
 		}
-		fmt.Printf("[TxService] Found %d accounts for vendor %s in environment %s\n", len(accounts), v.Code, env)
-		acc, err := s.selector.SelectAccount(ctx, v.ID, accounts)
+		
+		fmt.Printf("[TxService] Found %d accounts for vendor %s in environment %s\n", len(ownedAccounts), v.Code, env)
+		acc, err := s.selector.SelectAccount(ctx, v.ID, ownedAccounts)
 		if err == nil {
 			selectedAccount = acc
 			selectedVendor = v
@@ -188,7 +197,8 @@ func (s *transactionService) GenerateQRIS(ctx context.Context, apiKey string, id
 	tx := &domain.Transaction{
 		ID:             uuid.New().String(),
 		TransactionID:  uuid.New().String(),
-		UserID:         userID,
+		MerchantID:     merchantID,
+		Environment:    env,
 		VendorID:       selectedVendor.ID,
 		AccountID:      selectedAccount.ID,
 		Amount:         req.Amount,
@@ -196,6 +206,7 @@ func (s *transactionService) GenerateQRIS(ctx context.Context, apiKey string, id
 		PaymentChannel: "qris",
 		Status:         domain.StatusPendingPayment,
 		IdempotencyKey: idempotencyKey,
+		RequestHash:    bodyHash,
 		QRISCode:       qrisCode,
 		CreatedAt:      time.Now(),
 	}
@@ -324,9 +335,9 @@ func (s *transactionService) HandleVendorCallback(ctx context.Context, vendorID 
 	}
 	s.repo.UpdateReadModel(ctx, tx)
 
-	if tx.UserID != "" {
+	if tx.MerchantID != "" {
 		var callbackURL string
-		err := s.db.QueryRow(ctx, "SELECT callback_url FROM ptms_users WHERE id = $1 AND callback_enabled = true", tx.UserID).Scan(&callbackURL)
+		err := s.db.QueryRow(ctx, "SELECT callback_url FROM merchants WHERE id = $1 AND callback_enabled = true", tx.MerchantID).Scan(&callbackURL)
 		if err == nil && callbackURL != "" {
 			s.forwardToUser(ctx, callbackURL, normalized)
 		}

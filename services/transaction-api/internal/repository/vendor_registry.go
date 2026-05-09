@@ -21,17 +21,18 @@ type vendorRegistry struct {
 	
 	vendors     map[string]domain.Vendor
 	accounts    map[string][]domain.VendorAccount
-	userVendors map[string]map[string]bool
+	// merchantVendors maps [merchantID][vendorID] -> true
+	merchantVendors map[string]map[string]bool
 }
 
 func NewVendorRegistry(db *pgxpool.Pool, rdb *redis.Client, cb domain.CircuitBreaker) domain.VendorRegistry {
 	return &vendorRegistry{
-		db:          db,
-		rdb:         rdb,
-		cb:          cb,
-		vendors:     make(map[string]domain.Vendor),
-		accounts:    make(map[string][]domain.VendorAccount),
-		userVendors: make(map[string]map[string]bool),
+		db:              db,
+		rdb:             rdb,
+		cb:              cb,
+		vendors:         make(map[string]domain.Vendor),
+		accounts:        make(map[string][]domain.VendorAccount),
+		merchantVendors: make(map[string]map[string]bool),
 	}
 }
 
@@ -40,7 +41,7 @@ func (r *vendorRegistry) Load(ctx context.Context) error {
 	
 	newVendors := make(map[string]domain.Vendor)
 	newAccounts := make(map[string][]domain.VendorAccount)
-	newUserVendors := make(map[string]map[string]bool)
+	newMerchantVendors := make(map[string]map[string]bool)
 
 	// 1. Load Vendors from DB
 	rows, err := r.db.Query(ctx, "SELECT id, code, name, is_active FROM vendors WHERE is_active = true")
@@ -57,112 +58,94 @@ func (r *vendorRegistry) Load(ctx context.Context) error {
 		newVendors[v.ID] = v
 	}
 
-	// 2. Load Accounts from DB
-	accRows, err := r.db.Query(ctx, "SELECT id, vendor_id, account_name, credentials, is_active, environment FROM vendor_accounts WHERE is_active = true")
+	// 2. Load Credentials from DB (replaces vendor_accounts)
+	accRows, err := r.db.Query(ctx, "SELECT id, merchant_id, vendor_id, environment, credentials_encrypted, is_enabled FROM merchant_vendor_credentials WHERE is_enabled = true")
 	if err != nil {
-		return fmt.Errorf("failed to query vendor accounts: %w", err)
+		return fmt.Errorf("failed to query vendor credentials: %w", err)
 	}
 	defer accRows.Close()
 
 	for accRows.Next() {
 		var a domain.VendorAccount
-		if err := accRows.Scan(&a.ID, &a.VendorID, &a.AccountName, &a.Credentials, &a.IsActive, &a.Environment); err != nil {
+		var merchantID *string
+		if err := accRows.Scan(&a.ID, &merchantID, &a.VendorID, &a.Environment, &a.Credentials, &a.IsActive); err != nil {
 			return err
+		}
+
+		if merchantID != nil {
+			a.MerchantID = *merchantID
+			if newMerchantVendors[*merchantID] == nil {
+				newMerchantVendors[*merchantID] = make(map[string]bool)
+			}
+			newMerchantVendors[*merchantID][a.VendorID] = true
 		}
 
 		// Decrypt credentials
 		if a.Credentials != "" {
-			decrypted, err := crypto.Decrypt(a.Credentials)
+			decrypted, err := crypto.DecryptRaw(a.Credentials)
 			if err == nil {
-				jsonStr, _ := json.Marshal(decrypted)
-				a.Credentials = string(jsonStr)
+				a.Credentials = decrypted
 			} else {
-				log.Printf("Warning: failed to decrypt credentials for account %s: %v", a.ID, err)
+				log.Printf("Warning: failed to decrypt credentials for credential record %s: %v", a.ID, err)
 			}
 		}
 
 		newAccounts[a.VendorID] = append(newAccounts[a.VendorID], a)
 	}
 
-	// 3. Load User Assignments from DB
-	userRows, err := r.db.Query(ctx, "SELECT user_id, vendor_id FROM user_account_assignments")
-	if err != nil {
-		return fmt.Errorf("failed to query user assignments: %w", err)
-	}
-	defer userRows.Close()
-
-	for userRows.Next() {
-		var userID, vendorID string
-		if err := userRows.Scan(&userID, &vendorID); err != nil {
-			return err
-		}
-		if newUserVendors[userID] == nil {
-			newUserVendors[userID] = make(map[string]bool)
-		}
-		newUserVendors[userID][vendorID] = true
-	}
-
 	r.mu.Lock()
 	r.vendors = newVendors
 	r.accounts = newAccounts
-	r.userVendors = newUserVendors
+	r.merchantVendors = newMerchantVendors
 	r.mu.Unlock()
 
-	log.Printf("Loaded %d vendors, their accounts, and user assignments into registry", len(newVendors))
+	log.Printf("Loaded %d vendors and their merchant-owned accounts into registry", len(newVendors))
 	return nil
 }
 
-func (r *vendorRegistry) GetEligibleVendors(ctx context.Context, userID string, amount float64, channel string, environment string) ([]domain.Vendor, error) {
+func (r *vendorRegistry) GetEligibleVendors(ctx context.Context, merchantID string, amount float64, channel string, environment string) ([]domain.Vendor, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	log.Printf("[Registry] GetEligibleVendors for user %s, amount %.2f, channel %s, env %s", userID, amount, channel, environment)
+	log.Printf("[Registry] GetEligibleVendors for merchant %s, amount %.2f, channel %s, env %s", merchantID, amount, channel, environment)
 
-	assignedVendors, ok := r.userVendors[userID]
+	assignedVendors, ok := r.merchantVendors[merchantID]
 	if !ok {
-		log.Printf("[Registry] No vendor assignments found for user %s", userID)
+		log.Printf("[Registry] No vendor accounts found for merchant %s", merchantID)
 		return nil, nil
 	}
-
-	log.Printf("[Registry] User %s has %d vendor assignments", userID, len(assignedVendors))
 
 	var eligible []domain.Vendor
 
 	for _, v := range r.vendors {
-		log.Printf("[Registry] Checking vendor %s (%s)", v.Name, v.ID)
-
 		if !assignedVendors[v.ID] {
-			log.Printf("[Registry]   - Not assigned to user")
 			continue
 		}
 
 		if !v.IsActive {
-			log.Printf("[Registry]   - Not active")
 			continue
 		}
 
-		// Filter accounts by environment
+		// Filter accounts by merchant AND environment
 		accounts := r.accounts[v.ID]
 		hasMatchingAccount := false
 		for _, acc := range accounts {
-			if environment == "" || acc.Environment == environment {
+			if acc.MerchantID == merchantID && (environment == "" || acc.Environment == environment) {
 				hasMatchingAccount = true
 				break
 			}
 		}
 
 		if !hasMatchingAccount {
-			log.Printf("[Registry]   - No matching account for environment %s", environment)
 			continue
 		}
 
 		allowed, _ := r.cb.AllowRequest(ctx, v.ID)
 		if !allowed {
-			log.Printf("[Registry]   - Circuit breaker blocked")
+			log.Printf("[Registry]   - Vendor %s blocked by circuit breaker", v.Name)
 			continue
 		}
 
-		log.Printf("[Registry]   - ELIGIBLE ✓")
 		eligible = append(eligible, v)
 	}
 

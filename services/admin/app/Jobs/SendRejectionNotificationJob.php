@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\PtmsUser;
+use App\Models\Merchant;
 use App\Mail\RejectionNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -15,7 +15,7 @@ class SendRejectionNotificationJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(protected PtmsUser $user, protected string $reason)
+    public function __construct(protected Merchant $user, protected string $reason)
     {}
 
     public function handle(): void

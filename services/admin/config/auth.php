@@ -14,7 +14,7 @@ return [
         ],
         'portal' => [
             'driver' => 'session',
-            'provider' => 'ptms_users',
+            'provider' => 'merchants',
         ],
     ],
 
@@ -23,9 +23,9 @@ return [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
-        'ptms_users' => [
+        'merchants' => [
             'driver' => 'eloquent',
-            'model' => App\Models\PtmsUser::class,
+            'model' => App\Models\Merchant::class,
         ],
     ],
 

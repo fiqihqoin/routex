@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\PtmsUserResource\Pages;
+namespace App\Filament\Resources\MerchantResource\Pages;
 
-use App\Filament\Resources\PtmsUserResource;
+use App\Filament\Resources\MerchantResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-class EditPtmsUser extends EditRecord
+class EditMerchant extends EditRecord
 {
-    protected static string $resource = PtmsUserResource::class;
+    protected static string $resource = MerchantResource::class;
 
     protected function getHeaderActions(): array
     {

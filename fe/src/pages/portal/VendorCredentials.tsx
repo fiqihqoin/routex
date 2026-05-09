@@ -30,17 +30,31 @@ export default function VendorCredentialsPage() {
   const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
+    // Reset state when environment or vendor changes
+    setFormData({ account_name: "", credentials: {} });
+    setErrors(null);
+    setSuccess(null);
     setLoading(true);
+
+    console.log('[VendorCredentials] Fetching for:', { vendorCode, env });
+
     fetch(`/portal/vendors/${vendorCode}/credentials`, {
-      headers: { 
+      headers: {
         "Accept": "application/json",
         "X-Routex-Environment": env
       }
     })
       .then(res => res.json())
       .then(json => {
+        console.log('[VendorCredentials] Response:', {
+          vendor: json.vendor?.name,
+          hasAccount: !!json.account,
+          accountEnv: json.account?.environment
+        });
+
         setVendor(json.vendor);
         setConfig(json.config);
+
         if (json.account) {
           setFormData({
             account_name: json.account.account_name,

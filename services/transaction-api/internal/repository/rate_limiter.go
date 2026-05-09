@@ -162,13 +162,13 @@ func (rl *redisRateLimiter) checkRedis(ctx context.Context, req domain.RateLimit
 	now := time.Now().UnixNano() / 1e6 // Current time in ms
 
 	// Get Limits from config or use defaults
-	userTPS := int(rl.getLimitFor("user", req.UserID, "tps"))
+	userTPS := int(rl.getLimitFor("user", req.MerchantID, "tps"))
 	vendorTPS := int(rl.getLimitFor("vendor", req.VendorID, "tps"))
 	accountTPS := int(rl.getLimitFor("account", req.AccountID, "tps"))
-	dailyLimit := rl.getLimitFor("user", req.UserID, "daily_volume")
+	dailyLimit := rl.getLimitFor("user", req.MerchantID, "daily_volume")
 
 	// Check User TPS
-	if !rl.runTPSCheck(ctx, fmt.Sprintf("rl:user:%s:tps", req.UserID), userTPS, 1000, now) {
+	if !rl.runTPSCheck(ctx, fmt.Sprintf("rl:user:%s:tps", req.MerchantID), userTPS, 1000, now) {
 		return &domain.RateLimitResult{Allowed: false, RetryAfter: 1, Reason: "USER_TPS_EXCEEDED"}, nil
 	}
 
@@ -183,7 +183,7 @@ func (rl *redisRateLimiter) checkRedis(ctx context.Context, req domain.RateLimit
 	}
 
 	// Check Daily Volume
-	if !rl.runVolumeCheck(ctx, fmt.Sprintf("rl:user:%s:vol:daily", req.UserID), req.Amount, dailyLimit) {
+	if !rl.runVolumeCheck(ctx, fmt.Sprintf("rl:user:%s:vol:daily", req.MerchantID), req.Amount, dailyLimit) {
 		return &domain.RateLimitResult{Allowed: false, RetryAfter: 60, Reason: "DAILY_VOLUME_EXCEEDED"}, nil
 	}
 
@@ -217,14 +217,14 @@ func (rl *redisRateLimiter) checkInMemory(req domain.RateLimitRequest) (*domain.
 	window := 1 * time.Second
 
 	// 50% Fallback Limits
-	userTPSLimit := int(rl.getLimitFor("user", req.UserID, "tps") * 0.5)
-	dailyVolLimit := rl.getLimitFor("user", req.UserID, "daily_volume") * 0.5
+	userTPSLimit := int(rl.getLimitFor("user", req.MerchantID, "tps") * 0.5)
+	dailyVolLimit := rl.getLimitFor("user", req.MerchantID, "daily_volume") * 0.5
 
 	rl.mu.Lock()
 	defer rl.mu.Unlock()
 
 	// Check User TPS (Simplified Sliding Window)
-	userKey := "local:tps:" + req.UserID
+	userKey := "local:tps:" + req.MerchantID
 	rl.localTPS[userKey] = rl.filterOld(rl.localTPS[userKey], now.Add(-window))
 	if len(rl.localTPS[userKey]) >= userTPSLimit {
 		return &domain.RateLimitResult{Allowed: false, RetryAfter: 1, Reason: "USER_TPS_EXCEEDED_FALLBACK"}
@@ -232,7 +232,7 @@ func (rl *redisRateLimiter) checkInMemory(req domain.RateLimitRequest) (*domain.
 	rl.localTPS[userKey] = append(rl.localTPS[userKey], now)
 
 	// Check Daily Volume
-	volKey := "local:vol:" + req.UserID
+	volKey := "local:vol:" + req.MerchantID
 	if rl.localVolume[volKey] + req.Amount > dailyVolLimit {
 		return &domain.RateLimitResult{Allowed: false, RetryAfter: 60, Reason: "DAILY_VOLUME_EXCEEDED_FALLBACK"}
 	}

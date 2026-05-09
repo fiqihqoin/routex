@@ -28,7 +28,7 @@
     </table>
     
     <p style="margin-top: 20px;">
-        <a href="{{ url('/admin/ptms-users/' . $user->id . '/edit') }}" 
+        <a href="{{ url('/admin/merchants/' . $user->id . '/edit') }}" 
            style="background-color: #10B981; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
             Lihat & Approve di Dashboard
         </a>

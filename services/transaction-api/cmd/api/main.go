@@ -173,7 +173,7 @@ func APIKeyMiddleware(db *pgxpool.Pool, rdb *redis.Client) func(http.Handler) ht
 
 				dbErr := db.QueryRow(r.Context(),
 					`SELECT id, is_active, sandbox_api_key, production_api_key
-					 FROM ptms_users
+					 FROM merchants
 					 WHERE sandbox_api_key = $1 OR production_api_key = $1`,
 					apiKey,
 				).Scan(&id, &isActive, &sandboxKey, &productionKey)
@@ -207,7 +207,7 @@ func APIKeyMiddleware(db *pgxpool.Pool, rdb *redis.Client) func(http.Handler) ht
 					userID = parts[0]
 					// Re-query to get environment if not in cache
 					db.QueryRow(r.Context(),
-						"SELECT CASE WHEN sandbox_api_key = $1 THEN 'sandbox' ELSE 'production' END FROM ptms_users WHERE id = $2",
+						"SELECT CASE WHEN sandbox_api_key = $1 THEN 'sandbox' ELSE 'production' END FROM merchants WHERE id = $2",
 						apiKey, userID,
 					).Scan(&detectedEnv)
 				}
@@ -231,7 +231,7 @@ func APIKeyMiddleware(db *pgxpool.Pool, rdb *redis.Client) func(http.Handler) ht
 			}
 
 			// Step 4: Save environment to context
-			ctx := context.WithValue(r.Context(), domain.ContextKeyUserID, userID)
+			ctx := context.WithValue(r.Context(), domain.ContextKeyMerchantID, userID)
 			ctx = context.WithValue(ctx, domain.ContextKeyEnvironment, detectedEnv)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})

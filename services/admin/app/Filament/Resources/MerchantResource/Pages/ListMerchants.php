@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Filament\Resources\PtmsUserResource\Pages;
+namespace App\Filament\Resources\MerchantResource\Pages;
 
-use App\Filament\Resources\PtmsUserResource;
+use App\Filament\Resources\MerchantResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
-class ListPtmsUsers extends ListRecords
+class ListMerchants extends ListRecords
 {
-    protected static string $resource = PtmsUserResource::class;
+    protected static string $resource = MerchantResource::class;
 
     protected function getHeaderActions(): array
     {

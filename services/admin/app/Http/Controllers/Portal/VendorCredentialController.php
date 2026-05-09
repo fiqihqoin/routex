@@ -38,6 +38,17 @@ class VendorCredentialController extends Controller
           ->where('environment', $environment)
           ->first();
 
+        \Illuminate\Support\Facades\Log::info('VendorCredential Show Debug', [
+            'user_id' => $user->id,
+            'vendor_code' => $vendorCode,
+            'vendor_id' => $vendor->id,
+            'environment' => $environment,
+            'account_found' => $existingAccount ? 'YES' : 'NO',
+            'account_id' => $existingAccount?->id,
+            'account_name' => $existingAccount?->account_name,
+            'account_environment' => $existingAccount?->environment,
+        ]);
+
         if ($request->wantsJson()) {
             return response()->json([
                 'vendor' => $vendor,

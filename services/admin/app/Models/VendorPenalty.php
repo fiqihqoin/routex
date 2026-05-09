@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class VendorPenalty extends Model
 {
@@ -15,7 +16,7 @@ class VendorPenalty extends Model
 
     protected $fillable = [
         'vendor_id',
-        'account_id',
+        'merchant_credential_id',
         'penalty_points',
         'last_updated_at',
     ];
@@ -24,14 +25,14 @@ class VendorPenalty extends Model
         'last_updated_at' => 'datetime',
     ];
 
-    public function vendor()
+    public function vendor(): BelongsTo
     {
         return $this->belongsTo(Vendor::class);
     }
 
-    public function account()
+    public function credential(): BelongsTo
     {
-        return $this->belongsTo(VendorAccount::class, 'account_id');
+        return $this->belongsTo(MerchantVendorCredential::class, 'merchant_credential_id');
     }
 
     // Helper for effective penalty calculation

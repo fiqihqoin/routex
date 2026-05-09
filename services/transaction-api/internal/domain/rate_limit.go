@@ -12,10 +12,10 @@ const (
 )
 
 type RateLimitRequest struct {
-	UserID    string
-	VendorID  string
-	AccountID string
-	Amount    float64
+	MerchantID string
+	VendorID   string
+	AccountID  string
+	Amount     float64
 }
 
 type RateLimitResult struct {

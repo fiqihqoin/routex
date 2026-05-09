@@ -11,15 +11,12 @@ trait HasEncryptedCredentials
         return app(CredentialEncryptionService::class);
     }
 
-    public function getCredentialsAttribute($value): array
+    public function getCredentialsAttribute(): array
     {
+        $value = $this->attributes['credentials_encrypted'] ?? null;
+        
         if (empty($value)) {
             return [];
-        }
-
-        // If it's already an array (due to casting or other reasons), return as is
-        if (is_array($value)) {
-            return $value;
         }
 
         return static::getEncryptionService()->decrypt($value);
@@ -28,9 +25,9 @@ trait HasEncryptedCredentials
     public function setCredentialsAttribute($value): void
     {
         if (is_array($value)) {
-            $this->attributes['credentials'] = static::getEncryptionService()->encrypt($value);
+            $this->attributes['credentials_encrypted'] = static::getEncryptionService()->encrypt($value);
         } else {
-            $this->attributes['credentials'] = $value;
+            $this->attributes['credentials_encrypted'] = $value;
         }
     }
 }

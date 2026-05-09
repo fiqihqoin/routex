@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
-use App\Models\PtmsUser;
+use App\Models\Merchant;
 use App\Models\EmailVerificationToken;
 use App\Jobs\SendVerificationEmailJob;
 use Illuminate\Http\Request;
@@ -22,7 +22,7 @@ class RegisterController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:ptms_users,email',
+            'email' => 'required|email|unique:merchants,email',
             'password' => 'required|string|min:8|confirmed',
             'company_name' => 'required|string|max:255',
             'use_case' => 'required|string',
@@ -30,7 +30,7 @@ class RegisterController extends Controller
         ]);
 
         return DB::transaction(function () use ($validated) {
-            $user = PtmsUser::create([
+            $user = Merchant::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => $validated['password'],
@@ -46,7 +46,7 @@ class RegisterController extends Controller
             $hashedToken = hash('sha256', $rawToken);
 
             EmailVerificationToken::create([
-                'ptms_user_id' => $user->id,
+                'merchant_id' => $user->id,
                 'token' => $hashedToken,
                 'expires_at' => Carbon::now()->addHours(24),
             ]);

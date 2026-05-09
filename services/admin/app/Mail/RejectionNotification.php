@@ -2,7 +2,7 @@
 
 namespace App\Mail;
 
-use App\Models\PtmsUser;
+use App\Models\Merchant;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -14,7 +14,7 @@ class RejectionNotification extends Mailable
     use Queueable, SerializesModels;
 
     public function __construct(
-        public PtmsUser $user,
+        public Merchant $user,
         public string $reason
     ) {}
 
