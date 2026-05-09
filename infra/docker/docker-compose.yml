@@ -148,6 +148,7 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - ./nginx/certs:/etc/nginx/certs:ro
       - ./nginx/logs:/var/log/nginx
+      - ../../services/admin/public:/var/www/html/public:ro
     networks:
       - ptms-network
     depends_on:

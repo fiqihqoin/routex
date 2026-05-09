@@ -6,11 +6,11 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 	"time"
 
@@ -91,6 +91,19 @@ func main() {
 		log.Println("Subscribed to 'config:update' for hot-reloads")
 		for msg := range ch {
 			log.Printf("Received config update: %s", msg.Payload)
+
+			var event map[string]interface{}
+			if err := json.Unmarshal([]byte(msg.Payload), &event); err == nil {
+				if event["type"] == "api_key_revoked" {
+					if keyHash, ok := event["key_hash"].(string); ok {
+						rdb.Del(ctx, "apikey:hash:"+keyHash)
+						log.Printf("Invalidated cache for revoked API key: %s", keyHash[:8]+"...")
+					}
+					continue
+				}
+			}
+
+			// Default: reload all configs
 			registry.Load(ctx)
 			routerEngine.Load(ctx)
 			limiter.Load(ctx)
@@ -151,77 +164,75 @@ func APIKeyMiddleware(db *pgxpool.Pool, rdb *redis.Client) func(http.Handler) ht
 				return
 			}
 
-			// Detect environment from API key prefix
-			if !strings.HasPrefix(apiKey, "ptms_sb_") && !strings.HasPrefix(apiKey, "ptms_live_") {
-				respondError(w, r, 401, "INVALID_API_KEY", "Invalid API key format")
-				return
+			// 2. Hash with SHA256
+			hash := sha256.Sum256([]byte(apiKey))
+			keyHash := hex.EncodeToString(hash[:])
+
+			// 3. Check Redis cache
+			cacheKey := "apikey:hash:" + keyHash
+			var cachedData struct {
+				MerchantID  string `json:"merchant_id"`
+				Environment string `json:"environment"`
+				APIKeyID    string `json:"api_key_id"`
 			}
 
-			keyHash := sha256.Sum256([]byte(apiKey))
-			keyHashHex := hex.EncodeToString(keyHash[:])
-
-			cacheKey := "apikey:" + keyHashHex
 			cached, err := rdb.Get(r.Context(), cacheKey).Result()
-			
-			var merchantID, detectedEnv, keyID string
+			if err == nil {
+				if err := json.Unmarshal([]byte(cached), &cachedData); err == nil {
+					goto validate_env
+				}
+			}
 
-			if err != nil {
-				// Query api_keys table
+			// 4. Cache miss, query DB
+			{
+				var merchantStatus string
 				err = db.QueryRow(r.Context(),
-					`SELECT merchant_id, environment, id 
-					 FROM api_keys 
-					 WHERE key_hash = $1 
-					   AND revoked_at IS NULL 
-					   AND (expires_at IS NULL OR expires_at > NOW())`,
-					keyHashHex,
-				).Scan(&merchantID, &detectedEnv, &keyID)
+					`SELECT ak.merchant_id, ak.environment, ak.id, m.status
+					 FROM api_keys ak
+					 JOIN merchants m ON m.id = ak.merchant_id
+					 WHERE ak.key_hash = $1
+					   AND ak.revoked_at IS NULL
+					   AND (ak.expires_at IS NULL OR ak.expires_at > NOW())
+					   AND m.deleted_at IS NULL
+					 LIMIT 1`,
+					keyHash,
+				).Scan(&cachedData.MerchantID, &cachedData.Environment, &cachedData.APIKeyID, &merchantStatus)
 
 				if err != nil {
-					respondError(w, r, 403, "INVALID_API_KEY", "Invalid API key")
+					respondError(w, r, 401, "INVALID_API_KEY", "Invalid or revoked API key")
 					return
 				}
 
-				// Check merchant status
-				var mStatus string
-				err = db.QueryRow(r.Context(),
-					"SELECT status FROM merchants WHERE id = $1 AND deleted_at IS NULL",
-					merchantID,
-				).Scan(&mStatus)
-
-				if err != nil || mStatus != "active" {
-					respondError(w, r, 403, "MERCHANT_NOT_ACTIVE", "Merchant account is not active")
+				// 6. Check merchant status
+				if merchantStatus != "active" {
+					respondError(w, r, 403, "MERCHANT_INACTIVE", "Account tidak aktif")
 					return
 				}
 
-				rdb.Set(r.Context(), cacheKey, merchantID+"|"+detectedEnv+"|"+keyID, 5*time.Minute)
-			} else {
-				parts := strings.Split(cached, "|")
-				if len(parts) == 3 {
-					merchantID = parts[0]
-					detectedEnv = parts[1]
-					keyID = parts[2]
-				}
+				// 7. Cache result
+				data, _ := json.Marshal(cachedData)
+				rdb.Set(r.Context(), cacheKey, data, 5*time.Minute)
 			}
 
-			// Compare detected env with X-Routex-Environment header
-			nginxEnv := r.Header.Get("X-Routex-Environment")
-			if nginxEnv != "" && nginxEnv != detectedEnv {
-				message := "API key ini adalah production key. Gunakan routex.id"
-				if detectedEnv == "sandbox" {
-					message = "API key ini adalah sandbox key. Gunakan sandbox.routex.id"
-				}
-				respondError(w, r, 403, "ENVIRONMENT_MISMATCH", message)
+		validate_env:
+			// 8. Validate environment match
+			routexEnv := r.Header.Get("X-Routex-Environment")
+			if routexEnv != "" && cachedData.Environment != routexEnv {
+				msg := fmt.Sprintf("Key ini adalah %s key, gunakan %s.routex.id", 
+					cachedData.Environment, cachedData.Environment)
+				respondError(w, r, 403, "ENVIRONMENT_MISMATCH", msg)
 				return
 			}
 
-			// Update last_used_at async
-			go func(kID string) {
-				db.Exec(context.Background(), "UPDATE api_keys SET last_used_at = NOW() WHERE id = $1", kID)
-			}(keyID)
+			// 9. Update last_used_at async
+			go func(keyID string) {
+				db.Exec(context.Background(), "UPDATE api_keys SET last_used_at = NOW() WHERE id = $1", keyID)
+			}(cachedData.APIKeyID)
 
-			// Step 4: Save environment and merchantID to context
-			ctx := context.WithValue(r.Context(), domain.ContextKeyMerchantID, merchantID)
-			ctx = context.WithValue(ctx, domain.ContextKeyEnvironment, detectedEnv)
+			// 10. Inject to context
+			ctx := context.WithValue(r.Context(), domain.ContextKeyMerchantID, cachedData.MerchantID)
+			ctx = context.WithValue(ctx, domain.ContextKeyEnvironment, cachedData.Environment)
+			ctx = context.WithValue(ctx, domain.ContextKeyAPIKeyID, cachedData.APIKeyID)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

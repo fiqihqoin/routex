@@ -1,5 +1,22 @@
 import { useState, useEffect } from "react";
-import { KeyRound, Copy, Check, Info, Globe, Beaker, Plus, Trash2, ShieldAlert } from "lucide-react";
+import { 
+  KeyRound, 
+  Copy, 
+  Check, 
+  Plus, 
+  Trash2, 
+  ShieldAlert, 
+  ShieldCheck,
+  AlertCircle,
+  Loader2,
+  Globe,
+  Beaker,
+  Info,
+  ExternalLink,
+  Terminal,
+  Pencil,
+  AlertTriangle
+} from "lucide-react";
 import { PortalLayout } from "@/components/portal/PortalLayout";
 import { PortalCard } from "@/components/portal/ui";
 import { usePortal } from "@/components/portal/PortalContext";
@@ -17,291 +34,549 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
+  Tabs, 
+  TabsContent, 
+  TabsList, 
+  TabsTrigger 
+} from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 
-type ApiKey = {
+type ApiKeyItem = {
   id: string;
   name: string;
+  environment: 'sandbox' | 'production';
   key_prefix: string;
-  environment: "sandbox" | "production";
+  display: string;
+  status: 'active' | 'revoked' | 'expired';
   last_used_at: string | null;
   created_at: string;
+  revoked_at: string | null;
 };
 
 export default function ApiKeysPage() {
-  const { user } = usePortal();
+  const { env: portalEnv } = usePortal(); // Respect global environment state
   const { toast } = useToast();
-  const [keys, setKeys] = useState<ApiKey[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isGenModalOpen, setIsGenModalOpen] = useState(false);
+  
+  const [keys, setKeys] = useState<ApiKeyItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Modal States
+  const [showGenerateModal, setShowGenerateModal] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
-  const [newKeyEnv, setNewKeyEnv] = useState<"sandbox" | "production">("sandbox");
-  const [generatedPlainKey, setGeneratedPlainKey] = useState<string | null>(null);
-  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  
+  // Result Modal
+  const [newKeyResult, setNewKeyResult] = useState<{ plain_key: string, key: any } | null>(null);
+  const [hasSavedKey, setHasSavedKey] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
+
+  // Revoke Modal
+  const [revokeConfirm, setRevokeConfirm] = useState<{ keyId: string, keyName: string } | null>(null);
+  const [revokeReason, setRevokeReason] = useState("");
+  const [isRevoking, setIsRevoking] = useState(false);
+
+  // Edit Name State
+  const [editingName, setEditingName] = useState<{ keyId: string, currentName: string } | null>(null);
 
   const fetchKeys = async () => {
+    setIsLoading(true);
     try {
-      const res = await fetch("/portal/api/keys", {
-        headers: { "Accept": "application/json" }
+      const res = await fetch("/portal/api-keys", {
+        headers: { 
+          "Accept": "application/json",
+          "X-Routex-Environment": portalEnv
+        }
       });
       const data = await res.json();
-      if (data.api_keys) setKeys(data.api_keys);
+      if (data.keys) {
+        // Filter keys based on active environment from header
+        setKeys(data.keys.filter((k: ApiKeyItem) => k.environment === portalEnv));
+      }
     } catch (err) {
-      console.error("Failed to fetch keys:", err);
+      toast({
+        title: "Error",
+        description: "Gagal memuat API keys.",
+        variant: "destructive"
+      });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     fetchKeys();
-  }, []);
-
-  const copyToClipboard = (key: string, label: string) => {
-    navigator.clipboard.writeText(key);
-    setCopiedKey(label);
-    toast({
-      title: "Copied!",
-      description: `${label} has been copied to clipboard.`,
-    });
-    setTimeout(() => setCopiedKey(null), 2000);
-  };
+  }, [portalEnv]);
 
   const handleGenerate = async () => {
     if (!newKeyName) return;
-    
+    setIsGenerating(true);
     try {
-      const res = await fetch("/portal/api/keys/regenerate", {
+      const res = await fetch("/portal/api-keys/generate", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "X-XSRF-TOKEN": document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] || "",
+          "X-Routex-Environment": portalEnv
+        },
+        body: JSON.stringify({
+          name: newKeyName,
+          environment: portalEnv // Force current environment
+        })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        setNewKeyResult({ plain_key: data.plain_key, key: data.key });
+        setShowGenerateModal(false);
+        setNewKeyName("");
+      } else {
+        toast({
+          title: "Gagal",
+          description: data.error || data.message || "Gagal membuat key.",
+          variant: "destructive"
+        });
+      }
+    } catch (err) {
+      toast({ title: "Error", description: "Terjadi kesalahan koneksi.", variant: "destructive" });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleRevoke = async () => {
+    if (!revokeConfirm) return;
+    setIsRevoking(true);
+    try {
+      const res = await fetch(`/portal/api-keys/${revokeConfirm.keyId}/revoke`, {
+        method: "DELETE",
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json",
           "X-XSRF-TOKEN": document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] || ""
         },
-        body: JSON.stringify({
-          name: newKeyName,
-          environment: newKeyEnv
-        })
+        body: JSON.stringify({ reason: revokeReason })
       });
-      
-      const data = await res.json();
-      if (data.plain_key) {
-        setGeneratedPlainKey(data.plain_key);
+
+      if (res.ok) {
+        toast({ title: "Sukses", description: "API Key berhasil dicabut." });
+        setRevokeConfirm(null);
+        setRevokeReason("");
         fetchKeys();
+      } else {
+        const data = await res.json();
+        toast({ title: "Gagal", description: data.error, variant: "destructive" });
       }
     } catch (err) {
-      toast({
-        title: "Error",
-        description: "Failed to generate API Key",
-        variant: "destructive"
-      });
+      toast({ title: "Error", description: "Gagal mencabut key.", variant: "destructive" });
+    } finally {
+      setIsRevoking(false);
     }
   };
 
-  const handleRevoke = async (id: string) => {
-    if (!confirm("Are you sure you want to revoke this API key? This action cannot be undone.")) return;
-    
-    // In a real app, you'd have a specific revoke endpoint
-    // For now we'll just show the concept
-    toast({
-      title: "Info",
-      description: "Revoke feature coming soon to UI",
-    });
+  const handleUpdateName = async (id: string, name: string) => {
+    try {
+      const res = await fetch(`/portal/api-keys/${id}/name`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "X-XSRF-TOKEN": document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] || ""
+        },
+        body: JSON.stringify({ name })
+      });
+      if (res.ok) {
+        setEditingName(null);
+        fetchKeys();
+      }
+    } catch (err) {
+      toast({ title: "Error", description: "Gagal mengubah nama.", variant: "destructive" });
+    }
   };
 
-  const closeGenModal = () => {
-    setIsGenModalOpen(false);
-    setGeneratedPlainKey(null);
-    setNewKeyName("");
+  const copyText = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast({ title: "Copied!", description: `${label} disalin ke clipboard.` });
+  };
+
+  const getRelativeTime = (dateStr: string | null) => {
+    if (!dateStr) return "Never";
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    
+    if (diffInSeconds < 60) return "Just now";
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+    return date.toLocaleDateString();
+  };
+
+  const codeSnippets = {
+    curl: (env: string) => `curl -X POST https://${env === 'production' ? 'api' : 'sandbox'}.routex.id/api/v1/transactions \\
+  -H "Content-Type: application/json" \\
+  -H "X-API-Key: ptms_${env === 'production' ? 'live' : 'sb'}_your_key_here" \\
+  -d '{"amount": 10000, "currency": "IDR", "payment_channel": "qris"}'`,
+    node: (env: string) => `const axios = require('axios');
+
+axios.post('https://${env === 'production' ? 'api' : 'sandbox'}.routex.id/api/v1/transactions', {
+  amount: 10000,
+  currency: 'IDR',
+  payment_channel: 'qris'
+}, {
+  headers: { 'X-API-Key': 'ptms_${env === 'production' ? 'live' : 'sb'}_your_key_here' }
+});`,
+    php: (env: string) => `$ch = curl_init('https://${env === 'production' ? 'api' : 'sandbox'}.routex.id/api/v1/transactions');
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'Content-Type: application/json',
+    'X-API-Key: ptms_${env === 'production' ? 'live' : 'sb'}_your_key_here'
+]);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+    'amount' => 10000,
+    'currency' => 'IDR',
+    'payment_channel' => 'qris'
+]));
+$response = curl_exec($ch);`,
+    go: (env: string) => `// Use Routex Go SDK or net/http
+req, _ := http.NewRequest("POST", "https://${env === 'production' ? 'api' : 'sandbox'}.routex.id/api/v1/transactions", body)
+req.Header.Set("X-API-Key", "ptms_${env === 'production' ? 'live' : 'sb'}_your_key_here")`
   };
 
   return (
     <PortalLayout title="API Keys" breadcrumb="Configuration / API Keys">
-      <div className="space-y-6 max-w-5xl">
-        <div className="flex items-center justify-between">
-          <header>
+      <div className="space-y-6 max-w-7xl mx-auto">
+        
+        {/* HEADER */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
             <h1 className="text-2xl font-bold tracking-tight text-portal-text">API Keys</h1>
-            <p className="mt-1 text-sm text-portal-text-muted">
-              Kelola kunci akses untuk integrasi sistem Anda.
+            <p className="text-sm text-portal-text-muted mt-1">
+              Kelola API keys untuk autentikasi request ke Routex API di lingkungan <span className="font-bold uppercase text-portal-text">{portalEnv}</span>.
             </p>
-          </header>
-          <Button onClick={() => setIsGenModalOpen(true)} className="bg-teal hover:bg-teal/90 text-white">
+          </div>
+          <Button 
+            onClick={() => setShowGenerateModal(true)} 
+            className="bg-teal hover:bg-teal/90 text-white shadow-lg shadow-teal/20"
+          >
             <Plus className="h-4 w-4 mr-2" />
-            Generate New Key
+            Generate Key
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* SANDBOX SECTION */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 px-1">
-              <Beaker className="h-4 w-4 text-amber-500" />
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-portal-text-muted">Sandbox Keys</h2>
-            </div>
-            
-            {loading ? (
-               <PortalCard className="animate-pulse h-24" />
-            ) : keys.filter(k => k.environment === "sandbox").length === 0 ? (
-               <PortalCard className="bg-portal-surface border-dashed border-portal-border flex flex-col items-center justify-center py-8 text-center">
-                 <KeyRound className="h-8 w-8 text-portal-text-dim mb-2 opacity-20" />
-                 <p className="text-xs text-portal-text-muted">Belum ada sandbox key.</p>
-               </PortalCard>
-            ) : (
-              keys.filter(k => k.environment === "sandbox").map(k => (
-                <PortalCard key={k.id} className="border-amber-500/10 hover:border-amber-500/30 transition-colors">
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                      <div className="font-medium text-portal-text">{k.name}</div>
-                      <div className="flex items-center gap-2 font-mono text-xs text-amber-500 bg-amber-500/10 px-2 py-1 rounded">
-                        {k.key_prefix}************************
-                      </div>
-                    </div>
-                    <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20">Active</Badge>
-                  </div>
-                  <div className="mt-4 flex items-center justify-between text-[11px] text-portal-text-dim">
-                    <span>Dibuat: {new Date(k.created_at).toLocaleDateString()}</span>
-                    <span>Terakhir digunakan: {k.last_used_at ? new Date(k.last_used_at).toLocaleDateString() : 'Never'}</span>
-                  </div>
-                </PortalCard>
-              ))
-            )}
+        {/* INFO BOX */}
+        {!isLoading && keys.length === 0 && (
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 flex gap-3 items-start">
+            <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0" />
+            <p className="text-sm text-amber-600 font-medium">
+              Kamu belum punya API key untuk {portalEnv}. Generate key baru untuk mulai menggunakan Routex API.
+            </p>
           </div>
+        )}
 
-          {/* PRODUCTION SECTION */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 px-1">
-              <Globe className="h-4 w-4 text-teal" />
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-portal-text-muted">Production Keys</h2>
+        {/* TABEL API KEYS (NO LOCAL SWITCHER) */}
+        <div className="bg-portal-surface rounded-xl border border-portal-border overflow-hidden">
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <Loader2 className="h-8 w-8 animate-spin text-teal" />
             </div>
-
-            {loading ? (
-               <PortalCard className="animate-pulse h-24" />
-            ) : keys.filter(k => k.environment === "production").length === 0 ? (
-              <PortalCard className="bg-portal-surface border-dashed border-portal-border flex flex-col items-center justify-center py-8 text-center">
-                <KeyRound className="h-8 w-8 text-portal-text-dim mb-2 opacity-20" />
-                <p className="text-xs text-portal-text-muted">Belum ada production key.</p>
-              </PortalCard>
-            ) : (
-              keys.filter(k => k.environment === "production").map(k => (
-                <PortalCard key={k.id} className="border-teal/10 hover:border-teal/30 transition-colors">
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                      <div className="font-medium text-portal-text">{k.name}</div>
-                      <div className="flex items-center gap-2 font-mono text-xs text-teal bg-teal/10 px-2 py-1 rounded">
-                        {k.key_prefix}************************
-                      </div>
-                    </div>
-                    <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20">Active</Badge>
-                  </div>
-                  <div className="mt-4 flex items-center justify-between text-[11px] text-portal-text-dim">
-                    <span>Dibuat: {new Date(k.created_at).toLocaleDateString()}</span>
-                    <span>Terakhir digunakan: {k.last_used_at ? new Date(k.last_used_at).toLocaleDateString() : 'Never'}</span>
-                  </div>
-                </PortalCard>
-              ))
-            )}
-          </div>
+          ) : keys.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-center px-4">
+              <div className="h-16 w-16 rounded-full bg-portal-elev flex items-center justify-center mb-4">
+                <KeyRound className="h-8 w-8 text-portal-text-dim opacity-20" />
+              </div>
+              <h3 className="text-lg font-semibold text-portal-text">No {portalEnv} keys yet</h3>
+              <p className="text-sm text-portal-text-muted mt-1 max-w-xs">
+                Create a key to start processing transactions in the {portalEnv} environment.
+              </p>
+              <Button 
+                variant="outline" 
+                onClick={() => setShowGenerateModal(true)}
+                className="mt-6 border-portal-border hover:bg-portal-elev text-portal-text"
+              >
+                Create your first {portalEnv} key
+              </Button>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-portal-elev/50 border-b border-portal-border">
+                    <th className="px-6 py-4 text-[11px] font-bold uppercase text-portal-text-muted">Name</th>
+                    <th className="px-6 py-4 text-[11px] font-bold uppercase text-portal-text-muted">Environment</th>
+                    <th className="px-6 py-4 text-[11px] font-bold uppercase text-portal-text-muted">Key</th>
+                    <th className="px-6 py-4 text-[11px] font-bold uppercase text-portal-text-muted">Status</th>
+                    <th className="px-6 py-4 text-[11px] font-bold uppercase text-portal-text-muted">Last Used</th>
+                    <th className="px-6 py-4 text-[11px] font-bold uppercase text-portal-text-muted text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-portal-border">
+                  {keys.map((key) => (
+                    <tr key={key.id} className={`hover:bg-portal-elev/30 transition-colors group ${key.status !== 'active' ? 'opacity-60' : ''}`}>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          {editingName?.keyId === key.id ? (
+                            <div className="flex items-center gap-1">
+                              <Input 
+                                className="h-8 w-40 bg-portal-elev" 
+                                autoFocus
+                                value={editingName.currentName}
+                                onChange={e => setEditingName({...editingName, currentName: e.target.value})}
+                                onKeyDown={e => e.key === 'Enter' && handleUpdateName(key.id, editingName.currentName)}
+                                onBlur={() => setEditingName(null)}
+                              />
+                            </div>
+                          ) : (
+                            <>
+                              <span className="font-bold text-portal-text">{key.name}</span>
+                              {key.status === 'active' && (
+                                <button 
+                                  onClick={() => setEditingName({keyId: key.id, currentName: key.name})}
+                                  className="p-1 rounded hover:bg-portal-elev text-portal-text-dim opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  <Pencil className="h-3 w-3" />
+                                </button>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <Badge 
+                          variant="outline" 
+                          className={key.environment === 'sandbox' ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' : 'bg-teal/10 text-teal border-teal/20'}
+                        >
+                          {key.environment === 'sandbox' ? 'Sandbox' : 'Production'}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2 font-mono text-xs text-portal-text-dim">
+                          {key.display}
+                          <button onClick={() => copyText(key.key_prefix, "Prefix")} className="p-1 hover:text-teal"><Copy className="h-3 w-3" /></button>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-1.5">
+                          <div className={`h-1.5 w-1.5 rounded-full ${
+                            key.status === 'active' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' :
+                            key.status === 'revoked' ? 'bg-red-500' : 'bg-gray-400'
+                          }`} />
+                          <span className={`text-[11px] font-bold uppercase tracking-wider ${
+                            key.status === 'active' ? 'text-green-600' :
+                            key.status === 'revoked' ? 'text-red-600' : 'text-gray-500'
+                          }`}>
+                            {key.status}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-xs text-portal-text-muted">
+                        {getRelativeTime(key.last_used_at)}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        {key.status === 'active' && (
+                          <button 
+                            onClick={() => setRevokeConfirm({keyId: key.id, keyName: key.name})}
+                            className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
-        <PortalCard className="bg-portal-surface border-teal/20">
-          <div className="flex gap-4">
-            <div className="h-10 w-10 rounded-full bg-teal/10 flex items-center justify-center text-teal shrink-0">
-               <ShieldAlert className="h-5 w-5" />
-            </div>
-            <div className="space-y-2">
-              <h3 className="text-sm font-semibold text-portal-text">Peringatan Keamanan</h3>
-              <p className="text-xs text-portal-text-muted leading-relaxed">
-                Kunci API memberikan akses penuh ke akun Anda. Jangan pernah membagikan kunci API production. 
-                Jika kunci Anda terkompromi, segera lakukan regenerasi untuk mencabut akses kunci lama.
-              </p>
-            </div>
+        {/* CODE SNIPPET SECTION */}
+        <div className="mt-12 space-y-4">
+          <div className="flex items-center gap-2">
+            <Terminal className="h-5 w-5 text-teal" />
+            <h3 className="text-lg font-bold text-portal-text">Quick Start</h3>
           </div>
-        </PortalCard>
-
-        {/* GENERATE MODAL */}
-        <Dialog open={isGenModalOpen} onOpenChange={closeGenModal}>
-          <DialogContent className="sm:max-w-md bg-portal-surface border-portal-border text-portal-text">
-            <DialogHeader>
-              <DialogTitle>Generate New API Key</DialogTitle>
-              <DialogDescription className="text-portal-text-muted">
-                Buat kunci akses baru untuk aplikasi Anda. Kunci lama untuk environment yang sama akan tetap aktif kecuali Anda melakukan pencabutan secara manual (policy saat ini me-revoke key lama saat regenerate via dashboard).
-              </DialogDescription>
-            </DialogHeader>
-
-            {!generatedPlainKey ? (
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Key Name</Label>
-                  <Input 
-                    id="name" 
-                    placeholder="e.g. My Website App" 
-                    value={newKeyName}
-                    onChange={(e) => setNewKeyName(e.target.value)}
-                    className="bg-portal-elev border-portal-border"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="env">Environment</Label>
-                  <Select value={newKeyEnv} onValueChange={(v: any) => setNewKeyEnv(v)}>
-                    <SelectTrigger className="bg-portal-elev border-portal-border">
-                      <SelectValue placeholder="Select environment" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-portal-surface border-portal-border text-portal-text">
-                      <SelectItem value="sandbox">Sandbox (Development)</SelectItem>
-                      <SelectItem value="production">Production (Live)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-4 py-4">
-                <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg flex gap-3 items-start">
-                  <Info className="h-5 w-5 text-amber-500 shrink-0" />
-                  <p className="text-xs text-amber-500 leading-relaxed font-medium">
-                    SIMPAN KEY INI SEKARANG. Anda tidak akan bisa melihatnya lagi setelah menutup jendela ini demi alasan keamanan.
-                  </p>
-                </div>
+          
+          <Tabs defaultValue="curl" className="w-full">
+            <div className="flex items-center justify-between bg-black/40 border border-portal-border rounded-t-xl px-4 pt-1">
+               <TabsList className="bg-transparent border-0 h-10">
+                 {['curl', 'node', 'php', 'go'].map(t => (
+                    <TabsTrigger key={t} value={t} className="data-[state=active]:bg-teal/10 data-[state=active]:text-teal border-b-2 border-transparent data-[state=active]:border-teal rounded-none px-4 h-full uppercase text-[10px] font-bold tracking-widest">{t === 'node' ? 'Node.js' : t}</TabsTrigger>
+                 ))}
+               </TabsList>
+               <div className="text-[10px] font-mono text-portal-text-dim">
+                  Endpoint: {portalEnv === 'production' ? 'https://api.routex.id' : 'https://sandbox.routex.id'}
+               </div>
+            </div>
+            
+            {['curl', 'node', 'php', 'go'].map(lang => (
+              <TabsContent key={lang} value={lang} className="mt-0">
                 <div className="relative group">
-                  <div className="flex items-center gap-2 bg-black/40 border border-portal-border rounded-lg p-4 font-mono text-sm break-all">
-                    {generatedPlainKey}
-                  </div>
+                  <pre className="bg-black/60 border-x border-b border-portal-border rounded-b-xl p-5 font-mono text-xs text-teal-400 overflow-x-auto leading-relaxed">
+                    {(codeSnippets as any)[lang](portalEnv)}
+                  </pre>
                   <Button 
-                    size="sm"
-                    className="absolute top-2 right-2 h-8 bg-teal hover:bg-teal/90 text-white"
-                    onClick={() => copyToClipboard(generatedPlainKey, "New API Key")}
+                    size="sm" 
+                    variant="ghost" 
+                    onClick={() => copyText((codeSnippets as any)[lang](portalEnv), lang)}
+                    className="absolute top-4 right-4 h-8 bg-portal-elev/50 hover:bg-teal hover:text-white border border-portal-border opacity-0 group-hover:opacity-100 transition-all"
                   >
-                    {copiedKey === "New API Key" ? <Check className="h-3 w-3 mr-1" /> : <Copy className="h-3 w-3 mr-1" />}
-                    Copy
+                    <Copy className="h-3 w-3 mr-2" /> Copy
                   </Button>
                 </div>
-              </div>
-            )}
+              </TabsContent>
+            ))}
+          </Tabs>
+        </div>
 
+        {/* MODAL: GENERATE (FORCED ENV) */}
+        <Dialog open={showGenerateModal} onOpenChange={setShowGenerateModal}>
+          <DialogContent className="bg-portal-surface border-portal-border text-portal-text">
+            <DialogHeader>
+              <DialogTitle>Generate New {portalEnv.toUpperCase()} Key</DialogTitle>
+              <DialogDescription>Kunci ini akan dibuat khusus untuk lingkungan {portalEnv.toUpperCase()}.</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-6 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Key Name</Label>
+                <Input 
+                  id="name" 
+                  placeholder="e.g. Production Main, CI/CD Key" 
+                  value={newKeyName}
+                  onChange={e => setNewKeyName(e.target.value)}
+                  className="bg-portal-elev border-portal-border h-11"
+                />
+              </div>
+              <div className="space-y-3">
+                <div className="p-3 bg-teal/5 border border-teal/20 rounded-lg flex gap-2 items-center text-teal">
+                  <Info className="h-4 w-4 shrink-0" />
+                  <p className="text-[11px] font-medium">Sesuai pengaturan portal, key ini akan menggunakan mode <span className="font-bold uppercase">{portalEnv}</span>.</p>
+                </div>
+                {portalEnv === 'production' && (
+                  <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg flex gap-2 items-start text-amber-600">
+                    <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+                    <p className="text-[11px] leading-tight font-medium">Key ini akan memproses transaksi dengan uang sungguhan.</p>
+                  </div>
+                )}
+              </div>
+            </div>
             <DialogFooter>
-              {!generatedPlainKey ? (
-                <>
-                  <Button variant="ghost" onClick={closeGenModal}>Cancel</Button>
-                  <Button 
-                    onClick={handleGenerate} 
-                    disabled={!newKeyName}
-                    className="bg-teal hover:bg-teal/90 text-white"
-                  >
-                    Generate Key
-                  </Button>
-                </>
-              ) : (
-                <Button onClick={closeGenModal} className="w-full bg-portal-elev hover:bg-portal-elev/80 border border-portal-border text-portal-text">
-                  I have saved this key safely
-                </Button>
-              )}
+              <Button variant="ghost" onClick={() => setShowGenerateModal(false)}>Batal</Button>
+              <Button onClick={handleGenerate} disabled={!newKeyName || isGenerating} className="bg-teal hover:bg-teal/90 text-white min-w-[120px]">
+                {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : "Generate Key"}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* MODAL: RESULT (SINGLE VIEW) */}
+        <Dialog open={!!newKeyResult} onOpenChange={() => {}}>
+          <DialogContent className="bg-portal-surface border-portal-border text-portal-text sm:max-w-xl shadow-2xl">
+            <div className="animate-in fade-in zoom-in duration-300">
+              <div className="flex justify-center mb-4">
+                <div className="h-16 w-16 rounded-full bg-teal/10 flex items-center justify-center">
+                  <ShieldCheck className="h-10 w-10 text-teal" />
+                </div>
+              </div>
+              <DialogHeader className="text-center">
+                <DialogTitle className="text-2xl font-bold">API Key Berhasil Dibuat</DialogTitle>
+                <div className="mt-4 p-4 bg-amber-500/5 border-2 border-amber-500/30 rounded-xl flex gap-3 items-center text-amber-600">
+                   <AlertCircle className="h-6 w-6 shrink-0" />
+                   <p className="text-xs font-bold leading-relaxed text-left">
+                     SIMPAN KEY INI SEKARANG. Kamu tidak akan bisa melihatnya lagi setelah modal ini ditutup.
+                   </p>
+                </div>
+              </DialogHeader>
+
+              <div className="space-y-6 py-8">
+                <div className="relative group">
+                  <div className="bg-black/60 border-2 border-teal/40 rounded-xl p-5 pr-20 font-mono text-sm break-all leading-relaxed text-teal-400 selection:bg-teal/20">
+                    {newKeyResult?.plain_key}
+                  </div>
+                  <Button 
+                    onClick={() => {
+                      copyText(newKeyResult!.plain_key, "API Key");
+                      setIsCopied(true);
+                      setTimeout(() => setIsCopied(false), 3000);
+                    }}
+                    className="absolute top-1/2 -translate-y-1/2 right-4 bg-teal hover:bg-teal/80 text-white shadow-lg"
+                  >
+                    {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                  </Button>
+                </div>
+
+                <div className="space-y-2 text-center">
+                  <div className="text-[11px] font-bold text-portal-text-dim uppercase tracking-widest">Target Integration</div>
+                  <div className="text-sm font-semibold text-portal-text">
+                    {portalEnv === 'production' ? 'https://api.routex.id/api/v1' : 'https://sandbox.routex.id/api/v1'}
+                  </div>
+                </div>
+
+                <div 
+                  className="flex items-start gap-3 p-4 bg-portal-elev/50 border border-portal-border rounded-xl cursor-pointer hover:bg-portal-elev transition-colors"
+                  onClick={() => setHasSavedKey(!hasSavedKey)}
+                >
+                  <Checkbox 
+                    id="confirm-save" 
+                    checked={hasSavedKey}
+                    onCheckedChange={(v) => setHasSavedKey(!!v)}
+                    className="mt-0.5 border-portal-border data-[state=checked]:bg-teal"
+                  />
+                  <Label htmlFor="confirm-save" className="text-xs text-portal-text-muted leading-tight cursor-pointer font-medium">
+                    Saya sudah menyimpan API key ini di tempat yang aman (seperti password manager).
+                  </Label>
+                </div>
+              </div>
+
+              <DialogFooter>
+                <Button 
+                  onClick={() => {
+                    setNewKeyResult(null);
+                    setHasSavedKey(false);
+                    fetchKeys();
+                  }} 
+                  disabled={!hasSavedKey}
+                  className="w-full h-12 bg-teal hover:bg-teal/90 text-white font-bold text-base shadow-xl shadow-teal/20 disabled:opacity-50"
+                >
+                  Selesai
+                </Button>
+              </DialogFooter>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* MODAL: REVOKE */}
+        <Dialog open={!!revokeConfirm} onOpenChange={() => setRevokeConfirm(null)}>
+          <DialogContent className="bg-portal-surface border-portal-border text-portal-text">
+            <DialogHeader>
+              <DialogTitle className="text-red-500 flex items-center gap-2">
+                <ShieldAlert className="h-5 w-5" /> Revoke '{revokeConfirm?.keyName}'?
+              </DialogTitle>
+              <DialogDescription className="pt-2">
+                Key ini akan langsung tidak bisa digunakan. Aplikasi yang masih menggunakan key ini akan mendapat error 401. Tindakan ini tidak bisa dibatalkan.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4 space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="reason">Reason (optional)</Label>
+                <Textarea 
+                  id="reason" 
+                  placeholder="e.g. Key bocor, aplikasi sudah tidak digunakan" 
+                  value={revokeReason}
+                  onChange={e => setRevokeReason(e.target.value)}
+                  className="bg-portal-elev border-portal-border"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="ghost" onClick={() => setRevokeConfirm(null)}>Batal</Button>
+              <Button onClick={handleRevoke} disabled={isRevoking} className="bg-red-500 hover:bg-red-600 text-white min-w-[120px]">
+                {isRevoking ? <Loader2 className="h-4 w-4 animate-spin" /> : "Revoke Key"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
       </div>
     </PortalLayout>
   );

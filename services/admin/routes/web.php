@@ -26,9 +26,13 @@ Route::middleware('auth:portal')->group(function () {
         Route::patch('/vendors/{vendorCode}/toggle', [VendorCredentialController::class, 'toggle'])->name('vendors.toggle');
 
         // API Keys Management API
-        Route::get('/api/keys', [ApiKeyController::class, 'index'])->name('api-keys.index');
-        Route::post('/api/keys/regenerate-sandbox', [ApiKeyController::class, 'regenerateSandbox'])->name('api-keys.regenerate-sandbox');
-        Route::post('/api/keys/regenerate-production', [ApiKeyController::class, 'regenerateProduction'])->name('api-keys.regenerate-production');
+        Route::prefix('api-keys')->name('api-keys.')
+            ->group(function () {
+                Route::get('/', [ApiKeyController::class, 'index'])->name('index');
+                Route::post('/generate', [ApiKeyController::class, 'generate'])->name('generate');
+                Route::delete('/{keyId}/revoke', [ApiKeyController::class, 'revoke'])->name('revoke');
+                Route::patch('/{keyId}/name', [ApiKeyController::class, 'updateName'])->name('update-name');
+            });
     });
 
     // SPA Catch-all (Must be last)

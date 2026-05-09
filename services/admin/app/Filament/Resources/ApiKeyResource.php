@@ -2,20 +2,21 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ApiKeyResource\Pages;
 use App\Models\ApiKey;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Redis;
 use Filament\Notifications\Notification;
 
 class ApiKeyResource extends Resource
 {
     protected static ?string $model = ApiKey::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-key';
+    protected static ?string $navigationIcon = 'heroicon-o-shield-check';
 
     protected static ?string $navigationGroup = 'Security';
 
@@ -23,24 +24,34 @@ class ApiKeyResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('merchant_id')
-                    ->relationship('merchant', 'email')
-                    ->required(),
-                Forms\Components\TextInput::make('name')
-                    ->required(),
-                Forms\Components\Select::make('environment')
-                    ->options([
-                        'sandbox' => 'Sandbox',
-                        'production' => 'Production',
-                    ])
-                    ->required(),
-                Forms\Components\TextInput::make('key_prefix')
-                    ->disabled(),
-                Forms\Components\DateTimePicker::make('expires_at'),
-                Forms\Components\DateTimePicker::make('revoked_at')
-                    ->disabled(),
-                Forms\Components\Textarea::make('revoked_reason')
-                    ->disabled(),
+                Forms\Components\Section::make('API Key Information')
+                    ->schema([
+                        Forms\Components\TextInput::make('key_prefix')
+                            ->label('Key')
+                            ->disabled()
+                            ->extraAttributes(['class' => 'font-mono']),
+                        Forms\Components\Select::make('merchant_id')
+                            ->relationship('merchant', 'email')
+                            ->disabled(),
+                        Forms\Components\TextInput::make('environment')
+                            ->disabled(),
+                        Forms\Components\TagsInput::make('scopes')
+                            ->disabled(),
+                    ])->columns(2),
+                
+                Forms\Components\Section::make('Usage & Security')
+                    ->schema([
+                        Forms\Components\DateTimePicker::make('last_used_at')
+                            ->label('Last Used')
+                            ->disabled(),
+                        Forms\Components\DateTimePicker::make('expires_at')
+                            ->disabled(),
+                        Forms\Components\DateTimePicker::make('revoked_at')
+                            ->disabled(),
+                        Forms\Components\Textarea::make('revoked_reason')
+                            ->disabled()
+                            ->columnSpanFull(),
+                    ])->columns(2),
             ]);
     }
 
@@ -48,13 +59,14 @@ class ApiKeyResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('key_prefix')
+                    ->label('Key')
+                    ->fontFamily('mono')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('merchant.email')
+                    ->label('Merchant')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('key_prefix')
-                    ->fontFamily('mono'),
                 Tables\Columns\TextColumn::make('environment')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -62,7 +74,6 @@ class ApiKeyResource extends Resource
                         'production' => 'success',
                     }),
                 Tables\Columns\TextColumn::make('status')
-                    ->label('Status')
                     ->badge()
                     ->state(function (ApiKey $record): string {
                         if ($record->revoked_at) return 'revoked';
@@ -72,15 +83,17 @@ class ApiKeyResource extends Resource
                     ->color(fn (string $state): string => match ($state) {
                         'active' => 'success',
                         'revoked' => 'danger',
-                        'expired' => 'warning',
+                        'expired' => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('last_used_at')
+                    ->label('Last Used')
                     ->dateTime()
+                    ->since()
+                    ->placeholder('Never')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->date()
+                    ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('environment')
@@ -88,16 +101,47 @@ class ApiKeyResource extends Resource
                         'sandbox' => 'Sandbox',
                         'production' => 'Production',
                     ]),
+                Tables\Filters\Filter::make('status')
+                    ->form([
+                        Forms\Components\Select::make('status')
+                            ->options([
+                                'active' => 'Active',
+                                'revoked' => 'Revoked',
+                                'expired' => 'Expired',
+                            ]),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['status'] === 'active',
+                                fn (Builder $query) => $query->whereNull('revoked_at')
+                                    ->where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))
+                            )
+                            ->when(
+                                $data['status'] === 'revoked',
+                                fn (Builder $query) => $query->whereNotNull('revoked_at')
+                            )
+                            ->when(
+                                $data['status'] === 'expired',
+                                fn (Builder $query) => $query->whereNull('revoked_at')
+                                    ->whereNotNull('expires_at')
+                                    ->where('expires_at', '<=', now())
+                            );
+                    }),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\Action::make('revoke')
-                    ->color('danger')
+                    ->label('Revoke')
                     ->icon('heroicon-o-no-symbol')
-                    ->visible(fn (ApiKey $record) => !$record->revoked_at)
+                    ->color('danger')
+                    ->visible(fn (ApiKey $record) => is_null($record->revoked_at) && (is_null($record->expires_at) || $record->expires_at->isFuture()))
                     ->requiresConfirmation()
                     ->form([
                         Forms\Components\Textarea::make('revoked_reason')
-                            ->required(),
+                            ->label('Reason for Revocation')
+                            ->required()
+                            ->maxLength(255),
                     ])
                     ->action(function (ApiKey $record, array $data): void {
                         $record->update([
@@ -106,23 +150,32 @@ class ApiKeyResource extends Resource
                             'revoked_reason' => $data['revoked_reason'],
                         ]);
 
+                        // Clear Redis Cache immediately
+                        try {
+                            Redis::del("apikey_hash:" . $record->key_hash);
+                        } catch (\Exception $e) {
+                            // Log or ignore redis failure
+                        }
+
                         Notification::make()
                             ->title('API Key Revoked')
-                            ->danger()
+                            ->success()
+                            ->body("The key {$record->key_prefix}... has been revoked and access is disabled.")
                             ->send();
                     }),
             ])
             ->bulkActions([
-                //
+                // No bulk actions for security
+            ])
+            ->headerActions([
+                // No create action
             ]);
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListApiKeys::route('/'),
-            'create' => Pages\CreateApiKey::route('/create'),
-            'edit' => Pages\EditApiKey::route('/{record}/edit'),
+            'index' => ApiKeyResource\Pages\ManageApiKeys::route('/'),
         ];
     }
 }

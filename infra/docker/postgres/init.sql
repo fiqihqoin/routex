@@ -62,7 +62,8 @@ CREATE TABLE api_keys (
     revoked_by BIGINT REFERENCES admins(id),
     revoked_reason TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    created_by_ip INET
+    created_by_ip INET,
+    deleted_at TIMESTAMP WITH TIME ZONE
 );
 
 CREATE INDEX idx_api_keys_hash ON api_keys(key_hash) WHERE revoked_at IS NULL;

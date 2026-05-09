@@ -79,27 +79,12 @@ export default function VendorsPage() {
   return (
     <PortalLayout title="Vendor Setup" breadcrumb="Configuration / Vendors">
       <div className="space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <header>
-            <h1 className="text-2xl font-bold tracking-tight text-portal-text">Vendor Setup</h1>
-            <p className="mt-1 text-sm text-portal-text-muted">
-              Connect and manage your payment gateway credentials.
-            </p>
-          </header>
-
-          <Tabs value={env} onValueChange={(v: any) => setEnv(v)} className="w-full md:w-auto">
-            <TabsList className="bg-portal-elev border border-portal-border">
-              <TabsTrigger value="sandbox" className="data-[state=active]:bg-amber-500 data-[state=active]:text-white">
-                <Beaker className="h-4 w-4 mr-2" />
-                Sandbox
-              </TabsTrigger>
-              <TabsTrigger value="production" className="data-[state=active]:bg-teal data-[state=active]:text-white">
-                <Globe className="h-4 w-4 mr-2" />
-                Production
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
+        <header>
+          <h1 className="text-2xl font-bold tracking-tight text-portal-text">Vendor Setup</h1>
+          <p className="mt-1 text-sm text-portal-text-muted">
+            Connect and manage your payment gateway credentials for {env.toUpperCase()} environment.
+          </p>
+        </header>
 
         {loading ? (
           <div className="flex flex-col items-center justify-center min-h-[40vh]">

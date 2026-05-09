@@ -18,6 +18,7 @@ class MerchantVendorCredential extends Model
         'merchant_id',
         'vendor_id',
         'environment',
+        'credentials',
         'credentials_encrypted',
         'credentials_fingerprint',
         'validation_status',

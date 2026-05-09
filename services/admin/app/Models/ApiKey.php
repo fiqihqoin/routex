@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class ApiKey extends Model
 {
@@ -22,24 +22,24 @@ class ApiKey extends Model
         'name',
         'environment',
         'scopes',
-        'expires_at',
         'last_used_at',
+        'expires_at',
         'revoked_at',
         'revoked_by',
         'revoked_reason',
         'created_by_ip',
     ];
 
-    protected $hidden = [
-        'key_hash',
-    ];
-
     protected $casts = [
         'scopes' => 'array',
-        'expires_at' => 'datetime',
         'last_used_at' => 'datetime',
+        'expires_at' => 'datetime',
         'revoked_at' => 'datetime',
         'created_at' => 'datetime',
+    ];
+
+    protected $hidden = [
+        'key_hash',
     ];
 
     public function merchant(): BelongsTo
@@ -47,32 +47,72 @@ class ApiKey extends Model
         return $this->belongsTo(Merchant::class, 'merchant_id');
     }
 
-    public static function generate(string $merchantId, string $environment, string $name = 'Default'): array
+    public function getIsActiveAttribute(): bool
     {
-        $prefix = 'ptms_' . ($environment === 'sandbox' ? 'sb_' : 'live_');
-        $random = bin2hex(random_bytes(24));
-        $plainKey = $prefix . $random;
-        
+        return $this->revoked_at === null 
+            && ($this->expires_at === null 
+                || $this->expires_at->isFuture());
+    }
+
+    public function getStatusAttribute(): string
+    {
+        if ($this->revoked_at) {
+            return 'revoked';
+        }
+        if ($this->expires_at && $this->expires_at->isPast()) {
+            return 'expired';
+        }
+        return 'active';
+    }
+
+    public static function generate(string $merchantId, string $environment, string $name = 'Default', ?string $ip = null): array
+    {
+        $prefix = $environment === 'sandbox' ? 'ptms_sb_' : 'ptms_live_';
+        $plainKey = $prefix . bin2hex(random_bytes(24));
+        $hash = hash('sha256', $plainKey);
+        $keyPrefix = substr($plainKey, 0, 12);
+
         $apiKey = static::create([
             'merchant_id' => $merchantId,
-            'key_hash' => hash('sha256', $plainKey),
-            'key_prefix' => substr($plainKey, 0, 12),
+            'key_hash' => $hash,
+            'key_prefix' => $keyPrefix,
             'name' => $name,
             'environment' => $environment,
             'scopes' => ['transactions:write', 'transactions:read'],
+            'created_by_ip' => $ip,
         ]);
 
         return [
-            'plain' => $plainKey,
-            'model' => $apiKey
+            'plain_key' => $plainKey,
+            'api_key' => $apiKey
         ];
     }
 
-    public static function findByPlainKey(string $plainKey): ?self
+    public static function findByPlainKey(string $plainKey): ?ApiKey
     {
         $hash = hash('sha256', $plainKey);
+        
         return static::where('key_hash', $hash)
             ->whereNull('revoked_at')
+            ->where(function ($query) {
+                $query->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            })
             ->first();
+    }
+
+    public static function revokeAll(string $merchantId, string $environment): void
+    {
+        static::where('merchant_id', $merchantId)
+            ->where('environment', $environment)
+            ->whereNull('revoked_at')
+            ->update(['revoked_at' => now()]);
+    }
+
+    public function updateLastUsed(): void
+    {
+        DB::table('api_keys')
+            ->where('id', $this->id)
+            ->update(['last_used_at' => now()]);
     }
 }

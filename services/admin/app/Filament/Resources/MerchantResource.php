@@ -120,8 +120,8 @@ class MerchantResource extends Resource
                         ])
                         ->action(function (Merchant $record, array $data): void {
                             // Generate API Keys
-                            $sbResult = ApiKey::generate($record->id, 'sandbox', 'Default Sandbox');
-                            $prodResult = ApiKey::generate($record->id, 'production', 'Default Production');
+                            $sbResult = ApiKey::generate($record->id, 'sandbox', 'Default');
+                            $prodResult = ApiKey::generate($record->id, 'production', 'Default');
 
                             $record->update([
                                 'status' => 'active',

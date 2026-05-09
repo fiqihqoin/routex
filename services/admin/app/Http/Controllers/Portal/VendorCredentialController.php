@@ -92,7 +92,7 @@ class VendorCredentialController extends Controller
                 'environment' => $environment,
             ],
             [
-                'credentials_encrypted' => $credentials, // Handled by trait
+                'credentials' => $credentials, // Use virtual attribute to trigger trait
                 'validation_status' => 'valid',
                 'last_validated_at' => now(),
                 'validation_error' => null,

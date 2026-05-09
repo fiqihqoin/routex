@@ -49,7 +49,13 @@ export const PortalProvider = ({ children }: { children: ReactNode }) => {
       document.documentElement.classList.remove("light");
     }
     
-    // Always fetch user info when env changes to ensure data is correct
+    // Only fetch and redirect if we are inside the /portal area
+    const isPortalArea = window.location.pathname.startsWith("/portal");
+    if (!isPortalArea) {
+      setLoading(false);
+      return;
+    }
+
     const fetchUser = async () => {
       try {
         const res = await fetch(`/portal/dashboard?env=${env}`, {
@@ -76,7 +82,7 @@ export const PortalProvider = ({ children }: { children: ReactNode }) => {
     };
 
     fetchUser();
-  }, [env]);
+  }, [env, navigate]);
 
   const logout = async () => {
     try {

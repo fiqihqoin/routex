@@ -1,0 +1,34 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('merchants', function (Blueprint $table) {
+            if (Schema::hasColumn('merchants', 'sandbox_api_key')) {
+                $table->dropColumn('sandbox_api_key');
+            }
+            if (Schema::hasColumn('merchants', 'production_api_key')) {
+                $table->dropColumn('production_api_key');
+            }
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('merchants', function (Blueprint $table) {
+            $table->string('sandbox_api_key')->nullable();
+            $table->string('production_api_key')->nullable();
+        });
+    }
+};
