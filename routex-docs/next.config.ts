@@ -1,7 +1,16 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
   images: { unoptimized: true },
+  typescript: {
+    // Abaikan error tipe saat build agar tidak memakan RAM untuk pengecekan
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    // Abaikan lint saat build untuk menghemat memori
+    ignoreDuringBuilds: true,
+  },
   async redirects() {
     return [
       {

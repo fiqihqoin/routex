@@ -31,6 +31,8 @@ type NormalizedCallback struct {
 	Amount              float64
 	Status              string
 	PaidAt              time.Time
+	PaymentMethod       string
+	VendorID            string
 }
 
 type VendorAdapter interface {

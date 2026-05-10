@@ -15,7 +15,7 @@ Example of integration using the `requests` library in Python.
 import os
 
 def create_qris(order_id, amount):
-    url = "https://sandbox.routex.id/api/v1/transactions"
+    url = "https://sandbox.routex.web.id/api/v1/transactions"
     headers = {
         "X-API-Key": os.getenv("ROUTEX_API_KEY"),
         "X-Idempotency-Key": order_id,

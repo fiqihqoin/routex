@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Book, Search, Menu, X, Rocket, Code2, Webhook, Layers, History, ExternalLink, ChevronDown } from 'lucide-react';
 import { Lang, uiStrings } from '@/lib/i18n';
 import { navigation, NavSection, NavItem } from '@/lib/navigation';
+import { config } from '@/lib/config';
 
 export default function MobileNav({ lang }: { lang: Lang }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -151,7 +152,7 @@ export default function MobileNav({ lang }: { lang: Lang }) {
           {/* Footer */}
           <div className="p-4 border-t border-border bg-surface/50">
             <Link 
-              href="https://app.routex.id" 
+              href={config.dashboardUrl} 
               className="flex items-center justify-center gap-2 w-full py-3 bg-teal text-background rounded-xl font-bold hover:bg-teal-glow transition-all"
             >
               Go to Dashboard

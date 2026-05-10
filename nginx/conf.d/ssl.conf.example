@@ -1,0 +1,91 @@
+# ==================== FE (Homepage + Merchant Portal) ====================
+server {
+    listen 80;
+    server_name routex.web.id app.routex.web.id;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name routex.web.id app.routex.web.id;
+
+    ssl_certificate /etc/nginx/certs/routex.crt;
+    ssl_certificate_key /etc/nginx/certs/routex.key;
+
+    location / {
+        proxy_pass http://fe:80;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+# ==================== DOCS ====================
+server {
+    listen 80;
+    server_name docs.routex.web.id;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name docs.routex.web.id;
+
+    ssl_certificate /etc/nginx/certs/routex.crt;
+    ssl_certificate_key /etc/nginx/certs/routex.key;
+
+    location / {
+        proxy_pass http://docs:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+# ==================== LARAVEL ADMIN ====================
+server {
+    listen 80;
+    server_name admin.routex.web.id;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name admin.routex.web.id;
+
+    ssl_certificate /etc/nginx/certs/routex.crt;
+    ssl_certificate_key /etc/nginx/certs/routex.key;
+
+    location / {
+        proxy_pass http://admin:80;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+# ==================== TRANSACTION API (Internal & External) ====================
+server {
+    listen 80;
+    server_name api.routex.web.id sandbox.routex.web.id production.routex.web.id;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name api.routex.web.id sandbox.routex.web.id production.routex.web.id;
+
+    ssl_certificate /etc/nginx/certs/routex.crt;
+    ssl_certificate_key /etc/nginx/certs/routex.key;
+
+    location / {
+        proxy_pass http://transaction-api:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}

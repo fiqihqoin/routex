@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Share2, Check, Terminal } from 'lucide-react';
 import Link from 'next/link';
 import { Lang } from '@/lib/i18n';
+import { config } from '@/lib/config';
 
 interface DocActionsProps {
   lang: Lang;
@@ -40,7 +41,7 @@ export function CopyUrlButton() {
 }
 
 export function EditOnGithub({ lang, slug }: DocActionsProps) {
-  const githubUrl = `https://github.com/your-org/routex-docs/edit/main/content/${lang}/${slug}.mdx`;
+  const githubUrl = `${config.githubUrl}/edit/main/routex-docs/content/${lang}/${slug}.mdx`;
   
   return (
     <Link

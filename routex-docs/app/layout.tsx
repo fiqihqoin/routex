@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Lang, defaultLang } from "@/lib/i18n";
+import { config } from "@/lib/config";
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Routex Documentation",
     description: "The modern payment solution for your business.",
-    url: "https://docs.routex.id",
+    url: config.docsUrl,
     siteName: "Routex Docs",
     locale: "id_ID",
     type: "website",

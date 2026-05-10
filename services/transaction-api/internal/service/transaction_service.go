@@ -355,6 +355,9 @@ func (s *transactionService) HandleVendorCallback(ctx context.Context, vendorID 
 		return fmt.Errorf("transaction not found for callback: %w", err)
 	}
 
+	normalized.VendorID = v.Code
+	normalized.PaymentMethod = string(tx.PaymentChannel)
+
 	creds, err := s.repo.GetMerchantVendorCredentials(ctx, tx.VendorCredentialID)
 	if err != nil {
 		return fmt.Errorf("failed to get credentials for verification: %w", err)

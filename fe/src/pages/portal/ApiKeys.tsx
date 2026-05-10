@@ -23,6 +23,7 @@ import { usePortal } from "@/components/portal/PortalContext";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { config } from "@/lib/config";
 import { 
   Dialog, 
   DialogContent, 
@@ -213,20 +214,20 @@ export default function ApiKeysPage() {
   };
 
   const codeSnippets = {
-    curl: (env: string) => `curl -X POST https://${env === 'production' ? 'api' : 'sandbox'}.routex.id/api/v1/transactions \\
+    curl: (env: string) => `curl -X POST https://${env === 'production' ? 'api' : 'sandbox'}.${config.baseDomain}/api/v1/transactions \\
   -H "Content-Type: application/json" \\
   -H "X-API-Key: ptms_${env === 'production' ? 'live' : 'sb'}_your_key_here" \\
   -d '{"amount": 10000, "currency": "IDR", "payment_channel": "qris"}'`,
     node: (env: string) => `const axios = require('axios');
 
-axios.post('https://${env === 'production' ? 'api' : 'sandbox'}.routex.id/api/v1/transactions', {
+axios.post('https://${env === 'production' ? 'api' : 'sandbox'}.${config.baseDomain}/api/v1/transactions', {
   amount: 10000,
   currency: 'IDR',
   payment_channel: 'qris'
 }, {
   headers: { 'X-API-Key': 'ptms_${env === 'production' ? 'live' : 'sb'}_your_key_here' }
 });`,
-    php: (env: string) => `$ch = curl_init('https://${env === 'production' ? 'api' : 'sandbox'}.routex.id/api/v1/transactions');
+    php: (env: string) => `$ch = curl_init('https://${env === 'production' ? 'api' : 'sandbox'}.${config.baseDomain}/api/v1/transactions');
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     'Content-Type: application/json',
@@ -239,7 +240,7 @@ curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
 ]));
 $response = curl_exec($ch);`,
     go: (env: string) => `// Use Routex Go SDK or net/http
-req, _ := http.NewRequest("POST", "https://${env === 'production' ? 'api' : 'sandbox'}.routex.id/api/v1/transactions", body)
+req, _ := http.NewRequest("POST", "https://${env === 'production' ? 'api' : 'sandbox'}.${config.baseDomain}/api/v1/transactions", body)
 req.Header.Set("X-API-Key", "ptms_${env === 'production' ? 'live' : 'sb'}_your_key_here")`
   };
 
@@ -405,7 +406,7 @@ req.Header.Set("X-API-Key", "ptms_${env === 'production' ? 'live' : 'sb'}_your_k
                  ))}
                </TabsList>
                <div className="text-[10px] font-mono text-portal-text-dim">
-                  Endpoint: {portalEnv === 'production' ? 'https://api.routex.id' : 'https://sandbox.routex.id'}
+                  Endpoint: {portalEnv === 'production' ? 'https://api.${config.baseDomain}' : 'https://sandbox.${config.baseDomain}'}
                </div>
             </div>
             
@@ -508,7 +509,7 @@ req.Header.Set("X-API-Key", "ptms_${env === 'production' ? 'live' : 'sb'}_your_k
                 <div className="space-y-2 text-center">
                   <div className="text-[11px] font-bold text-portal-text-dim uppercase tracking-widest">Target Integration</div>
                   <div className="text-sm font-semibold text-portal-text">
-                    {portalEnv === 'production' ? 'https://api.routex.id/api/v1' : 'https://sandbox.routex.id/api/v1'}
+                    {portalEnv === 'production' ? 'https://api.${config.baseDomain}/api/v1' : 'https://sandbox.${config.baseDomain}/api/v1'}
                   </div>
                 </div>
 

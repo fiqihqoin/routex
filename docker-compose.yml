@@ -1,0 +1,140 @@
+version: '3.9'
+
+services:
+
+  # ==================== NGINX ====================
+  nginx:
+    image: nginx:alpine
+    container_name: routex-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    depends_on:
+      - fe
+      - admin
+      - transaction-api
+      - docs
+    networks:
+      - routex-net
+
+  # ==================== FE (Homepage + Merchant Portal) ====================
+  fe:
+    image: fiqihqoin/routex-fe:latest
+    container_name: routex-fe
+    restart: always
+    networks:
+      - routex-net
+
+  # ==================== DOCS ====================
+  docs:
+    image: fiqihqoin/routex-docs:latest
+    container_name: routex-docs
+    restart: always
+    networks:
+      - routex-net
+
+  # ==================== LARAVEL ADMIN ====================
+  admin:
+    image: fiqihqoin/routex-admin:latest
+    container_name: routex-admin
+    restart: always
+    env_file: .env.admin
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - routex-net
+
+  # ==================== LARAVEL QUEUE WORKER ====================
+  admin-queue:
+    image: fiqihqoin/routex-admin:latest
+    container_name: routex-admin-queue
+    restart: always
+    command: php artisan queue:work --sleep=3 --tries=5 --max-time=3600
+    env_file: .env.admin
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - routex-net
+
+  # ==================== GO TRANSACTION API ====================
+  transaction-api:
+    image: fiqihqoin/routex-go-api:latest
+    container_name: routex-transaction-api
+    restart: always
+    env_file: .env.go
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - routex-net
+
+  # ==================== POSTGRESQL ====================
+  postgres:
+    image: postgres:16-alpine
+    container_name: routex-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ptms_db
+      POSTGRES_USER: ptms_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-p5Nv5gM5aLycakSV}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ptms_user -d ptms_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - routex-net
+
+  # ==================== REDIS ====================
+  redis:
+    image: redis:7-alpine
+    container_name: routex-redis
+    restart: always
+    command: redis-server --appendonly yes
+    volumes:
+      - ./data/redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - routex-net
+
+  # ==================== RABBITMQ ====================
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: routex-rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: routex
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-lhaN3cfjRM5MM3jK}
+    volumes:
+      - ./data/rabbitmq:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    networks:
+      - routex-net
+
+networks:
+  routex-net:
+    driver: bridge

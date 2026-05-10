@@ -2,8 +2,10 @@ import { MetadataRoute } from 'next';
 import { getAllDocs } from '@/lib/docs';
 import { languages, Lang } from '@/lib/i18n';
 
+import { config } from '@/lib/config';
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://docs.routex.id';
+  const baseUrl = config.docsUrl;
   const sitemapEntries: MetadataRoute.Sitemap = [
     {
       url: baseUrl,

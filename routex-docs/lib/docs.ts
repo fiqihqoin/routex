@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import { Lang } from './i18n';
+import { config } from './config';
 
 const CONTENT_PATH = path.join(process.cwd(), 'content');
 
@@ -35,7 +36,8 @@ export async function getDoc(lang: Lang, slug: string[]): Promise<Doc | null> {
   }
 
   const fileContents = fs.readFileSync(fullPath, 'utf8');
-  const { data, content } = matter(fileContents);
+  const processedContents = fileContents.replace(/routex\.web\.id/g, config.baseDomain);
+  const { data, content } = matter(processedContents);
 
   // Calculate read time (approx 200 words per minute)
   const words = content.split(/\s+/).length;

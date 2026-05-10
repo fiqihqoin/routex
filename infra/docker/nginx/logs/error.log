@@ -1390,3 +1390,49 @@
 2026/05/10 07:53:40 [warn] 22#22: *208 delaying request, excess: 0.950, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/profile HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/profile"
 2026/05/10 07:53:51 [warn] 21#21: *221 delaying request, excess: 0.900, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/transactions?environment=sandbox&page=1&per_page=25 HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
 2026/05/10 07:53:54 [warn] 21#21: *226 delaying request, excess: 0.800, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/profile/sessions HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/profile"
+2026/05/10 12:11:09 [notice] 1#1: using the "epoll" event method
+2026/05/10 12:11:09 [notice] 1#1: nginx/1.29.8
+2026/05/10 12:11:09 [notice] 1#1: built by gcc 15.2.0 (Alpine 15.2.0) 
+2026/05/10 12:11:09 [notice] 1#1: OS: Linux 6.8.0-100-generic
+2026/05/10 12:11:09 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1024:524288
+2026/05/10 12:11:09 [notice] 1#1: start worker processes
+2026/05/10 12:11:09 [notice] 1#1: start worker process 21
+2026/05/10 12:11:09 [notice] 1#1: start worker process 22
+2026/05/10 12:11:09 [notice] 1#1: signal 3 (SIGQUIT) received, shutting down
+2026/05/10 12:11:09 [notice] 21#21: gracefully shutting down
+2026/05/10 12:11:09 [notice] 21#21: exiting
+2026/05/10 12:11:09 [notice] 22#22: gracefully shutting down
+2026/05/10 12:11:09 [notice] 22#22: exiting
+2026/05/10 12:11:09 [notice] 21#21: exit
+2026/05/10 12:11:09 [notice] 22#22: exit
+2026/05/10 12:11:09 [notice] 1#1: signal 17 (SIGCHLD) received from 21
+2026/05/10 12:11:09 [notice] 1#1: worker process 21 exited with code 0
+2026/05/10 12:11:09 [notice] 1#1: worker process 22 exited with code 0
+2026/05/10 12:11:09 [notice] 1#1: exit
+2026/05/10 12:11:11 [notice] 1#1: using the "epoll" event method
+2026/05/10 12:11:11 [notice] 1#1: nginx/1.29.8
+2026/05/10 12:11:11 [notice] 1#1: built by gcc 15.2.0 (Alpine 15.2.0) 
+2026/05/10 12:11:11 [notice] 1#1: OS: Linux 6.8.0-100-generic
+2026/05/10 12:11:11 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1024:524288
+2026/05/10 12:11:11 [notice] 1#1: start worker processes
+2026/05/10 12:11:11 [notice] 1#1: start worker process 21
+2026/05/10 12:11:11 [notice] 1#1: start worker process 22
+2026/05/10 15:58:40 [notice] 1#1: signal 3 (SIGQUIT) received, shutting down
+2026/05/10 15:58:40 [notice] 22#22: gracefully shutting down
+2026/05/10 15:58:40 [notice] 21#21: gracefully shutting down
+2026/05/10 15:58:40 [notice] 21#21: exiting
+2026/05/10 15:58:40 [notice] 22#22: exiting
+2026/05/10 15:58:40 [notice] 22#22: exit
+2026/05/10 15:58:40 [notice] 21#21: exit
+2026/05/10 15:58:40 [notice] 1#1: signal 17 (SIGCHLD) received from 22
+2026/05/10 15:58:40 [notice] 1#1: worker process 21 exited with code 0
+2026/05/10 15:58:40 [notice] 1#1: worker process 22 exited with code 0
+2026/05/10 15:58:40 [notice] 1#1: exit
+2026/05/10 15:59:05 [notice] 1#1: using the "epoll" event method
+2026/05/10 15:59:05 [notice] 1#1: nginx/1.29.8
+2026/05/10 15:59:05 [notice] 1#1: built by gcc 15.2.0 (Alpine 15.2.0) 
+2026/05/10 15:59:05 [notice] 1#1: OS: Linux 6.8.0-100-generic
+2026/05/10 15:59:05 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1024:524288
+2026/05/10 15:59:05 [notice] 1#1: start worker processes
+2026/05/10 15:59:05 [notice] 1#1: start worker process 21
+2026/05/10 15:59:05 [notice] 1#1: start worker process 22

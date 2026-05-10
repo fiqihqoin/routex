@@ -16,8 +16,8 @@ berdasarkan environment:
 
 | Prefix | Environment | Endpoint |
 |--------|-------------|----------|
-| `ptms_sb_` | Sandbox | `sandbox.routex.id` |
-| `ptms_live_` | Production | `api.routex.id` |
+| `ptms_sb_` | Sandbox | `sandbox.routex.web.id` |
+| `ptms_live_` | Production | `api.routex.web.id` |
 
 <Callout type="danger">
 Menggunakan sandbox key di production endpoint 
@@ -36,7 +36,7 @@ X-API-Key: ptms_sb_your_api_key_here
 Contoh request lengkap:
 
 ```bash
-curl -X POST https://sandbox.routex.id/api/v1/transactions \
+curl -X POST https://sandbox.routex.web.id/api/v1/transactions \
   -H "Content-Type: application/json" \
   -H "X-API-Key: ptms_sb_your_key_here" \
   -d '{ ... }'

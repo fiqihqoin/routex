@@ -5,6 +5,8 @@ import { Search, Terminal, ArrowRight, Menu } from 'lucide-react';
 import { Lang, uiStrings } from '@/lib/i18n';
 import LanguageSwitcher from './LanguageSwitcher';
 
+import { config } from '@/lib/config';
+
 export default function DocsHeader({ lang }: { lang: Lang }) {
   const t = uiStrings[lang];
 
@@ -20,7 +22,7 @@ export default function DocsHeader({ lang }: { lang: Lang }) {
             <Menu className="w-5 h-5" />
           </button>
           
-          <Link href={`/${lang}/docs/getting-started/introduction`} className="flex items-center gap-2.5 group">
+          <Link href={`/${lang}/docs`} className="flex items-center gap-2.5 group">
             <div className="flex items-center gap-2">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="text-teal transition-transform group-hover:scale-110">
                 <path d="M3 6h7l4 6h7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -57,7 +59,7 @@ export default function DocsHeader({ lang }: { lang: Lang }) {
           </div>
           
           <Link 
-            href="https://github.com/routex" 
+            href="https://github.com/fiqihqoin/PTMS" 
             target="_blank"
             className="text-text-muted hover:text-foreground transition-colors"
           >
@@ -65,7 +67,7 @@ export default function DocsHeader({ lang }: { lang: Lang }) {
           </Link>
 
           <Link 
-            href="https://app.routex.id" 
+            href={config.dashboardUrl} 
             className="hidden sm:flex items-center gap-1 px-3 py-1.5 bg-teal text-background rounded-md text-xs font-semibold hover:bg-teal-glow transition-all"
           >
             <span>Dashboard</span>

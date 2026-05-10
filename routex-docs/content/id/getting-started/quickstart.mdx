@@ -12,7 +12,7 @@ melalui Routex dalam waktu 5 menit.
 ## Prasyarat
 
 - Akun Routex yang sudah aktif 
-  ([Daftar di sini](https://app.routex.id/register))
+  ([Daftar di sini](https://app.routex.web.id/register))
 - Minimal satu vendor yang sudah dikonfigurasi di 
   portal Routex
 - API Key sandbox (didapat setelah akun diapprove)
@@ -39,7 +39,7 @@ atau repository publik. Gunakan environment variables.
 Request pertamamu:
 
 ```bash
-curl -X POST https://sandbox.routex.id/api/v1/transactions \
+curl -X POST https://sandbox.routex.web.id/api/v1/transactions \
   -H "Content-Type: application/json" \
   -H "X-API-Key: ptms_sb_your_key_here" \
   -H "X-Idempotency-Key: order-12345" \
@@ -68,11 +68,11 @@ Response sukses:
 ## Langkah 3 — Cek Status Transaksi
 
 ```bash
-curl https://sandbox.routex.id/api/v1/transactions/ptms_20260510_a1b2c3d4 \
+curl https://sandbox.routex.web.id/api/v1/transactions/ptms_20260510_a1b2c3d4 \
   -H "X-API-Key: ptms_sb_your_key_here"
 ```
 
 ## Langkah 4 — Setup Webhook (Opsional)
 
-Daftarkan webhook URL di [portal Routex](https://app.routex.id/portal/webhooks) 
+Daftarkan webhook URL di [portal Routex](https://app.routex.web.id/portal/webhooks) 
 untuk menerima notifikasi saat pembayaran selesai.

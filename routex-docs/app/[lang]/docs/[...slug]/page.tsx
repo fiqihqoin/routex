@@ -27,11 +27,15 @@ export async function generateStaticParams({ params }: { params: { lang: string 
   }));
 }
 
+import { config } from '@/lib/config';
+
 export async function generateMetadata({ params }: DocPageProps) {
   const { lang, slug: slugArr } = await params;
   const slug = (slugArr || ['getting-started', 'introduction']).join('/');
   const doc = await getDoc(lang as Lang, slug.split('/'));
   if (!doc) return {};
+
+  const baseUrl = config.docsUrl;
 
   return {
     title: doc.meta.title,
@@ -39,11 +43,11 @@ export async function generateMetadata({ params }: DocPageProps) {
     openGraph: {
       title: `${doc.meta.title} | Routex Docs`,
       description: doc.meta.description,
-      url: `https://docs.routex.id/${lang}/docs/${slug}`,
+      url: `${baseUrl}/${lang}/docs/${slug}`,
       siteName: 'Routex Documentation',
       type: 'article',
       images: [{
-        url: 'https://docs.routex.id/og-image.png',
+        url: `${baseUrl}/og-image.png`,
         width: 1200,
         height: 630,
       }]
@@ -54,10 +58,10 @@ export async function generateMetadata({ params }: DocPageProps) {
       description: doc.meta.description,
     },
     alternates: {
-      canonical: `https://docs.routex.id/${lang}/docs/${slug}`,
+      canonical: `${baseUrl}/${lang}/docs/${slug}`,
       languages: {
-        'id': `https://docs.routex.id/id/docs/${slug}`,
-        'en': `https://docs.routex.id/en/docs/${slug}`,
+        'id': `${baseUrl}/id/docs/${slug}`,
+        'en': `${baseUrl}/en/docs/${slug}`,
       }
     }
   };

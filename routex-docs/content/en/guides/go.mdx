@@ -20,7 +20,7 @@ import (
 )
 
 func createQRIS(orderId string, amount int) {
-    url := "https://sandbox.routex.id/api/v1/transactions"
+    url := "https://sandbox.routex.web.id/api/v1/transactions"
     payload := map[string]interface{}{
         "amount": amount,
         "currency": "IDR",

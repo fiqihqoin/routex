@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Lang, uiStrings } from '@/lib/i18n';
+import { config } from '@/lib/config';
 import { Rocket, Code2, Webhook, ArrowRight } from 'lucide-react';
 
 export default async function DocsHomePage({ params }: { params: Promise<{ lang: string }> }) {
@@ -90,8 +91,9 @@ export default async function DocsHomePage({ params }: { params: Promise<{ lang:
       {/* Status Bar */}
       <div className="flex justify-center pb-12">
         <Link 
-          href="https://status.routex.id" 
+          href={`https://status.${config.baseDomain}`} 
           target="_blank"
+
           className="group inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-surface border border-border hover:border-teal/40 transition-all duration-300"
         >
           <span className="relative flex h-2 w-2">

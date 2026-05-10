@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import * as Icons from 'lucide-react';
 import { Lang } from '@/lib/i18n';
 import { navigation, NavSection, NavItem } from '@/lib/navigation';
+import { config } from '@/lib/config';
 
 export default function DocsSidebar({ lang }: { lang: Lang }) {
   const pathname = usePathname();
@@ -73,7 +74,7 @@ export default function DocsSidebar({ lang }: { lang: Lang }) {
         {/* BOTTOM: Pinned Links */}
         <div className="p-4 border-t border-border/50 bg-background/50">
           <div className="flex flex-col gap-2">
-            <Link href="https://status.routex.id" target="_blank" className="flex items-center justify-between text-[11px] text-text-muted hover:text-teal transition-colors">
+            <Link href={`https://status.${config.baseDomain}`} target="_blank" className="flex items-center justify-between text-[11px] text-text-muted hover:text-teal transition-colors">
               <span>Status Page</span>
               <Icons.ExternalLink className="w-3 h-3" />
             </Link>
