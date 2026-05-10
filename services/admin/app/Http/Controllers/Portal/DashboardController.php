@@ -28,6 +28,24 @@ class DashboardController extends Controller
     }
 
     /**
+     * Return current authenticated merchant data
+     */
+    public function me(): JsonResponse
+    {
+        $merchant = Auth::guard('portal')->user();
+        
+        return response()->json([
+            'user' => [
+                'id' => $merchant->id,
+                'name' => $merchant->name,
+                'email' => $merchant->email,
+                'company' => $merchant->company_name,
+                'merchant_id' => $merchant->id,
+            ]
+        ]);
+    }
+
+    /**
      * Dedicated Dashboard Data API
      */
     public function dashboard(Request $request): JsonResponse
@@ -48,6 +66,13 @@ class DashboardController extends Controller
         $prevDateTo = $dateFrom;
 
         return response()->json([
+            'user' => [
+                'id' => $merchant->id,
+                'name' => $merchant->name,
+                'email' => $merchant->email,
+                'company' => $merchant->company_name,
+                'merchant_id' => $merchant->id,
+            ],
             'stats' => $this->getStats($merchant, $env, $dateFrom, $prevDateFrom, $prevDateTo),
             'volume_chart' => $this->calculateVolumeChart($merchant, $env, $rangeDays, $dateFrom),
             'vendor_performance' => $this->getVendorPerformance($merchant, $env, $dateFrom),

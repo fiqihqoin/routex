@@ -1,23 +1,24 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 type Env = "sandbox" | "production";
 
 type Merchant = {
-  id?: string;
+  id: string;
   name: string;
   email: string;
   company: string;
-  merchant_id?: string;
+  merchant_id: string;
 };
 
 type PortalCtx = {
   env: Env;
   setEnv: (e: Env) => void;
-  user: Merchant;
-  setUser: (u: Merchant) => void;
+  user: Merchant | null;
+  setUser: (u: Merchant | null) => void;
   loading: boolean;
   logout: () => Promise<void>;
+  authenticated: boolean;
 };
 
 const Ctx = createContext<PortalCtx | null>(null);
@@ -30,17 +31,43 @@ function getCookie(name: string) {
 
 export const PortalProvider = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [env, setEnv] = useState<Env>("sandbox");
-  const [user, setUser] = useState<Merchant>({ 
-    name: "Loading...", 
-    email: "", 
-    company: "",
-  });
+  const [user, setUser] = useState<Merchant | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Initial auth check
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("/portal/me", {
+          headers: { "Accept": "application/json" }
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.user) {
+            setUser(data.user);
+          }
+        } else if (res.status === 401) {
+          setUser(null);
+          // Only redirect to login if we're trying to access a portal route
+          if (location.pathname.startsWith("/portal")) {
+            navigate("/login");
+          }
+        }
+      } catch (err) {
+        console.error("Auth check failed:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   // Sync theme with env state
   useEffect(() => {
-    console.log("[PortalContext] Environment changed to:", env);
     if (env === "production") {
       document.documentElement.classList.add("light");
       document.documentElement.classList.remove("dark");
@@ -48,41 +75,14 @@ export const PortalProvider = ({ children }: { children: ReactNode }) => {
       document.documentElement.classList.add("dark");
       document.documentElement.classList.remove("light");
     }
-    
-    // Only fetch and redirect if we are inside the /portal area
-    const isPortalArea = window.location.pathname.startsWith("/portal");
-    if (!isPortalArea) {
-      setLoading(false);
-      return;
+  }, [env]);
+
+  // Handle protected route redirection
+  useEffect(() => {
+    if (!loading && !user && location.pathname.startsWith("/portal")) {
+      navigate("/login");
     }
-
-    const fetchUser = async () => {
-      try {
-        const res = await fetch(`/portal/dashboard?env=${env}`, {
-          headers: { 
-            "Accept": "application/json",
-            "X-Routex-Environment": env
-          }
-        });
-        
-        if (res.status === 401) {
-           navigate("/login");
-           return;
-        }
-        
-        const data = await res.json();
-        if (data && data.user) {
-          setUser(data.user);
-        }
-      } catch (err) {
-        console.error("Portal context error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, [env, navigate]);
+  }, [user, loading, location.pathname, navigate]);
 
   const logout = async () => {
     try {
@@ -96,6 +96,7 @@ export const PortalProvider = ({ children }: { children: ReactNode }) => {
     } catch (err) {
       console.error("Logout error:", err);
     } finally {
+      setUser(null);
       navigate("/login");
     }
   };
@@ -109,6 +110,7 @@ export const PortalProvider = ({ children }: { children: ReactNode }) => {
         setUser,
         loading,
         logout,
+        authenticated: !!user,
       }}
     >
       {children}

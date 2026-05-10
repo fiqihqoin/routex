@@ -4,9 +4,9 @@ import { ArrowLeft, Eye, EyeOff, AlertCircle, Loader2, Activity, Zap } from "luc
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Logo } from "@/components/routex/Logo";
 import { z } from "zod";
+import { usePortal } from "@/components/portal/PortalContext";
 
 const vendors = [
   { name: "Qoinhub", health: 99.8, latency: 220, weight: 0.45 },
@@ -27,12 +27,13 @@ function getCookie(name: string) {
 
 const Login = () => {
   const navigate = useNavigate();
+  const { authenticated, loading, setUser } = usePortal();
   const [showPwd, setShowPwd] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<any>({});
   const [formError, setFormError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [shake, setShake] = useState(false);
   const [tick, setTick] = useState(0);
 
@@ -40,6 +41,13 @@ const Login = () => {
     const id = setInterval(() => setTick((t) => t + 1), 1800);
     return () => clearInterval(id);
   }, []);
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (!loading && authenticated) {
+      navigate("/portal");
+    }
+  }, [authenticated, loading, navigate]);
   
   const activeIdx = tick % vendors.length;
 
@@ -61,7 +69,7 @@ const Login = () => {
     }
 
     setErrors({});
-    setLoading(true);
+    setIsSubmitting(true);
 
     try {
       const response = await fetch("/portal/login", {
@@ -75,6 +83,11 @@ const Login = () => {
       });
 
       if (response.ok) {
+        const data = await response.json();
+        // Set user context immediately after successful login
+        if (data.user) {
+          setUser(data.user);
+        }
         navigate("/portal");
         return;
       }
@@ -86,9 +99,18 @@ const Login = () => {
     } catch (err) {
       setFormError("Could not connect to the server. Please try again later.");
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-teal mb-4" />
+        <p className="text-sm font-mono uppercase tracking-[0.2em] text-muted-foreground">Checking session...</p>
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-background text-foreground">
@@ -262,10 +284,10 @@ const Login = () => {
                   type="submit"
                   variant="hero"
                   size="lg"
-                  disabled={loading}
+                  disabled={isSubmitting}
                   className="w-full transition-transform hover:scale-[1.01]"
                 >
-                  {loading ? (
+                  {isSubmitting ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin mr-2" /> Signing in...
                     </>

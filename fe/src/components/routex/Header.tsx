@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Logo } from "./Logo";
 import { Button } from "@/components/ui/button";
+import { usePortal } from "@/components/portal/PortalContext";
 
 const links = [
   { label: "Features", href: "#features" },
@@ -13,6 +14,7 @@ const links = [
 export const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState("#features");
+  const { authenticated, loading } = usePortal();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -50,16 +52,26 @@ export const Header = () => {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <Link to="/login">
-            <Button variant="ghost" size="sm" className="hidden sm:inline-flex text-muted-foreground hover:text-foreground">
-              Sign in
-            </Button>
-          </Link>
-          <Link to="/register">
-            <Button size="sm" variant="hero">
-              Start for free
-            </Button>
-          </Link>
+          {!loading && authenticated ? (
+            <Link to="/portal">
+              <Button size="sm" variant="hero">
+                Dashboard
+              </Button>
+            </Link>
+          ) : (
+            <>
+              <Link to="/login">
+                <Button variant="ghost" size="sm" className="hidden sm:inline-flex text-muted-foreground hover:text-foreground">
+                  Sign in
+                </Button>
+              </Link>
+              <Link to="/register">
+                <Button size="sm" variant="hero">
+                  Start for free
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>

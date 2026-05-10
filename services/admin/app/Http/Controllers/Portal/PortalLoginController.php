@@ -43,7 +43,14 @@ class PortalLoginController extends Controller
                 $request->session()->regenerate();
                 return response()->json([
                     'message' => 'Login successful',
-                    'redirect' => '/portal'
+                    'redirect' => '/portal',
+                    'user' => [
+                        'id' => $merchant->id,
+                        'name' => $merchant->name,
+                        'email' => $merchant->email,
+                        'company' => $merchant->company_name,
+                        'merchant_id' => $merchant->id,
+                    ]
                 ]);
             default:
                 throw ValidationException::withMessages(['email' => ['Status akun tidak dikenal.']]);

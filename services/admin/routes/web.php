@@ -22,10 +22,14 @@ Route::middleware('auth:portal')->group(function () {
     // 1. Dashboard UI (Root portal path)
     Route::get('/portal', [DashboardController::class, 'serveApp'])->name('portal.dashboard');
     
-    // 2. Portal Backend API logic
+    // Portal Backend API logic
     Route::prefix('portal')->name('portal.')->group(function () {
+        // Auth & User
+        Route::get('/me', [DashboardController::class, 'me'])->name('me');
+
         // Dashboard Data
         Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard.data');
+
         Route::get('/dashboard/chart', [DashboardController::class, 'volumeChart'])->name('dashboard.chart');
 
         // Vendor Management
