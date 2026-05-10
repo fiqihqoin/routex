@@ -1,0 +1,32 @@
+---
+title: Python Integration
+description: Guide to integrating Routex API using Python and the requests library
+lastUpdated: '2026-05-10'
+---
+
+# Python Integration
+
+Example of integration using the `requests` library in Python.
+
+## Code Example
+
+<CodeBlock language="python" filename="routex.py">
+{`import requests
+import os
+
+def create_qris(order_id, amount):
+    url = "https://sandbox.routex.id/api/v1/transactions"
+    headers = {
+        "X-API-Key": os.getenv("ROUTEX_API_KEY"),
+        "X-Idempotency-Key": order_id,
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "amount": amount,
+        "currency": "IDR",
+        "payment_channel": "qris"
+    }
+    
+    response = requests.post(url, json=payload, headers=headers)
+    return response.json()`}
+</CodeBlock>

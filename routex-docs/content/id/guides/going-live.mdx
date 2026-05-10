@@ -1,0 +1,17 @@
+---
+title: Go Live ke Production
+description: Persiapan dan langkah-langkah memindahkan aplikasi ke environment Live
+lastUpdated: '2026-05-10'
+---
+
+# Go Live ke Production
+
+Setelah pengujian di sandbox selesai, ikuti checklist berikut untuk mulai menerima pembayaran asli.
+
+## Checklist Go Live
+
+- [ ] Pastikan akun merchant sudah diapprove untuk Production.
+- [ ] Ganti Base URL ke `https://api.routex.id`.
+- [ ] Ganti API Key ke `ptms_live_...`.
+- [ ] Pastikan Webhook URL sudah menggunakan HTTPS.
+- [ ] Lakukan transaksi riil nominal kecil (misal Rp 1.000) untuk verifikasi akhir.

@@ -1,0 +1,50 @@
+---
+title: Authentication
+description: How to authenticate requests to Routex API using API keys
+lastUpdated: '2026-05-10'
+---
+
+# Authentication
+
+Routex uses API keys to authenticate all requests.
+
+## API Key Format
+
+Routex uses two different types of API keys based on the environment:
+
+| Prefix | Environment | Endpoint |
+|--------|-------------|----------|
+| `ptms_sb_` | Sandbox | `sandbox.routex.id` |
+| `ptms_live_` | Production | `api.routex.id` |
+
+<Callout type="danger">
+Using a sandbox key on a production endpoint 
+(or vice versa) will result in an 
+`ENVIRONMENT_MISMATCH` error.
+</Callout>
+
+## How to Use API Keys
+
+Include your API key in the header of every request:
+
+```bash
+X-API-Key: ptms_sb_your_api_key_here
+```
+
+Full request example:
+
+```bash
+curl -X POST https://sandbox.routex.id/api/v1/transactions \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: ptms_sb_your_api_key_here" \
+  -d '{ ... }'
+```
+
+## Authentication Errors
+
+| Error Code | HTTP Status | Description |
+|------------|-------------|-----------|
+| `MISSING_API_KEY` | 401 | X-API-Key header is missing |
+| `INVALID_API_KEY` | 401 | API key is invalid or has been revoked |
+| `ENVIRONMENT_MISMATCH` | 403 | API key does not match the environment endpoint |
+| `USER_DISABLED` | 403 | Merchant account is disabled |

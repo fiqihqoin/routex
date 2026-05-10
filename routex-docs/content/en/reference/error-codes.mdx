@@ -1,0 +1,26 @@
+---
+title: Error Codes Reference
+description: Complete reference of Routex API error codes
+lastUpdated: '2026-05-10'
+---
+
+# Error Codes Reference
+
+Here is a comprehensive list of all error codes that may be returned by the Routex API.
+
+## Client Errors (4xx)
+
+| Code | Description |
+|------|-------------|
+| `MISSING_API_KEY` | X-API-Key header not found |
+| `INVALID_AMOUNT` | Amount must be > 0 |
+| `INVALID_CURRENCY` | Only IDR is supported |
+| `IDEMPOTENCY_CONFLICT` | Same key used with different parameters |
+
+## Server Errors (5xx)
+
+| Code | Description |
+|------|-------------|
+| `VENDOR_UNAVAILABLE` | Vendor is currently down |
+| `ROUTING_ERROR` | Failed to find a routing path |
+| `INTERNAL_ERROR` | A system error occurred |

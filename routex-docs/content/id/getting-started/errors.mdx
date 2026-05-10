@@ -1,0 +1,31 @@
+---
+title: Error Handling
+description: Panduan menangani error dan daftar status code di Routex
+lastUpdated: '2026-05-10'
+---
+
+# Error Handling
+
+Routex menggunakan standar HTTP response code untuk menunjukkan keberhasilan atau kegagalan sebuah request.
+
+## Struktur Error
+
+```json
+{
+  "error": {
+    "code": "INVALID_AMOUNT",
+    "message": "The amount must be greater than 0"
+  }
+}
+```
+
+## Daftar Error Umum
+
+| HTTP | Code | Deskripsi |
+|------|------|-----------|
+| 400 | `BAD_REQUEST` | Request tidak valid |
+| 401 | `UNAUTHORIZED` | API Key salah atau hilang |
+| 403 | `FORBIDDEN` | Tidak memiliki akses |
+| 404 | `NOT_FOUND` | Resource tidak ditemukan |
+| 429 | `TOO_MANY_REQUESTS` | Rate limit terlampaui |
+| 500 | `INTERNAL_SERVER_ERROR` | Terjadi kesalahan pada server |

@@ -1,0 +1,74 @@
+---
+title: Pengenalan Routex
+description: Apa itu Routex dan bagaimana cara kerjanya sebagai middleware payment routing untuk bisnis Indonesia
+lastUpdated: '2026-05-10'
+---
+
+# Pengenalan Routex
+
+Routex adalah **payment traffic management system** yang 
+berada di antara aplikasimu dan payment gateway. 
+Routex secara cerdas merouting, membatasi, dan 
+melindungi traffic transaksi pembayaran.
+
+<Callout type="info">
+Routex **bukan** payment gateway. Routex hanya 
+merouting request — tidak memproses transaksi, 
+tokenisasi kartu, atau settlement dana.
+</Callout>
+
+## Cara Kerja Routex
+
+Alur pembayaran QRIS melalui Routex:
+
+1. **Generate** — Aplikasimu call Routex API → 
+   Routex memilih vendor optimal → mengembalikan 
+   QRIS code
+2. **Bayar** — User scan QRIS via banking/e-wallet app
+3. **Callback** — Vendor notifikasi Routex → Routex 
+   forward callback yang sudah dinormalisasi ke 
+   webhook URL kamu
+
+## Keunggulan Routex
+
+### Maksimalkan Success Rate
+Routing otomatis menghindari vendor yang bermasalah 
+secara real-time melalui sistem penalty dan 
+circuit breaker.
+
+### Proteksi Volume
+Rate limiting per-account, per-vendor, dan per-user 
+memastikan kamu tidak melebihi batas kontraktual 
+dengan vendor.
+
+### Optimasi Biaya
+Basket-size routing memilih vendor berdasarkan 
+efisiensi biaya per bracket nominal transaksi.
+
+### Observabilitas Penuh
+Setiap keputusan routing, kesehatan vendor, dan 
+status transaksi terlacak secara real-time.
+
+## Vendor yang Didukung
+
+Routex mendukung tiga payment gateway untuk 
+transaksi QRIS:
+
+| Vendor | Environment | Status |
+|--------|-------------|--------|
+| Qoinhub | Sandbox & Production | ✅ Aktif |
+| Midtrans | Sandbox & Production | ✅ Aktif |
+| Xendit | Sandbox & Production | ✅ Aktif |
+
+## Mulai Sekarang
+
+<div className="grid grid-cols-2 gap-4 mt-6">
+  <Link href="/id/docs/getting-started/quickstart" className="p-4 rounded-xl border border-border bg-surface hover:border-teal/40 transition-all no-underline">
+    <div className="font-bold text-teal mb-1">Quick Start →</div>
+    <div className="text-xs text-text-muted">Setup dalam 5 menit</div>
+  </Link>
+  <Link href="/id/docs/getting-started/authentication" className="p-4 rounded-xl border border-border bg-surface hover:border-teal/40 transition-all no-underline">
+    <div className="font-bold text-teal mb-1">Autentikasi →</div>
+    <div className="text-xs text-text-muted">Kelola API Key</div>
+  </Link>
+</div>

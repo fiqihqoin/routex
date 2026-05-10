@@ -1,0 +1,33 @@
+---
+title: Payload Format
+description: Structure of webhook notification data from Routex
+lastUpdated: '2026-05-10'
+---
+
+# Payload Format
+
+Routex normalizes data from various vendors into a single standard format to keep your integration consistent.
+
+## Success Payload Example
+
+```json
+{
+  "event": "transaction.settled",
+  "data": {
+    "transaction_id": "ptms_20260510_a1b2c3d4",
+    "status": "settled",
+    "amount": 50000,
+    "currency": "IDR",
+    "payment_channel": "qris",
+    "paid_at": "2026-05-10T14:40:00Z"
+  }
+}
+```
+
+## Event List
+
+| Event | Description |
+|-------|-------------|
+| `transaction.settled` | Payment successfully received |
+| `transaction.failed` | Transaction failed at the vendor side |
+| `transaction.expired` | QRIS can no longer be paid |

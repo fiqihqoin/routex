@@ -1,0 +1,29 @@
+---
+title: PHP / Laravel Integration
+description: Guide to integrating Routex API using Laravel Http Client
+lastUpdated: '2026-05-10'
+---
+
+# PHP / Laravel Integration
+
+Example of integration using the Http Facade in Laravel.
+
+## Code Example
+
+<CodeBlock language="php" filename="RoutexService.php">
+{`use Illuminate\\Support\\Facades\\Http;
+
+public function createQRIS($orderId, $amount)
+{
+    $response = Http::withHeaders([
+        'X-API-Key' => config('services.routex.key'),
+        'X-Idempotency-Key' => $orderId,
+    ])->post('https://sandbox.routex.id/api/v1/transactions', [
+        'amount' => $amount,
+        'currency' => 'IDR',
+        'payment_channel' => 'qris',
+    ]);
+
+    return $response->json();
+}`}
+</CodeBlock>

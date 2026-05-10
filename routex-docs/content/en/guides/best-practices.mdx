@@ -1,0 +1,21 @@
+---
+title: Best Practices
+description: Best tips and practices for secure and efficient Routex integration
+lastUpdated: '2026-05-10'
+---
+
+# Best Practices
+
+Follow these guidelines to ensure your integration runs optimally.
+
+## Security
+
+1. **Use Environment Variables**: Never hardcode your API Key.
+2. **Use HTTPS**: Mandatory for Webhook URLs.
+3. **Verify Signatures**: Always check the HMAC signature on every received webhook.
+
+## Performance
+
+1. **Handle Timeouts**: Set a request timeout of at least 30 seconds.
+2. **Implement Retries**: Use exponential backoff if a request to Routex fails (status 5xx).
+3. **Use Idempotency**: Always send the `X-Idempotency-Key` to avoid double charging.

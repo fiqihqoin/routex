@@ -1,0 +1,73 @@
+---
+title: Introduction to Routex
+description: What is Routex and how it works as a payment routing middleware for businesses
+lastUpdated: '2026-05-10'
+---
+
+# Introduction to Routex
+
+Routex is a **payment traffic management system** that 
+sits between your application and payment gateways. 
+Routex intelligently routes, limits, and protects 
+your payment transaction traffic.
+
+<Callout type="info">
+Routex is **not** a payment gateway. Routex only 
+routes requests — it does not process transactions, 
+card tokenization, or fund settlements.
+</Callout>
+
+## How Routex Works
+
+The QRIS payment flow through Routex:
+
+1. **Generate** — Your application calls Routex API → 
+   Routex selects the optimal vendor → returns the 
+   QRIS code.
+2. **Pay** — User scans the QRIS via banking/e-wallet app.
+3. **Callback** — Vendor notifies Routex → Routex 
+   forwards the normalized callback to your webhook URL.
+
+## Key Advantages
+
+### Maximize Success Rate
+Automated routing avoids problematic vendors in 
+real-time through a penalty system and 
+circuit breakers.
+
+### Volume Protection
+Rate limiting per-account, per-vendor, and per-user 
+ensures you don't exceed contractual limits 
+with vendors.
+
+### Cost Optimization
+Basket-size routing selects vendors based on 
+cost efficiency per transaction nominal bracket.
+
+### Full Observability
+Every routing decision, vendor health status, and 
+transaction state is tracked in real-time.
+
+## Supported Vendors
+
+Routex supports three payment gateways for 
+QRIS transactions:
+
+| Vendor | Environment | Status |
+|--------|-------------|--------|
+| Qoinhub | Sandbox & Production | ✅ Active |
+| Midtrans | Sandbox & Production | ✅ Active |
+| Xendit | Sandbox & Production | ✅ Active |
+
+## Get Started
+
+<div className="grid grid-cols-2 gap-4 mt-6">
+  <Link href="/en/docs/getting-started/quickstart" className="p-4 rounded-xl border border-border bg-surface hover:border-teal/40 transition-all no-underline">
+    <div className="font-bold text-teal mb-1">Quick Start →</div>
+    <div className="text-xs text-text-muted">Setup in 5 minutes</div>
+  </Link>
+  <Link href="/en/docs/getting-started/authentication" className="p-4 rounded-xl border border-border bg-surface hover:border-teal/40 transition-all no-underline">
+    <div className="font-bold text-teal mb-1">Authentication →</div>
+    <div className="text-xs text-text-muted">Manage API Keys</div>
+  </Link>
+</div>

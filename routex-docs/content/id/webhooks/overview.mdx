@@ -1,0 +1,21 @@
+---
+title: Pengenalan Webhook
+description: Memahami alur notifikasi pembayaran real-time via Webhook
+lastUpdated: '2026-05-10'
+---
+
+# Pengenalan Webhook
+
+Webhook memungkinkan Routex untuk mengirimkan notifikasi secara otomatis ke server Anda saat terjadi perubahan status pada transaksi (misalnya saat pembayaran berhasil).
+
+## Kenapa Menggunakan Webhook?
+
+Tanpa webhook, server Anda harus melakukan polling (pemanggilan API cek status berulang kali) untuk mengetahui apakah user sudah membayar. Webhook menghilangkan kebutuhan ini dengan mendorong data langsung ke sistem Anda.
+
+## Alur Webhook
+
+1. User menyelesaikan pembayaran QRIS.
+2. Vendor (misal: Midtrans) mengirim notifikasi ke Routex.
+3. Routex memproses data dan menormalkan formatnya.
+4. Routex mengirim POST request ke URL Webhook yang Anda daftarkan.
+5. Server Anda memproses data dan membalas dengan status 200 OK.

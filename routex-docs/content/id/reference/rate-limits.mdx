@@ -1,0 +1,21 @@
+---
+title: Rate Limits
+description: Batasan request API per detik (TPS) di Routex
+lastUpdated: '2026-05-10'
+---
+
+# Rate Limits
+
+Untuk menjaga stabilitas sistem, Routex menerapkan batasan jumlah request (Rate Limiting).
+
+## Batasan Umum
+
+| Akun Type | TPS (Transactions Per Second) |
+|-----------|-------------------------------|
+| Sandbox | 2 TPS |
+| Production (Standard) | 10 TPS |
+| Production (Enterprise) | Kustom |
+
+<Callout type="warning">
+Request yang melebihi batas akan menerima status `429 Too Many Requests`.
+</Callout>

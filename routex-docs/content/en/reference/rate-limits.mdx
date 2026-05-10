@@ -1,0 +1,21 @@
+---
+title: Rate Limits
+description: API request limits per second (TPS) in Routex
+lastUpdated: '2026-05-10'
+---
+
+# Rate Limits
+
+To maintain system stability, Routex applies request limits (Rate Limiting).
+
+## General Limits
+
+| Account Type | TPS (Transactions Per Second) |
+|--------------|-------------------------------|
+| Sandbox | 2 TPS |
+| Production (Standard) | 10 TPS |
+| Production (Enterprise) | Custom |
+
+<Callout type="warning">
+Requests exceeding the limit will receive a `429 Too Many Requests` status.
+</Callout>

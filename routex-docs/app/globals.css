@@ -1,0 +1,219 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans: "Inter", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "sans-serif";
+  
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  
+  --color-surface: hsl(var(--surface));
+  --color-surface-elevated: hsl(var(--surface-elevated));
+  
+  --color-border: hsl(var(--border));
+  --color-border-subtle: hsl(var(--border-subtle));
+  
+  --color-text-muted: hsl(var(--text-muted));
+  --color-text-dim: hsl(var(--text-dim));
+  
+  --color-teal: hsl(var(--teal));
+  --color-teal-glow: hsl(var(--teal-glow));
+  --color-purple: hsl(var(--purple));
+  
+  --color-success: hsl(var(--success));
+  --color-warning: hsl(var(--warning));
+  --color-danger: hsl(var(--danger));
+  
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+  
+  --animate-fade-up: fade-up 0.6s ease-out forwards;
+  --animate-pulse-ring: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-grid-drift: grid-drift 20s linear infinite;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse-ring {
+    0% {
+      box-shadow: 0 0 0 0 hsl(var(--teal) / 0.4);
+    }
+    70% {
+      box-shadow: 0 0 0 10px hsl(var(--teal) / 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 hsl(var(--teal) / 0);
+    }
+  }
+
+  @keyframes grid-drift {
+    from {
+      background-position: 0 0;
+    }
+    to {
+      background-position: 56px 56px;
+    }
+  }
+}
+
+@layer base {
+  :root {
+    /* Background layers */
+    --background: 222 47% 5%;          /* #0A0E1A */
+    --surface: 222 40% 8%;             /* card bg */
+    --surface-elevated: 220 40% 11%;   /* #111827 */
+    
+    /* Borders */
+    --border: 222 30% 14%;
+    --border-subtle: 214 32% 17%;      /* #1E2A3A */
+    
+    /* Text */
+    --foreground: 210 40% 98%;         /* #F1F5F9 */
+    --text-muted: 215 20% 65%;         /* #94A3B8 */
+    --text-dim: 215 19% 35%;           /* #475569 */
+    
+    /* Brand colors */
+    --teal: 168 100% 42%;              /* #00D4AA */
+    --teal-glow: 168 100% 55%;
+    --purple: 270 70% 60%;             /* accent */
+    
+    /* Status */
+    --success: 160 84% 39%;
+    --warning: 38 92% 50%;
+    --danger: 0 84% 60%;
+    
+    /* Docs specific */
+    --sidebar-width: 280px;
+    --toc-width: 240px;
+    --header-height: 60px;
+    --content-max-width: 720px;
+    
+    --radius: 0.75rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+@layer utilities {
+  .grid-bg {
+    background-image:
+      linear-gradient(hsl(var(--border) / 0.5) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--border) / 0.5) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  }
+
+  .gradient-hero {
+    background: radial-gradient(
+      ellipse at top, 
+      hsl(var(--teal) / 0.15), 
+      transparent 60%
+    ), radial-gradient(
+      ellipse at bottom right, 
+      hsl(var(--purple) / 0.12), 
+      transparent 60%
+    );
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-br from-[#F1F5F9] to-[#00D4AA];
+  }
+
+  .shadow-glow {
+    box-shadow: 0 0 40px hsl(var(--teal) / 0.3);
+  }
+
+  .shadow-card {
+    box-shadow: 
+      0 1px 0 hsl(210 40% 98% / 0.05) inset,
+      0 8px 24px hsl(0 0% 0% / 0.4);
+  }
+
+  /* Prose Overrides */
+  .prose {
+    --tw-prose-body: hsl(var(--text-muted));
+    --tw-prose-headings: hsl(var(--foreground));
+    --tw-prose-links: hsl(var(--teal));
+    --tw-prose-bold: hsl(var(--foreground));
+    --tw-prose-counters: hsl(var(--teal));
+    --tw-prose-bullets: hsl(var(--teal));
+    --tw-prose-hr: hsl(var(--border));
+    --tw-prose-quotes: hsl(var(--text-muted));
+    --tw-prose-quote-borders: hsl(var(--teal));
+    --tw-prose-captions: hsl(var(--text-dim));
+    --tw-prose-code: hsl(var(--teal));
+    --tw-prose-pre-code: hsl(var(--foreground));
+    --tw-prose-pre-bg: transparent;
+    --tw-prose-th-borders: hsl(var(--border));
+    --tw-prose-td-borders: hsl(var(--border));
+  }
+
+  .prose h1, .prose h2, .prose h3, .prose h4 {
+    @apply scroll-mt-[100px] font-bold tracking-tight;
+  }
+
+  .prose h2 {
+    @apply text-2xl border-b border-border pb-2 mt-12 mb-6;
+  }
+
+  .prose h3 {
+    @apply text-xl mt-8 mb-4;
+  }
+
+  .prose p {
+    @apply leading-[1.8] mb-6;
+  }
+
+  .prose a {
+    @apply no-underline border-b border-teal/30 hover:border-teal transition-colors;
+  }
+
+  .prose :not(pre) > code {
+    @apply bg-surface-elevated text-teal border border-border rounded px-1.5 py-0.5 text-[0.875em] font-mono font-normal;
+  }
+
+  .prose :not(pre) > code::before,
+  .prose :not(pre) > code::after {
+    content: none !important;
+  }
+
+  .prose blockquote {
+    @apply not-italic bg-teal/5 border-l-4 border-teal rounded-r-lg py-1 px-5 my-8;
+  }
+
+  .prose table {
+    @apply w-full border-collapse my-8;
+  }
+
+  .prose th {
+    @apply bg-surface-elevated text-left font-semibold text-foreground px-4 py-3 border-b-2 border-border;
+  }
+
+  .prose td {
+    @apply px-4 py-3 border-b border-border text-text-muted;
+  }
+
+  .prose tr:hover td {
+    @apply bg-surface/50 transition-colors;
+  }
+
+  .prose hr {
+    @apply my-12;
+  }
+}

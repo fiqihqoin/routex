@@ -1,0 +1,30 @@
+---
+title: Verifikasi Signature
+description: Menjamin keamanan data webhook dengan HMAC verification
+lastUpdated: '2026-05-10'
+---
+
+# Verifikasi Signature
+
+Untuk menjamin bahwa data yang diterima benar-benar dari Routex, Anda harus memverifikasi header `X-Routex-Signature`.
+
+## Algoritma
+
+Routex menggunakan **HMAC-SHA256** dengan payload request sebagai data dan **Webhook Secret** sebagai key.
+
+## Cara Verifikasi (Node.js)
+
+```javascript
+const crypto = require('crypto');
+
+function verify(payload, signature, secret) {
+  const hmac = crypto.createHmac('sha256', secret);
+  hmac.update(JSON.stringify(payload));
+  const digest = hmac.digest('hex');
+  return digest === signature;
+}
+```
+
+<Callout type="danger">
+Abaikan request jika signature tidak cocok. Jangan proses transaksi sebelum verifikasi berhasil.
+</Callout>

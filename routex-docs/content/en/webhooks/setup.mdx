@@ -1,0 +1,25 @@
+---
+title: Setup Webhook
+description: Steps to register a webhook endpoint in Routex
+lastUpdated: '2026-05-10'
+---
+
+# Setup Webhook
+
+Follow these steps to start receiving Routex notifications.
+
+## 1. Prepare an Endpoint on Your Server
+
+Create an endpoint that accepts `POST` requests with a JSON body.
+
+## 2. Register the URL in the Portal
+
+Go to [Routex Dashboard → Settings → Webhooks](https://app.routex.id/portal/webhooks) and enter your server URL.
+
+## 3. Verify the Endpoint
+
+Routex will send a test ping when you save the URL. Ensure your server responds with a `200 OK` status.
+
+<Callout type="warning">
+Always use HTTPS for your webhook endpoint to maintain transaction data security.
+</Callout>

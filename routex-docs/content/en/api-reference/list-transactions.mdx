@@ -1,0 +1,41 @@
+---
+title: List Transactions
+description: Retrieve a list of all transactions
+lastUpdated: '2026-05-10'
+---
+
+# List Transactions
+
+This endpoint returns a list of the most recent transactions in your account.
+
+<ApiEndpoint method="GET" endpoint="/api/v1/transactions" />
+
+## Query Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `limit` | integer | ❌ | 10 | Records per page |
+| `page` | integer | ❌ | 1 | Page number |
+| `status` | string | ❌ | - | Filter by transaction status |
+
+## Response
+
+### 200 — Success
+
+```json
+{
+  "data": [
+    {
+      "transaction_id": "ptms_20260510_a1b2c3d4",
+      "status": "settled",
+      "amount": 50000,
+      "created_at": "2026-05-10T14:32:00Z"
+    }
+  ],
+  "meta": {
+    "total": 1,
+    "limit": 10,
+    "page": 1
+  }
+}
+```

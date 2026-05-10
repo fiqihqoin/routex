@@ -1,0 +1,21 @@
+---
+title: Retry & DLQ
+description: Bagaimana Routex menangani kegagalan pengiriman webhook
+lastUpdated: '2026-05-10'
+---
+
+# Retry & DLQ
+
+Jika server Anda gagal menerima webhook (kembali selain status 200), Routex akan mencoba mengirim ulang.
+
+## Kebijakan Retry
+
+Routex akan mencoba maksimal **10 kali** dengan interval eksponensial:
+1. 1 menit
+2. 5 menit
+3. 15 menit
+4. ... s/d 24 jam
+
+## Dead Letter Queue (DLQ)
+
+Jika setelah 10 kali masih gagal, webhook akan masuk ke DLQ. Anda bisa melihat dan memicu kirim ulang manual melalui Dashboard Routex.

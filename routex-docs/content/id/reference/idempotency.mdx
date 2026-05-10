@@ -1,0 +1,21 @@
+---
+title: Idempotency Keys
+description: Detail teknis implementasi Idempotency di API Routex
+lastUpdated: '2026-05-10'
+---
+
+# Idempotency Keys
+
+Routex menggunakan Idempotency Key untuk menjamin keamanan operasi tulis (POST).
+
+## Mekanisme
+
+1. Routex menyimpan response request pertama berdasarkan key selama 24 jam.
+2. Jika ada request baru dengan key yang sama:
+   - Jika parameter sama: kembalikan cached response (HTTP 200/201).
+   - Jika parameter berbeda: kembalikan error `IDEMPOTENCY_CONFLICT` (HTTP 409).
+
+## Karakteristik Key
+
+- Maksimal 64 karakter.
+- Disarankan menggunakan format UUID v4 atau string alfanumerik unik (seperti Order ID).

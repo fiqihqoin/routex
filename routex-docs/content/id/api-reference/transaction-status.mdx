@@ -1,0 +1,43 @@
+---
+title: Cek Status Transaksi
+description: Mendapatkan status terbaru dari sebuah transaksi
+lastUpdated: '2026-05-10'
+---
+
+# Cek Status Transaksi
+
+Gunakan endpoint ini untuk memeriksa status pembayaran secara manual.
+
+<ApiEndpoint method="GET" endpoint="/api/v1/transactions/{transaction_id}" />
+
+## Path Parameters
+
+| Parameter | Type | Required | Deskripsi |
+|-----------|------|----------|-----------|
+| `transaction_id` | string | ✅ | ID transaksi dari Routex |
+
+## Response
+
+### 200 — Success
+
+```json
+{
+  "transaction_id": "ptms_20260510_a1b2c3d4",
+  "status": "settled",
+  "amount": 50000,
+  "currency": "IDR",
+  "payment_channel": "qris",
+  "paid_at": "2026-05-10T14:40:00Z",
+  "created_at": "2026-05-10T14:32:00Z"
+}
+```
+
+## Daftar Status
+
+| Status | Deskripsi |
+|--------|-----------|
+| `pending_payment` | QRIS sudah dibuat, menunggu user membayar |
+| `settled` | Pembayaran berhasil diterima |
+| `expired` | QRIS sudah kadaluarsa |
+| `failed` | Transaksi gagal |
+| `refunded` | Dana sudah dikembalikan ke user |

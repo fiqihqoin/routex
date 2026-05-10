@@ -1,0 +1,23 @@
+---
+title: Idempotency
+description: Cara mencegah duplikasi transaksi menggunakan Idempotency Key
+lastUpdated: '2026-05-10'
+---
+
+# Idempotency
+
+Routex mendukung idempotensi untuk mencegah pembuatan transaksi ganda secara tidak sengaja.
+
+## Cara Menggunakan
+
+Sertakan header `X-Idempotency-Key` dengan nilai UUID yang unik untuk setiap transaksi.
+
+```bash
+X-Idempotency-Key: your-unique-uuid
+```
+
+Jika Routex menerima request kedua dengan key yang sama dalam waktu 24 jam, Routex akan mengembalikan response yang sama tanpa memproses transaksi ulang.
+
+<Callout type="tip">
+Gunakan Order ID dari sistem Anda sebagai Idempotency Key untuk memastikan sinkronisasi yang aman.
+</Callout>

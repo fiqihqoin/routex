@@ -1,0 +1,21 @@
+---
+title: Best Practices
+description: Tips dan panduan terbaik untuk integrasi Routex yang aman dan efisien
+lastUpdated: '2026-05-10'
+---
+
+# Best Practices
+
+Ikuti panduan ini untuk memastikan integrasi Anda berjalan optimal.
+
+## Keamanan
+
+1. **Gunakan Environment Variables**: Jangan hardcode API Key.
+2. **Gunakan HTTPS**: Wajib untuk Webhook URL.
+3. **Verifikasi Signature**: Selalu cek HMAC signature pada setiap webhook yang diterima.
+
+## Performa
+
+1. **Handle Timeout**: Set timeout request minimal 30 detik.
+2. **Implementasikan Retry**: Gunakan exponential backoff jika request ke Routex gagal (status 5xx).
+3. **Gunakan Idempotency**: Selalu kirim `X-Idempotency-Key` untuk menghindari double charging.
