@@ -104,6 +104,9 @@ Route::middleware('auth:portal')->group(function () {
                 // POST - konfirmasi OTP untuk aktifkan 2FA
                 Route::post('/2fa/confirm', [ProfileController::class, 'confirmTwoFactor'])->name('2fa.confirm');
                 
+                // POST - ambil recovery codes (dengan password)
+                Route::post('/2fa/recovery-codes', [ProfileController::class, 'getRecoveryCodes'])->name('2fa.recovery-codes');
+
                 // DELETE - nonaktifkan 2FA
                 Route::delete('/2fa', [ProfileController::class, 'disableTwoFactor'])->name('2fa.disable');
                 

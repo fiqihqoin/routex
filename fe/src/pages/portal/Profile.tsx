@@ -119,6 +119,8 @@ export default function ProfilePage() {
   const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
   const [hasSavedRecovery, setHasSavedRecovery] = useState(false);
   const [disable2FAPassword, setDisable2FAPassword] = useState("");
+  const [recoveryPassword, setRecoveryPassword] = useState("");
+  const [isFetchingCodes, setIsFetchingCodes] = useState(false);
 
   // Password State
   const [curPass, setCurPass] = useState("");
@@ -269,6 +271,36 @@ export default function ProfilePage() {
       setTwoStep(1);
       setShow2FAModal(true);
     } catch (err) { /* ignore */ }
+  };
+
+  const handleFetchRecoveryCodes = async () => {
+    setIsFetchingCodes(true);
+    try {
+      const res = await fetch("/portal/profile/2fa/recovery-codes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "X-XSRF-TOKEN": document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] || ""
+        },
+        body: JSON.stringify({ password: recoveryPassword })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        setRecoveryCodes(data.recovery_codes);
+        setShowRecoveryModal(false);
+        setRecoveryPassword("");
+        setTwoStep(3);
+        setShow2FAModal(true);
+      } else {
+        toast({ title: "Gagal", description: data.error || "Password tidak sesuai.", variant: "destructive" });
+      }
+    } catch (err) {
+      toast({ title: "Error", description: "Terjadi kesalahan.", variant: "destructive" });
+    } finally {
+      setIsFetchingCodes(false);
+    }
   };
 
   const handleConfirm2FA = async () => {
@@ -504,34 +536,6 @@ export default function ProfilePage() {
                     <span className={cn("font-medium", !profile.last_password_changed_at ? "text-amber-500" : "text-portal-text")}>
                        {profile.last_password_changed_at ? new Date(profile.last_password_changed_at).toLocaleDateString() : 'Belum pernah'}
                     </span>
-                 </div>
-
-                 <div className="h-px bg-portal-border/60 my-4" />
-
-                 <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                       <div className="space-y-0.5">
-                          <h4 className="text-sm font-bold text-portal-text">Two-Factor Authentication</h4>
-                          <p className="text-xs text-portal-text-dim">Lapisan keamanan tambahan via OTP.</p>
-                       </div>
-                       {profile.two_factor_enabled ? (
-                          <div className="flex items-center gap-1.5 text-teal text-xs font-bold">
-                             <ShieldCheck className="h-4 w-4" /> Aktif
-                          </div>
-                       ) : (
-                          <div className="text-portal-text-dim text-xs">Tidak aktif</div>
-                       )}
-                    </div>
-                    
-                    {profile.two_factor_enabled ? (
-                       <Button variant="ghost" size="sm" onClick={() => setShowDisable2FAModal(true)} className="w-full text-red-500 hover:bg-red-500/5 font-bold h-9">
-                          Nonaktifkan 2FA
-                       </Button>
-                    ) : (
-                       <Button size="sm" onClick={handleSetup2FA} className="w-full bg-portal-elev hover:bg-portal-elev/80 text-portal-text font-bold h-9 border border-portal-border">
-                          Aktifkan 2FA
-                       </Button>
-                    )}
                  </div>
               </div>
            </PortalCard>
@@ -916,6 +920,33 @@ export default function ProfilePage() {
                     </div>
                  </div>
               )}
+           </DialogContent>
+        </Dialog>
+
+        {/* MODAL: VIEW RECOVERY CODES (Password Confirm) */}
+        <Dialog open={showRecoveryModal} onOpenChange={setShowRecoveryModal}>
+           <DialogContent className="bg-portal-surface border-portal-border text-portal-text">
+              <DialogHeader>
+                 <DialogTitle>Lihat Recovery Codes</DialogTitle>
+                 <DialogDescription className="pt-2">Masukkan password Anda untuk melihat kode pemulihan 2FA.</DialogDescription>
+              </DialogHeader>
+              <div className="py-4">
+                 <Input 
+                   type="password" 
+                   value={recoveryPassword} 
+                   onChange={e => setRecoveryPassword(e.target.value)} 
+                   placeholder="Password Anda"
+                   className="bg-portal-elev h-11"
+                   autoFocus
+                   onKeyDown={e => e.key === 'Enter' && handleFetchRecoveryCodes()}
+                 />
+              </div>
+              <DialogFooter>
+                 <Button variant="ghost" onClick={() => setShowRecoveryModal(false)}>Batal</Button>
+                 <Button onClick={handleFetchRecoveryCodes} disabled={!recoveryPassword || isFetchingCodes} className="bg-teal text-white font-bold">
+                    {isFetchingCodes ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : "Tampilkan Kode"}
+                 </Button>
+              </DialogFooter>
            </DialogContent>
         </Dialog>
 

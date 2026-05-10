@@ -314,6 +314,31 @@ class ProfileController extends Controller
     }
 
     /**
+     * Get 2FA recovery codes (requires password confirmation).
+     */
+    public function getRecoveryCodes(Request $request): JsonResponse
+    {
+        $merchant = Auth::guard('portal')->user();
+
+        $request->validate(['password' => 'required']);
+
+        if (!Hash::check($request->password, $merchant->password_hash)) {
+            return response()->json(['error' => 'Password tidak sesuai'], 422);
+        }
+
+        if (!$merchant->two_factor_enabled || !$merchant->two_factor_recovery_codes) {
+            return response()->json(['error' => '2FA tidak aktif'], 400);
+        }
+
+        $codes = json_decode(Crypt::decryptString($merchant->two_factor_recovery_codes), true);
+
+        return response()->json([
+            'success' => true,
+            'recovery_codes' => $codes
+        ]);
+    }
+
+    /**
      * Disable Two-Factor Authentication.
      */
     public function disableTwoFactor(Request $request): JsonResponse
