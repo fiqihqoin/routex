@@ -82,8 +82,16 @@ export default function MobileNav({ lang }: { lang: Lang }) {
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-border">
             <div className="flex items-center gap-2">
-              <span className="text-lg font-extrabold gradient-text">Routex</span>
-              <span className="text-[10px] font-bold text-teal bg-teal/10 px-1.5 py-0.5 rounded border border-teal/20 uppercase">docs</span>
+              <div className="flex items-center gap-1.5">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-teal">
+                  <path d="M3 6h7l4 6h7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M3 18h7l4-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.7" />
+                  <circle cx="21" cy="6" r="1.5" fill="currentColor" />
+                  <circle cx="21" cy="12" r="1.5" fill="currentColor" opacity="0.6" />
+                </svg>
+                <span className="text-lg font-bold tracking-tight text-foreground leading-none">Routex</span>
+              </div>
+              <span className="text-[10px] font-bold text-teal bg-teal/10 px-2 py-0.5 rounded-full border border-teal/20 uppercase tracking-wider">docs</span>
             </div>
             <button onClick={() => setIsOpen(false)} className="p-2 text-text-muted hover:text-teal transition-colors">
               <X className="w-5 h-5" />

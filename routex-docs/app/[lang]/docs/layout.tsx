@@ -2,6 +2,7 @@ import DocsHeader from '@/components/docs/DocsHeader';
 import DocsSidebar from '@/components/docs/DocsSidebar';
 import TableOfContents from '@/components/docs/TableOfContents';
 import MobileNav from '@/components/docs/MobileNav';
+import SearchModal from '@/components/docs/SearchModal';
 import { Lang } from '@/lib/i18n';
 
 export default async function DocsLayout({
@@ -37,8 +38,9 @@ export default async function DocsLayout({
         </div>
       </div>
 
-      {/* Mobile Navigation & Drawer */}
+      {/* Overlays & Drawers */}
       <MobileNav lang={l} />
+      <SearchModal lang={l} />
     </div>
   );
 }
