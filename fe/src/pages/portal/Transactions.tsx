@@ -1,14 +1,13 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { 
-  Search, 
-  Filter, 
-  Download, 
-  ChevronRight, 
-  Calendar, 
-  Clock, 
-  CreditCard, 
-  RefreshCcw, 
+import {
+  Search,
+  Filter,
+  ChevronRight,
+  Calendar,
+  Clock,
+  CreditCard,
+  RefreshCcw,
   ArrowLeft,
   ArrowRight,
   MoreVertical,
@@ -20,7 +19,9 @@ import {
   FileText,
   Activity,
   History,
-  Info
+  Info,
+  Terminal as TerminalIcon,
+  Loader2
 } from "lucide-react";
 import { PortalLayout } from "@/components/portal/PortalLayout";
 import { PortalCard } from "@/components/portal/ui";
@@ -247,6 +248,14 @@ export default function TransactionsPage() {
     });
   };
 
+  const copyText = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Copied!",
+      description: `${label} disalin ke clipboard.`
+    });
+  };
+
   const formatIDR = (amount: number) => {
     return new Intl.NumberFormat('id-ID', {
       style: 'currency',
@@ -276,23 +285,8 @@ export default function TransactionsPage() {
             <h1 className="text-2xl font-bold tracking-tight text-portal-text">Transactions</h1>
             <p className="text-sm text-portal-text-muted mt-1">Riwayat transaksi masuk dan status pembayaran.</p>
           </div>
-          
-          <div className="flex items-center gap-3">
-             <div className="flex p-1 bg-portal-elev rounded-lg border border-portal-border">
-                <button 
-                  onClick={() => setEnv('sandbox')}
-                  className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${env === 'sandbox' ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20' : 'text-portal-text-dim hover:text-portal-text'}`}
-                >
-                  Sandbox
-                </button>
-                <button 
-                  onClick={() => setEnv('production')}
-                  className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${env === 'production' ? 'bg-teal text-white shadow-lg shadow-teal/20' : 'text-portal-text-dim hover:text-portal-text'}`}
-                >
-                  Production
-                </button>
-             </div>
 
+          <div className="flex items-center gap-3">
              <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm" className="bg-portal-surface border-portal-border text-portal-text h-9">
@@ -302,8 +296,8 @@ export default function TransactionsPage() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-portal-surface border-portal-border text-portal-text min-w-[160px]">
                   {dateRanges.map(range => (
-                    <DropdownMenuItem 
-                      key={range.value} 
+                    <DropdownMenuItem
+                      key={range.value}
                       onClick={() => setFilters(f => ({...f, date_range: range.value, page: 1}))}
                       className="cursor-pointer hover:bg-portal-elev"
                     >
@@ -312,11 +306,6 @@ export default function TransactionsPage() {
                   ))}
                 </DropdownMenuContent>
              </DropdownMenu>
-
-             <Button variant="ghost" size="sm" className="text-portal-text-dim hover:text-portal-text h-9">
-                <Download className="h-4 w-4 mr-2" />
-                Export CSV
-             </Button>
           </div>
         </div>
 
@@ -487,7 +476,7 @@ export default function TransactionsPage() {
                       </td>
                       <td className="px-6 py-4 text-center">
                          <div className="inline-flex items-center gap-1.5 text-xs text-portal-text-muted font-medium bg-portal-elev px-2 py-1 rounded-md border border-portal-border">
-                            <Terminal className="h-3 w-3" /> QRIS
+                            <TerminalIcon className="h-3 w-3" /> QRIS
                          </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -566,50 +555,6 @@ export default function TransactionsPage() {
             </div>
           )}
         </div>
-
-        {/* CODE SNIPPET SECTION (BOTTOM) */}
-        <PortalCard className="mt-12 overflow-hidden border-portal-border bg-portal-elev/30">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="h-10 w-10 rounded-xl bg-teal/10 flex items-center justify-center text-teal">
-              <Terminal className="h-5 w-5" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-portal-text">Quick Integration</h3>
-              <p className="text-xs text-portal-text-muted">Coba buat transaksi pertama Anda via Terminal.</p>
-            </div>
-          </div>
-          
-          <Tabs defaultValue="curl" className="w-full">
-            <TabsList className="bg-black/20 border-b border-portal-border rounded-none w-full justify-start h-11 px-4 gap-4">
-              {['curl', 'node', 'php', 'go'].map(lang => (
-                <TabsTrigger 
-                  key={lang} 
-                  value={lang} 
-                  className="bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-teal border-b-2 border-transparent data-[state=active]:border-teal rounded-none h-full uppercase text-[10px] font-bold tracking-widest"
-                >
-                  {lang === 'node' ? 'Node.js' : lang}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-            {['curl', 'node', 'php', 'go'].map(lang => (
-              <TabsContent key={lang} value={lang} className="mt-0">
-                <div className="relative group">
-                  <pre className="p-6 bg-black/40 font-mono text-[11px] text-teal-400 overflow-x-auto leading-relaxed border-b border-portal-border">
-                    {(codeSnippets as any)[lang](env)}
-                  </pre>
-                  <Button 
-                    size="sm" 
-                    variant="ghost" 
-                    onClick={() => copyText((codeSnippets as any)[lang](env), lang)}
-                    className="absolute top-4 right-4 h-8 bg-portal-surface hover:bg-teal hover:text-white border border-portal-border opacity-0 group-hover:opacity-100 transition-all"
-                  >
-                    <Copy className="h-3.5 w-3.5 mr-2" /> Copy Snippet
-                  </Button>
-                </div>
-              </TabsContent>
-            ))}
-          </Tabs>
-        </PortalCard>
 
         {/* DETAIL DRAWER */}
         <Sheet open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>

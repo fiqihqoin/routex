@@ -1153,3 +1153,169 @@
 2026/05/09 16:07:28 [notice] 1#1: start worker processes
 2026/05/09 16:07:28 [notice] 1#1: start worker process 21
 2026/05/09 16:07:28 [notice] 1#1: start worker process 22
+2026/05/09 16:09:48 [warn] 21#21: *18 delaying request, excess: 0.850, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-CGfxfXfv.css HTTP/1.1", host: "localhost", referrer: "https://localhost/portal"
+2026/05/09 16:09:48 [warn] 21#21: *18 delaying request, excess: 0.330, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", host: "localhost", referrer: "https://localhost/portal"
+2026/05/09 16:09:48 [warn] 22#22: *23 delaying request, excess: 0.160, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", host: "localhost", referrer: "https://localhost/portal"
+2026/05/09 16:09:55 [warn] 22#22: *23 delaying request, excess: 0.870, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1", host: "localhost"
+2026/05/09 16:10:06 [warn] 21#21: *42 delaying request, excess: 0.760, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1", host: "localhost"
+2026/05/09 16:10:06 [warn] 21#21: *41 delaying request, excess: 1.760, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-CGfxfXfv.css HTTP/1.1", host: "localhost", referrer: "https://localhost/portal"
+2026/05/10 02:21:21 [warn] 22#22: *53 delaying request, excess: 0.640, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1", host: "localhost"
+2026/05/10 02:24:37 [warn] 21#21: *70 delaying request, excess: 0.630, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-CGfxfXfv.css HTTP/1.1", host: "localhost", referrer: "https://localhost/portal"
+2026/05/10 02:24:37 [warn] 22#22: *65 delaying request, excess: 1.610, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1", host: "localhost"
+2026/05/10 02:24:49 [warn] 22#22: *79 delaying request, excess: 0.930, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-CGfxfXfv.css HTTP/1.1", host: "localhost", referrer: "https://localhost/portal"
+2026/05/10 02:24:49 [warn] 21#21: *84 delaying request, excess: 1.890, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1", host: "localhost"
+2026/05/10 02:25:11 [warn] 22#22: *93 delaying request, excess: 0.570, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal"
+2026/05/10 02:32:18 [warn] 22#22: *96 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/transactions/stats?environment=sandbox&date_range=7d HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 02:32:18 [warn] 21#21: *97 delaying request, excess: 1.780, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 02:38:12 [warn] 22#22: *102 delaying request, excess: 0.940, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 02:38:12 [warn] 22#22: *104 delaying request, excess: 1.940, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/transactions?environment=sandbox&page=1&per_page=25 HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 02:48:32 [warn] 21#21: *119 delaying request, excess: 0.650, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-CGfxfXfv.css HTTP/1.1", host: "localhost", referrer: "https://localhost/portal/"
+2026/05/10 02:48:32 [warn] 22#22: *114 delaying request, excess: 1.610, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1", host: "localhost"
+2026/05/10 02:48:48 [warn] 22#22: *141 delaying request, excess: 0.690, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-CGfxfXfv.css HTTP/1.1", host: "localhost", referrer: "https://localhost/portal/"
+2026/05/10 02:48:48 [warn] 22#22: *142 delaying request, excess: 1.670, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1", host: "localhost"
+2026/05/10 02:48:48 [warn] 21#21: *133 delaying request, excess: 0.880, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/portal/"
+2026/05/10 02:48:48 [warn] 22#22: *141 delaying request, excess: 1.330, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", host: "localhost", referrer: "https://localhost/portal/"
+2026/05/10 02:49:23 [warn] 21#21: *147 delaying request, excess: 0.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/transactions/stats?environment=sandbox&date_range=7d HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 02:49:23 [warn] 21#21: *149 delaying request, excess: 1.980, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/transactions?environment=sandbox&page=1&per_page=25 HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 02:49:27 [warn] 22#22: *155 delaying request, excess: 0.950, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/transactions?environment=sandbox&page=1&per_page=25 HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 02:49:27 [warn] 21#21: *154 delaying request, excess: 1.950, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 02:49:29 [warn] 21#21: *160 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/transactions/stats?environment=sandbox&date_range=7d HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 02:49:29 [warn] 22#22: *161 delaying request, excess: 1.960, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/transactions?environment=sandbox&page=1&per_page=25 HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 02:51:35 [warn] 22#22: *166 delaying request, excess: 0.950, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/transactions/stats?environment=sandbox&date_range=7d HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 02:51:54 [warn] 22#22: *170 delaying request, excess: 0.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/transactions/stats?environment=sandbox&date_range=7d HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 02:52:13 [warn] 22#22: *173 delaying request, excess: 0.970, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/transactions/stats?environment=sandbox&date_range=7d HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 02:52:34 [warn] 21#21: *178 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/transactions?environment=sandbox&page=1&per_page=25 HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 02:52:49 [warn] 21#21: *181 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 02:52:49 [warn] 21#21: *183 delaying request, excess: 1.970, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/transactions?environment=sandbox&page=1&per_page=25 HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 02:52:54 [warn] 21#21: *188 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/transactions/stats?environment=production&date_range=7d HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 02:52:54 [warn] 21#21: *189 delaying request, excess: 1.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/transactions?environment=production&page=1&per_page=25 HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 02:52:58 [warn] 22#22: *194 delaying request, excess: 0.980, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 02:52:58 [warn] 22#22: *195 delaying request, excess: 1.950, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/transactions?environment=sandbox&page=1&per_page=25 HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 02:52:59 [warn] 21#21: *199 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/transactions?environment=production&page=1&per_page=25 HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 02:52:59 [warn] 21#21: *201 delaying request, excess: 1.980, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=production HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 02:53:05 [warn] 22#22: *207 delaying request, excess: 0.900, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/transactions/stats?environment=sandbox&date_range=7d HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 02:53:05 [warn] 22#22: *205 delaying request, excess: 1.900, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/transactions?environment=sandbox&page=1&per_page=25 HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 02:53:36 [warn] 22#22: *217 delaying request, excess: 0.780, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-CGfxfXfv.css HTTP/1.1", host: "localhost", referrer: "https://localhost/portal"
+2026/05/10 02:53:36 [warn] 21#21: *222 delaying request, excess: 1.780, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1", host: "localhost"
+2026/05/10 02:53:36 [warn] 22#22: *217 delaying request, excess: 0.070, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", host: "localhost", referrer: "https://localhost/portal"
+2026/05/10 02:53:36 [warn] 22#22: *217 delaying request, excess: 0.210, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", host: "localhost", referrer: "https://localhost/portal"
+2026/05/10 02:55:41 [warn] 21#21: *239 delaying request, excess: 0.940, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-CGfxfXfv.css HTTP/1.1", host: "localhost", referrer: "https://localhost/portal/"
+2026/05/10 02:55:41 [warn] 22#22: *240 delaying request, excess: 1.900, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1", host: "localhost"
+2026/05/10 02:55:44 [warn] 22#22: *233 delaying request, excess: 0.060, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-CGfxfXfv.css HTTP/1.1", host: "localhost", referrer: "https://localhost/portal/"
+2026/05/10 02:55:44 [warn] 21#21: *239 delaying request, excess: 1.060, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-CzXk8Qug.js HTTP/1.1", host: "localhost", referrer: "https://localhost/portal/"
+2026/05/10 02:55:44 [warn] 22#22: *245 delaying request, excess: 2.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1", host: "localhost"
+2026/05/10 02:55:44 [warn] 21#21: *239 delaying request, excess: 0.400, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/portal/"
+2026/05/10 02:55:49 [warn] 22#22: *233 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1", host: "localhost"
+2026/05/10 02:55:49 [warn] 21#21: *252 delaying request, excess: 1.930, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-CGfxfXfv.css HTTP/1.1", host: "localhost", referrer: "https://localhost/"
+2026/05/10 02:55:51 [warn] 21#21: *239 delaying request, excess: 0.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-CGfxfXfv.css HTTP/1.1", host: "localhost", referrer: "https://localhost/"
+2026/05/10 02:55:51 [warn] 21#21: *258 delaying request, excess: 1.930, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-CzXk8Qug.js HTTP/1.1", host: "localhost", referrer: "https://localhost/"
+2026/05/10 02:55:51 [warn] 21#21: *239 delaying request, excess: 0.530, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/"
+2026/05/10 02:57:39 [warn] 21#21: *267 delaying request, excess: 0.890, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-CGfxfXfv.css HTTP/1.1", host: "localhost", referrer: "https://localhost/"
+2026/05/10 02:57:39 [warn] 22#22: *269 delaying request, excess: 1.810, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1", host: "localhost"
+2026/05/10 02:57:39 [warn] 21#21: *267 delaying request, excess: 0.540, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/"
+2026/05/10 02:57:55 [warn] 21#21: *263 delaying request, excess: 0.980, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-CGfxfXfv.css HTTP/1.1", host: "localhost", referrer: "https://localhost/"
+2026/05/10 02:57:55 [warn] 21#21: *275 delaying request, excess: 1.710, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1", host: "localhost"
+2026/05/10 02:57:55 [warn] 21#21: *275 an upstream response is buffered to a temporary file /var/cache/nginx/fastcgi_temp/1/00/0000000001 while reading upstream, client: 172.18.0.1, server: localhost, request: "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1", upstream: "fastcgi://172.18.0.5:9000", host: "localhost"
+2026/05/10 02:57:55 [warn] 21#21: *263 delaying request, excess: 0.400, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/"
+2026/05/10 02:58:00 [warn] 21#21: *263 delaying request, excess: 0.960, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-CzXk8Qug.js HTTP/1.1", host: "localhost", referrer: "https://localhost/"
+2026/05/10 02:58:00 [warn] 22#22: *281 delaying request, excess: 1.750, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1", host: "localhost"
+2026/05/10 02:58:01 [warn] 22#22: *281 an upstream response is buffered to a temporary file /var/cache/nginx/fastcgi_temp/2/00/0000000002 while reading upstream, client: 172.18.0.1, server: localhost, request: "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1", upstream: "fastcgi://172.18.0.5:9000", host: "localhost"
+2026/05/10 02:58:01 [warn] 21#21: *263 delaying request, excess: 0.210, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/"
+2026/05/10 02:58:20 [warn] 22#22: *292 delaying request, excess: 0.720, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /assets/index-CGfxfXfv.css HTTP/1.1", host: "localhost", referrer: "https://localhost/login"
+2026/05/10 02:58:20 [warn] 21#21: *293 delaying request, excess: 1.690, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1", host: "localhost"
+2026/05/10 02:59:04 [notice] 1#1: signal 3 (SIGQUIT) received, shutting down
+2026/05/10 02:59:04 [notice] 21#21: gracefully shutting down
+2026/05/10 02:59:04 [notice] 22#22: gracefully shutting down
+2026/05/10 02:59:04 [notice] 22#22: exiting
+2026/05/10 02:59:04 [notice] 21#21: exiting
+2026/05/10 02:59:04 [notice] 21#21: exit
+2026/05/10 02:59:04 [notice] 22#22: exit
+2026/05/10 02:59:04 [notice] 1#1: signal 17 (SIGCHLD) received from 22
+2026/05/10 02:59:04 [notice] 1#1: worker process 21 exited with code 0
+2026/05/10 02:59:04 [notice] 1#1: worker process 22 exited with code 0
+2026/05/10 02:59:04 [notice] 1#1: exit
+2026/05/10 02:59:05 [notice] 1#1: using the "epoll" event method
+2026/05/10 02:59:05 [notice] 1#1: nginx/1.29.8
+2026/05/10 02:59:05 [notice] 1#1: built by gcc 15.2.0 (Alpine 15.2.0) 
+2026/05/10 02:59:05 [notice] 1#1: OS: Linux 6.8.0-100-generic
+2026/05/10 02:59:05 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1024:524288
+2026/05/10 02:59:05 [notice] 1#1: start worker processes
+2026/05/10 02:59:05 [notice] 1#1: start worker process 20
+2026/05/10 02:59:05 [notice] 1#1: start worker process 21
+2026/05/10 02:59:38 [notice] 1#1: signal 3 (SIGQUIT) received, shutting down
+2026/05/10 02:59:38 [notice] 21#21: gracefully shutting down
+2026/05/10 02:59:38 [notice] 20#20: gracefully shutting down
+2026/05/10 02:59:38 [notice] 21#21: exiting
+2026/05/10 02:59:38 [notice] 20#20: exiting
+2026/05/10 02:59:38 [notice] 21#21: exit
+2026/05/10 02:59:38 [notice] 20#20: exit
+2026/05/10 02:59:38 [notice] 1#1: signal 17 (SIGCHLD) received from 20
+2026/05/10 02:59:38 [notice] 1#1: worker process 20 exited with code 0
+2026/05/10 02:59:38 [notice] 1#1: signal 29 (SIGIO) received
+2026/05/10 02:59:38 [notice] 1#1: signal 17 (SIGCHLD) received from 21
+2026/05/10 02:59:38 [notice] 1#1: worker process 21 exited with code 0
+2026/05/10 02:59:38 [notice] 1#1: exit
+2026/05/10 02:59:38 [notice] 1#1: using the "epoll" event method
+2026/05/10 02:59:38 [notice] 1#1: nginx/1.29.8
+2026/05/10 02:59:38 [notice] 1#1: built by gcc 15.2.0 (Alpine 15.2.0) 
+2026/05/10 02:59:38 [notice] 1#1: OS: Linux 6.8.0-100-generic
+2026/05/10 02:59:38 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1024:524288
+2026/05/10 02:59:38 [notice] 1#1: start worker processes
+2026/05/10 02:59:38 [notice] 1#1: start worker process 21
+2026/05/10 02:59:38 [notice] 1#1: start worker process 22
+2026/05/10 03:01:15 [warn] 21#21: *10 delaying request, excess: 0.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/transactions?environment=sandbox&page=1&per_page=25 HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 03:01:15 [warn] 21#21: *11 delaying request, excess: 1.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 03:01:36 [warn] 21#21: *16 delaying request, excess: 0.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/vendors HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/vendors"
+2026/05/10 03:01:38 [warn] 21#21: *19 delaying request, excess: 0.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/api-keys HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/api-keys"
+2026/05/10 03:01:39 [warn] 22#22: *23 delaying request, excess: 0.990, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/vendors"
+2026/05/10 03:01:40 [warn] 21#21: *29 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/transactions?environment=sandbox&page=1&per_page=25 HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 03:01:40 [warn] 21#21: *27 delaying request, excess: 1.980, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/transactions/stats?environment=sandbox&date_range=7d HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal/transactions"
+2026/05/10 03:01:42 [warn] 21#21: *35 delaying request, excess: 0.360, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal"
+2026/05/10 03:15:37 [warn] 22#22: *41 delaying request, excess: 0.890, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal"
+2026/05/10 03:16:30 [warn] 22#22: *46 delaying request, excess: 0.950, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal"
+2026/05/10 03:18:51 [warn] 22#22: *49 delaying request, excess: 0.980, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal"
+2026/05/10 03:19:23 [warn] 22#22: *54 delaying request, excess: 0.910, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox&range=7d HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal"
+2026/05/10 03:20:00 [warn] 21#21: *57 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox&range=7d HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal"
+2026/05/10 03:24:10 [error] 22#22: *63 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET /login HTTP/1.1", upstream: "fastcgi://172.18.0.5:9000", host: "localhost"
+2026/05/10 03:24:11 [error] 22#22: *63 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1", upstream: "fastcgi://172.18.0.5:9000", host: "localhost"
+2026/05/10 03:24:14 [error] 22#22: *63 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET / HTTP/1.1", upstream: "fastcgi://172.18.0.5:9000", host: "localhost"
+2026/05/10 03:24:14 [warn] 22#22: *63 delaying request, excess: 0.140, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1", host: "localhost"
+2026/05/10 03:24:14 [error] 22#22: *63 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1", upstream: "fastcgi://172.18.0.5:9000", host: "localhost"
+2026/05/10 03:24:18 [error] 21#21: *69 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", upstream: "fastcgi://172.18.0.5:9000", host: "localhost", referrer: "http://localhost:8080/portal"
+2026/05/10 03:24:18 [warn] 22#22: *70 delaying request, excess: 0.970, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox&range=7d HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal"
+2026/05/10 03:24:18 [error] 22#22: *70 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox&range=7d HTTP/1.1", upstream: "fastcgi://172.18.0.5:9000", host: "localhost", referrer: "http://localhost:8080/portal"
+2026/05/10 03:24:20 [error] 21#21: *74 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox&range=7d HTTP/1.1", upstream: "fastcgi://172.18.0.5:9000", host: "localhost", referrer: "http://localhost:8080/portal"
+2026/05/10 03:24:20 [warn] 21#21: *73 delaying request, excess: 0.900, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal"
+2026/05/10 03:24:20 [error] 21#21: *73 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", upstream: "fastcgi://172.18.0.5:9000", host: "localhost", referrer: "http://localhost:8080/portal"
+2026/05/10 03:24:20 [error] 21#21: *77 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", upstream: "fastcgi://172.18.0.5:9000", host: "localhost", referrer: "http://localhost:8080/portal"
+2026/05/10 03:24:20 [warn] 21#21: *78 delaying request, excess: 0.980, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox&range=7d HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal"
+2026/05/10 03:24:20 [error] 21#21: *78 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox&range=7d HTTP/1.1", upstream: "fastcgi://172.18.0.5:9000", host: "localhost", referrer: "http://localhost:8080/portal"
+2026/05/10 03:26:16 [notice] 1#1: signal 3 (SIGQUIT) received, shutting down
+2026/05/10 03:26:16 [notice] 21#21: gracefully shutting down
+2026/05/10 03:26:16 [notice] 22#22: gracefully shutting down
+2026/05/10 03:26:16 [notice] 21#21: exiting
+2026/05/10 03:26:16 [notice] 22#22: exiting
+2026/05/10 03:26:16 [notice] 22#22: exit
+2026/05/10 03:26:16 [notice] 21#21: exit
+2026/05/10 03:26:16 [notice] 1#1: signal 17 (SIGCHLD) received from 21
+2026/05/10 03:26:16 [notice] 1#1: worker process 21 exited with code 0
+2026/05/10 03:26:16 [notice] 1#1: signal 29 (SIGIO) received
+2026/05/10 03:26:16 [notice] 1#1: signal 17 (SIGCHLD) received from 22
+2026/05/10 03:26:16 [notice] 1#1: worker process 22 exited with code 0
+2026/05/10 03:26:16 [notice] 1#1: exit
+2026/05/10 03:26:18 [notice] 1#1: using the "epoll" event method
+2026/05/10 03:26:18 [notice] 1#1: nginx/1.29.8
+2026/05/10 03:26:18 [notice] 1#1: built by gcc 15.2.0 (Alpine 15.2.0) 
+2026/05/10 03:26:18 [notice] 1#1: OS: Linux 6.8.0-100-generic
+2026/05/10 03:26:18 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1024:524288
+2026/05/10 03:26:18 [notice] 1#1: start worker processes
+2026/05/10 03:26:18 [notice] 1#1: start worker process 21
+2026/05/10 03:26:18 [notice] 1#1: start worker process 22
+2026/05/10 03:28:27 [warn] 21#21: *23 delaying request, excess: 0.750, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", host: "localhost", referrer: "http://localhost:8080/portal"
+2026/05/10 03:28:39 [warn] 21#21: *33 delaying request, excess: 0.950, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", host: "localhost", referrer: "https://localhost/portal"
+2026/05/10 03:28:41 [warn] 21#21: *33 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/transactions/stats?environment=sandbox&date_range=7d HTTP/1.1", host: "localhost", referrer: "https://localhost/portal/transactions"
+2026/05/10 03:28:41 [warn] 22#22: *41 delaying request, excess: 1.250, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", host: "localhost", referrer: "https://localhost/portal/transactions"
+2026/05/10 03:28:43 [warn] 22#22: *41 delaying request, excess: 0.950, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=sandbox HTTP/1.1", host: "localhost", referrer: "https://localhost/portal"
+2026/05/10 03:29:09 [warn] 22#22: *41 delaying request, excess: 0.850, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=production HTTP/1.1", host: "localhost", referrer: "https://localhost/portal"
+2026/05/10 03:29:15 [warn] 22#22: *29 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=production HTTP/1.1", host: "localhost", referrer: "https://localhost/portal/vendors"
+2026/05/10 03:29:17 [warn] 22#22: *29 delaying request, excess: 1.000, by zone "admin_limit", client: 172.18.0.1, server: localhost, request: "GET /portal/dashboard?env=production HTTP/1.1", host: "localhost", referrer: "https://localhost/portal"

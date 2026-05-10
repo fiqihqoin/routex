@@ -15,12 +15,19 @@ Route::get('/', fn() => file_get_contents(public_path('homepage.html')));
 Route::get('/login', fn() => file_get_contents(public_path('homepage.html')))->name('login');
 Route::get('/register', fn() => file_get_contents(public_path('homepage.html')))->name('register');
 
-// Protected Portal Routes (Served via SPA)
+// Protected Portal Routes
 Route::middleware('auth:portal')->group(function () {
-    Route::get('/portal', [DashboardController::class, 'index'])->name('portal.dashboard');
     
-    // Portal Backend API logic
+    // 1. Dashboard UI (Root portal path)
+    Route::get('/portal', [DashboardController::class, 'serveApp'])->name('portal.dashboard');
+    
+    // 2. Portal Backend API logic
     Route::prefix('portal')->name('portal.')->group(function () {
+        // Dashboard Data
+        Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard.data');
+        Route::get('/dashboard/chart', [DashboardController::class, 'volumeChart'])->name('dashboard.chart');
+
+        // Vendor Management
         Route::get('/vendors', [VendorController::class, 'index'])->name('vendors.index');
         Route::get('/vendors/{vendorCode}/credentials', [VendorCredentialController::class, 'show'])->name('vendors.show');
         Route::post('/vendors/{vendorCode}/credentials', [VendorCredentialController::class, 'store'])->name('vendors.store');
@@ -44,8 +51,8 @@ Route::middleware('auth:portal')->group(function () {
             });
     });
 
-    // SPA Catch-all (Must be last)
-    Route::get('/portal/{any}', [DashboardController::class, 'index'])->where('any', '.*');
+    // 3. SPA Catch-all (Must be last)
+    Route::get('/portal/{any}', [DashboardController::class, 'serveApp'])->where('any', '.*');
 });
 
 // Public Portal Backend API/Auth Logic
