@@ -8,6 +8,7 @@ use App\Http\Controllers\Portal\VendorController;
 use App\Http\Controllers\Portal\VendorCredentialController;
 use App\Http\Controllers\Portal\ApiKeyController;
 use App\Http\Controllers\Portal\TransactionController;
+use App\Http\Controllers\Portal\WebhookController;
 use Illuminate\Support\Facades\Route;
 
 // React SPA Routes (Frontend shell)
@@ -48,6 +49,17 @@ Route::middleware('auth:portal')->group(function () {
                 Route::get('/', [TransactionController::class, 'index'])->name('index');
                 Route::get('/stats', [TransactionController::class, 'stats'])->name('stats');
                 Route::get('/{transactionId}', [TransactionController::class, 'show'])->name('show');
+            });
+
+        // Webhooks API
+        Route::prefix('webhooks')->name('webhooks.')
+            ->group(function () {
+                Route::get('/', [WebhookController::class, 'index'])->name('index');
+                Route::post('/', [WebhookController::class, 'upsert'])->name('upsert');
+                Route::post('/test', [WebhookController::class, 'sendTest'])->name('test');
+                Route::post('/rotate-secret', [WebhookController::class, 'rotateSecret'])->name('rotate-secret');
+                Route::post('/reenable', [WebhookController::class, 'reenable'])->name('reenable');
+                Route::delete('/', [WebhookController::class, 'delete'])->name('delete');
             });
     });
 

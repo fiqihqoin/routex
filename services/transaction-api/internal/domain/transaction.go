@@ -79,7 +79,9 @@ type NormalizedCallback struct {
 
 type CallbackJob struct {
 	TransactionID string             `json:"transaction_id"`
+	MerchantID    string             `json:"merchant_id"`
 	CallbackURL   string             `json:"callback_url"`
+	WebhookSecret string             `json:"webhook_secret"`
 	Data          NormalizedCallback `json:"data"`
 	RetryCount    int                `json:"retry_count"`
 }
@@ -99,6 +101,12 @@ type TransactionRepository interface {
 	GetPendingForReconciliation(ctx context.Context, olderThan time.Duration, limit int) ([]Transaction, error)
 	IncrementReconciliationAttempt(ctx context.Context, transactionID string, createdAt time.Time) error
 	GetMerchantVendorCredentials(ctx context.Context, credentialID string) (string, error)
+	
+	// Webhook Management
+	IncrementWebhookFailureDay(ctx context.Context, merchantID string) error
+	GetWebhookConsecutiveFailureDays(ctx context.Context, merchantID string) (int, error)
+	DisableMerchantWebhook(ctx context.Context, merchantID string) error
+	ResetWebhookFailureDays(ctx context.Context, merchantID string) error
 }
 
 type TransactionService interface {

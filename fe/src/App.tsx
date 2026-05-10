@@ -12,6 +12,7 @@ import VendorsPage from "./pages/portal/Vendors.tsx";
 import VendorCredentialsPage from "./pages/portal/VendorCredentials.tsx";
 import ApiKeysPage from "./pages/portal/ApiKeys.tsx";
 import TransactionsPage from "./pages/portal/Transactions.tsx";
+import WebhooksPage from "./pages/portal/Webhooks.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/portal/api-keys" element={<ApiKeysPage />} />
             <Route path="/portal/transactions" element={<TransactionsPage />} />
             <Route path="/portal/transactions/:txId" element={<TransactionsPage />} />
+            <Route path="/portal/webhooks" element={<WebhooksPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

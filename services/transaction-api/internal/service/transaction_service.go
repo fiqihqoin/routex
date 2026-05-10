@@ -388,26 +388,30 @@ func (s *transactionService) HandleVendorCallback(ctx context.Context, vendorID 
 	s.repo.UpdateReadModel(ctx, tx)
 
 	if tx.MerchantID != "" {
-		var callbackURL string
-		err := s.db.QueryRow(ctx, "SELECT url FROM merchant_webhooks WHERE merchant_id = $1 AND environment = $2 AND is_enabled = true", tx.MerchantID, tx.Environment).Scan(&callbackURL)
-		if err == nil && callbackURL != "" {
-			s.forwardToUser(ctx, callbackURL, normalized)
+		var webhookURL, webhookSecret string
+		err := s.db.QueryRow(ctx, "SELECT url, secret FROM merchant_webhooks WHERE merchant_id = $1 AND environment = $2 AND is_enabled = true", tx.MerchantID, tx.Environment).Scan(&webhookURL, &webhookSecret)
+		if err == nil && webhookURL != "" {
+			s.forwardToUser(ctx, tx.MerchantID, webhookURL, webhookSecret, normalized)
 		}
 	}
 
 	return nil
 }
 
-func (s *transactionService) forwardToUser(ctx context.Context, callbackURL string, data *providers.NormalizedCallback) {
+func (s *transactionService) forwardToUser(ctx context.Context, merchantID string, callbackURL string, secret string, data *providers.NormalizedCallback) {
 	job := domain.CallbackJob{
 		TransactionID: data.ReferenceID,
+		MerchantID:    merchantID,
 		CallbackURL:   callbackURL,
+		WebhookSecret: secret,
 		Data: domain.NormalizedCallback{
 			TransactionID:       data.ReferenceID,
 			VendorTransactionID: data.VendorTransactionID,
 			Status:              data.Status,
 			Amount:              data.Amount,
 			PaidAt:              data.PaidAt,
+			PaymentMethod:       data.PaymentMethod,
+			VendorID:            data.VendorID,
 		},
 	}
 	if s.publisher != nil {

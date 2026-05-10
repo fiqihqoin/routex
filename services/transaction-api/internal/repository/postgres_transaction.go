@@ -395,3 +395,31 @@ func (r *postgresTransactionRepo) GetMerchantVendorCredentials(ctx context.Conte
 	err := r.db.QueryRow(ctx, query, credentialID).Scan(&encrypted)
 	return encrypted, err
 }
+
+func (r *postgresTransactionRepo) IncrementWebhookFailureDay(ctx context.Context, merchantID string) error {
+	query := `UPDATE merchant_webhooks 
+	          SET consecutive_failure_days = consecutive_failure_days + 1, 
+	              last_failure_at = NOW() 
+	          WHERE merchant_id = $1`
+	_, err := r.db.Exec(ctx, query, merchantID)
+	return err
+}
+
+func (r *postgresTransactionRepo) GetWebhookConsecutiveFailureDays(ctx context.Context, merchantID string) (int, error) {
+	var days int
+	query := "SELECT consecutive_failure_days FROM merchant_webhooks WHERE merchant_id = $1 LIMIT 1"
+	err := r.db.QueryRow(ctx, query, merchantID).Scan(&days)
+	return days, err
+}
+
+func (r *postgresTransactionRepo) DisableMerchantWebhook(ctx context.Context, merchantID string) error {
+	query := "UPDATE merchant_webhooks SET is_enabled = false, auto_disabled_at = NOW() WHERE merchant_id = $1"
+	_, err := r.db.Exec(ctx, query, merchantID)
+	return err
+}
+
+func (r *postgresTransactionRepo) ResetWebhookFailureDays(ctx context.Context, merchantID string) error {
+	query := "UPDATE merchant_webhooks SET consecutive_failure_days = 0, last_success_at = NOW() WHERE merchant_id = $1"
+	_, err := r.db.Exec(ctx, query, merchantID)
+	return err
+}

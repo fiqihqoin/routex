@@ -3,9 +3,14 @@ package service
 import (
 	"bytes"
 	"context"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -125,6 +130,12 @@ func (c *callbackConsumer) handleDelivery(ctx context.Context, d amqp.Delivery) 
 			c.repo.UpdateReadModel(ctx, tx)
 		}
 		c.repo.StoreEvent(ctx, job.TransactionID, domain.EventCallbackForwarded, job)
+		
+		// Reset consecutive failure days on success
+		if job.MerchantID != "" {
+			c.repo.ResetWebhookFailureDays(ctx, job.MerchantID)
+		}
+		
 		d.Ack(false)
 		return
 	}
@@ -173,6 +184,11 @@ func (c *callbackConsumer) moveToDLQ(ctx context.Context, d amqp.Delivery, job d
 
 	c.repo.StoreEvent(ctx, job.TransactionID, domain.EventCallbackDeliveryFail, job)
 
+	// Auto-disable logic for repeated failures
+	if job.MerchantID != "" {
+		c.checkAutoDisable(ctx, job.MerchantID)
+	}
+
 	// Check Alerting Logic (Mock)
 	c.checkAlerting(ctx)
 
@@ -180,13 +196,35 @@ func (c *callbackConsumer) moveToDLQ(ctx context.Context, d amqp.Delivery, job d
 }
 
 func (c *callbackConsumer) deliver(job domain.CallbackJob) bool {
-	payload, _ := json.Marshal(job.Data)
-	req, _ := http.NewRequest("POST", job.CallbackURL, bytes.NewBuffer(payload))
+	payload, err := json.Marshal(job.Data)
+	if err != nil {
+		return false
+	}
+	
+	// Generate HMAC-SHA256 signature
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	
+	// Stripe-like signing format: t=timestamp,v1=signature
+	// Signed string: timestamp + "." + payload
+	signedString := timestamp + "." + string(payload)
+	
+	mac := hmac.New(sha256.New, []byte(job.WebhookSecret))
+	mac.Write([]byte(signedString))
+	fullSignature := "t=" + timestamp + ",v1=" + hex.EncodeToString(mac.Sum(nil))
+	
+	req, err := http.NewRequest("POST", job.CallbackURL, bytes.NewBuffer(payload))
+	if err != nil {
+		return false
+	}
+	
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-PTMS-Signature", "mock-sig")
+	req.Header.Set("X-Routex-Signature", fullSignature)
+	req.Header.Set("X-Routex-Event", "payment." + job.Data.Status)
+	req.Header.Set("X-Routex-Delivery-ID", job.TransactionID + "-" + strconv.Itoa(job.RetryCount))
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
+		log.Printf("Delivery failed for tx %s: %v", job.TransactionID, err)
 		return false
 	}
 	defer resp.Body.Close()
@@ -204,7 +242,23 @@ func (c *callbackConsumer) checkAlerting(ctx context.Context) {
 	// 2. Check failure rate (In real scenario, use Prometheus metrics)
 }
 
-func (c *callbackConsumer) checkAutoDisable(ctx context.Context, userID string) {
-	// PRD: Auto-disable after 3 consecutive days of failures
-	log.Printf("Checking auto-disable for user %s", userID)
+func (c *callbackConsumer) checkAutoDisable(ctx context.Context, merchantID string) {
+	// Increment consecutive failure days logic
+	err := c.repo.IncrementWebhookFailureDay(ctx, merchantID)
+	if err != nil {
+		log.Printf("Failed to increment failure day for merchant %s: %v", merchantID, err)
+		return
+	}
+	
+	days, err := c.repo.GetWebhookConsecutiveFailureDays(ctx, merchantID)
+	if err != nil {
+		return
+	}
+	
+	if days >= 3 {
+		err = c.repo.DisableMerchantWebhook(ctx, merchantID)
+		if err == nil {
+			log.Printf("Auto-disabled webhook for merchant %s after %d days of consecutive failures", merchantID, days)
+		}
+	}
 }
