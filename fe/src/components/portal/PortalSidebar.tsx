@@ -13,7 +13,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { Logo } from "@/components/routex/Logo";
-import { usePortal } from "./PortalContext";
+import { usePortal } from "@/components/portal/PortalContext";
 
 type Item = {
   label: string;

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Search, Bell, ChevronDown, User, CreditCard, LogOut, AlertTriangle } from "lucide-react";
-import { usePortal } from "./PortalContext";
+import { usePortal } from "@/components/portal/PortalContext";
 import {
   DropdownMenu,
   DropdownMenuContent,

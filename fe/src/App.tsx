@@ -3,17 +3,18 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { PortalProvider } from "./components/portal/PortalContext.tsx";
-import Index from "./pages/Index.tsx";
-import Login from "./pages/Login.tsx";
-import Register from "./pages/Register.tsx";
-import PortalDashboard from "./pages/portal/Dashboard.tsx";
-import VendorsPage from "./pages/portal/Vendors.tsx";
-import VendorCredentialsPage from "./pages/portal/VendorCredentials.tsx";
-import ApiKeysPage from "./pages/portal/ApiKeys.tsx";
-import TransactionsPage from "./pages/portal/Transactions.tsx";
-import WebhooksPage from "./pages/portal/Webhooks.tsx";
-import NotFound from "./pages/NotFound.tsx";
+import { PortalProvider } from "@/components/portal/PortalContext";
+import Index from "./pages/Index";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import PortalDashboard from "./pages/portal/Dashboard";
+import VendorsPage from "./pages/portal/Vendors";
+import VendorCredentialsPage from "./pages/portal/VendorCredentials";
+import ApiKeysPage from "./pages/portal/ApiKeys";
+import TransactionsPage from "./pages/portal/Transactions";
+import WebhooksPage from "./pages/portal/Webhooks";
+import ProfilePage from "./pages/portal/Profile";
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/portal/transactions" element={<TransactionsPage />} />
             <Route path="/portal/transactions/:txId" element={<TransactionsPage />} />
             <Route path="/portal/webhooks" element={<WebhooksPage />} />
+            <Route path="/portal/profile" element={<ProfilePage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

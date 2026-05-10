@@ -11,6 +11,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
+use Carbon\Carbon;
+use Jenssegers\Agent\Agent;
 
 class Merchant extends Authenticatable
 {
@@ -34,10 +38,21 @@ class Merchant extends Authenticatable
         'approval_notes',
         'suspended_at',
         'suspension_reason',
+        'pending_email',
+        'pending_email_token_hash', 
+        'pending_email_token_expires_at',
+        'two_factor_secret',
+        'two_factor_enabled',
+        'two_factor_recovery_codes',
+        'notification_preferences',
+        'last_password_changed_at',
     ];
 
     protected $hidden = [
         'password_hash',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+        'pending_email_token_hash',
     ];
 
     protected $casts = [
@@ -46,6 +61,10 @@ class Merchant extends Authenticatable
         'suspended_at' => 'datetime',
         'expected_monthly_volume' => 'integer',
         'deleted_at' => 'datetime',
+        'two_factor_enabled' => 'boolean',
+        'notification_preferences' => 'array',
+        'pending_email_token_expires_at' => 'datetime',
+        'last_password_changed_at' => 'datetime',
     ];
 
     public function getAuthPassword()
@@ -57,6 +76,40 @@ class Merchant extends Authenticatable
     protected function setPasswordHashAttribute($value)
     {
         $this->attributes['password_hash'] = Hash::needsRehash($value) ? Hash::make($value) : $value;
+    }
+
+    public function getActiveSessions(): Collection
+    {
+        return DB::table('sessions')
+            ->where('user_id', $this->id)
+            ->orderBy('last_activity', 'desc')
+            ->get()
+            ->map(function ($session) {
+                $agent = new Agent();
+                $agent->setUserAgent($session->user_agent);
+                
+                return [
+                    'id' => $session->id,
+                    'device' => $agent->device() ?: 'Unknown Device',
+                    'browser' => $agent->browser() . ' ' . $agent->version($agent->browser()),
+                    'platform' => $agent->platform(),
+                    'ip_address' => $session->ip_address,
+                    'last_active' => Carbon::createFromTimestamp($session->last_activity)->diffForHumans(),
+                    'is_current' => $session->id === session()->getId(),
+                ];
+            });
+    }
+
+    public static function defaultNotificationPreferences(): array
+    {
+        return [
+            'payment_paid' => true,
+            'payment_failed' => true,
+            'vendor_down' => true,
+            'billing_reminder' => true,
+            'product_updates' => false,
+            'marketing' => false,
+        ];
     }
 
     public function apiKeys(): HasMany

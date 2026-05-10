@@ -1,5 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { createContext, useState, useEffect, useContext, ReactNode } from "react";
 
 type Env = "sandbox" | "production";
 
@@ -29,9 +28,11 @@ function getCookie(name: string) {
   if (parts.length === 2) return decodeURIComponent(parts.pop()?.split(";").shift() || "");
 }
 
+/**
+ * Main Context Provider
+ * Simplified to remove Router dependencies which can cause hook call issues
+ */
 export const PortalProvider = ({ children }: { children: ReactNode }) => {
-  const navigate = useNavigate();
-  const location = useLocation();
   const [env, setEnv] = useState<Env>("sandbox");
   const [user, setUser] = useState<Merchant | null>(null);
   const [loading, setLoading] = useState(true);
@@ -49,12 +50,8 @@ export const PortalProvider = ({ children }: { children: ReactNode }) => {
           if (data && data.user) {
             setUser(data.user);
           }
-        } else if (res.status === 401) {
+        } else {
           setUser(null);
-          // Only redirect to login if we're trying to access a portal route
-          if (location.pathname.startsWith("/portal")) {
-            navigate("/login");
-          }
         }
       } catch (err) {
         console.error("Auth check failed:", err);
@@ -77,13 +74,6 @@ export const PortalProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [env]);
 
-  // Handle protected route redirection
-  useEffect(() => {
-    if (!loading && !user && location.pathname.startsWith("/portal")) {
-      navigate("/login");
-    }
-  }, [user, loading, location.pathname, navigate]);
-
   const logout = async () => {
     try {
       await fetch("/portal/logout", {
@@ -97,7 +87,7 @@ export const PortalProvider = ({ children }: { children: ReactNode }) => {
       console.error("Logout error:", err);
     } finally {
       setUser(null);
-      navigate("/login");
+      window.location.href = "/login";
     }
   };
 

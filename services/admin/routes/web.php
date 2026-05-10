@@ -9,6 +9,7 @@ use App\Http\Controllers\Portal\VendorCredentialController;
 use App\Http\Controllers\Portal\ApiKeyController;
 use App\Http\Controllers\Portal\TransactionController;
 use App\Http\Controllers\Portal\WebhookController;
+use App\Http\Controllers\Portal\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 // React SPA Routes (Frontend shell)
@@ -65,6 +66,50 @@ Route::middleware('auth:portal')->group(function () {
                 Route::post('/reenable', [WebhookController::class, 'reenable'])->name('reenable');
                 Route::delete('/', [WebhookController::class, 'delete'])->name('delete');
             });
+
+        // Profile & Security API
+        Route::prefix('profile')->name('profile.')
+            ->group(function () {
+                // GET - ambil data profile
+                Route::get('/', [ProfileController::class, 'show'])->name('show');
+                
+                // PATCH - update info personal & perusahaan
+                Route::patch('/info', [ProfileController::class, 'updateInfo'])->name('update-info');
+                
+                // POST - request ganti email (kirim verif ke email baru)
+                Route::post('/email/change', [ProfileController::class, 'requestEmailChange'])->name('email.change');
+                Route::post('/email/cancel', [ProfileController::class, 'cancelEmailChange'])->name('email.cancel');
+                
+                // GET - verifikasi email baru dari link di email
+                Route::get('/email/verify/{token}', [ProfileController::class, 'verifyEmailChange'])
+                    ->name('email.verify')
+                    ->withoutMiddleware('auth:portal'); 
+
+                // POST - ganti password
+                Route::post('/password', [ProfileController::class, 'changePassword'])->name('password.change');
+                
+                // GET - list active sessions
+                Route::get('/sessions', [ProfileController::class, 'getSessions'])->name('sessions');
+                
+                // DELETE - revoke specific session
+                Route::delete('/sessions/{sessionId}', [ProfileController::class, 'revokeSession'])->name('sessions.revoke');
+                // DELETE - revoke all other sessions
+                Route::delete('/sessions', [ProfileController::class, 'revokeAllSessions'])->name('sessions.revoke-all');
+
+                // 2FA
+
+                // POST - mulai setup 2FA (return QR code)
+                Route::post('/2fa/enable', [ProfileController::class, 'enableTwoFactor'])->name('2fa.enable');
+                
+                // POST - konfirmasi OTP untuk aktifkan 2FA
+                Route::post('/2fa/confirm', [ProfileController::class, 'confirmTwoFactor'])->name('2fa.confirm');
+                
+                // DELETE - nonaktifkan 2FA
+                Route::delete('/2fa', [ProfileController::class, 'disableTwoFactor'])->name('2fa.disable');
+                
+                // DELETE - hapus akun (soft delete + anonymize)
+                Route::delete('/account', [ProfileController::class, 'deleteAccount'])->name('account.delete');
+            });
     });
 
     // 3. SPA Catch-all (Must be last)
@@ -76,6 +121,7 @@ Route::prefix('portal')->name('portal.')->group(function () {
     Route::post('/register', [RegisterController::class, 'store'])->name('register.submit');
     Route::get('/verify-email/{token}', [EmailVerificationController::class, 'verify'])->name('verify-email');
     Route::post('/login', [PortalLoginController::class, 'store'])->name('login.submit');
+    Route::post('/login/2fa', [PortalLoginController::class, 'verify2fa'])->name('login.2fa');
     Route::post('/logout', [PortalLoginController::class, 'destroy'])->name('logout');
     
     Route::get('/pending-approval', fn() => view('portal.pending-approval'))->name('pending-approval');

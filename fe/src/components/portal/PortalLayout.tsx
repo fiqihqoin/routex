@@ -1,8 +1,9 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { PortalSidebar } from "./PortalSidebar";
 import { PortalHeader } from "./PortalHeader";
 import { MobileTabBar } from "./MobileTabBar";
-import { usePortal } from "./PortalContext";
+import { usePortal } from "@/components/portal/PortalContext";
 import { Loader2 } from "lucide-react";
 
 export const PortalLayout = ({
@@ -15,6 +16,15 @@ export const PortalLayout = ({
   children: ReactNode;
 }) => {
   const { loading, user } = usePortal();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Handle protected route redirection here since it has Router context
+  useEffect(() => {
+    if (!loading && !user && location.pathname.startsWith("/portal")) {
+      navigate("/login");
+    }
+  }, [user, loading, location.pathname, navigate]);
 
   if (loading) {
     return (
@@ -25,9 +35,7 @@ export const PortalLayout = ({
     );
   }
 
-  // If not loading and no user, we return null because PortalContext 
-  // will trigger a redirect to /login. Returning null prevents 
-  // children (like DashboardContent) from crashing by accessing user properties.
+  // If not loading and no user, we return null as the redirect is being handled
   if (!user) {
     return null;
   }
