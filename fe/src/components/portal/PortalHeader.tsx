@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Search, Bell, ChevronDown, User, CreditCard, LogOut, AlertTriangle } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ChevronDown, User, LogOut, AlertTriangle } from "lucide-react";
 import { usePortal } from "@/components/portal/PortalContext";
 import {
   DropdownMenu,
@@ -10,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export const PortalHeader = ({ title, breadcrumb }: { title: string; breadcrumb?: string }) => {
-  const { env, setEnv, user } = usePortal();
+  const { env, setEnv, user, logout } = usePortal();
   const isProd = env === "production";
 
   return (
@@ -24,24 +25,7 @@ export const PortalHeader = ({ title, breadcrumb }: { title: string; breadcrumb?
             <h1 className="text-sm font-semibold text-portal-text truncate">{title}</h1>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              aria-label="Search"
-              className="hidden sm:flex h-9 w-9 items-center justify-center rounded-md text-portal-text-muted hover:text-portal-text hover:bg-portal-elev transition-colors"
-            >
-              <Search className="h-4 w-4" />
-            </button>
-
-            <button
-              aria-label="Notifications"
-              className="relative h-9 w-9 flex items-center justify-center rounded-md text-portal-text-muted hover:text-portal-text hover:bg-portal-elev transition-colors"
-            >
-              <Bell className="h-4 w-4" />
-              <span className="absolute top-1.5 right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-teal text-[9px] font-semibold text-primary-foreground flex items-center justify-center">
-                3
-              </span>
-            </button>
-
+          <div className="flex items-center gap-4">
             <EnvToggle env={env} onChange={setEnv} />
 
             <DropdownMenu>
@@ -54,18 +38,20 @@ export const PortalHeader = ({ title, breadcrumb }: { title: string; breadcrumb?
                 className="w-56 bg-portal-surface border-portal-border"
               >
                 <div className="px-2 py-2">
-                  <div className="text-xs font-medium text-portal-text truncate">{user.name}</div>
-                  <div className="text-[11px] text-portal-text-muted truncate">{user.email}</div>
+                  <div className="text-xs font-medium text-portal-text truncate">{user?.name}</div>
+                  <div className="text-[11px] text-portal-text-muted truncate">{user?.email}</div>
                 </div>
                 <DropdownMenuSeparator className="bg-portal-border" />
-                <DropdownMenuItem className="gap-2 text-portal-text-muted focus:text-portal-text focus:bg-portal-elev">
-                  <User className="h-4 w-4" /> Profile
-                </DropdownMenuItem>
-                <DropdownMenuItem className="gap-2 text-portal-text-muted focus:text-portal-text focus:bg-portal-elev">
-                  <CreditCard className="h-4 w-4" /> Billing
+                <DropdownMenuItem asChild className="gap-2 text-portal-text-muted focus:text-portal-text focus:bg-portal-elev cursor-pointer">
+                  <Link to="/portal/profile">
+                    <User className="h-4 w-4" /> Profile
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-portal-border" />
-                <DropdownMenuItem className="gap-2 text-portal-text-muted focus:text-portal-text focus:bg-portal-elev">
+                <DropdownMenuItem 
+                  onClick={logout}
+                  className="gap-2 text-portal-text-muted focus:text-portal-text focus:bg-portal-elev cursor-pointer"
+                >
                   <LogOut className="h-4 w-4" /> Sign out
                 </DropdownMenuItem>
               </DropdownMenuContent>

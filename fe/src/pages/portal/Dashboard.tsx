@@ -463,7 +463,7 @@ function DashboardContent() {
             icon={Bell} 
             title="Set Up Webhooks" 
             description="Configure callback URLs" 
-            onClick={() => toast({ title: "Soon", description: "Webhook management is coming soon." })}
+            href="/portal/webhooks" 
         />
       </div>
     </div>

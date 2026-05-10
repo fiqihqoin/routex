@@ -106,7 +106,6 @@ class Merchant extends Authenticatable
             'payment_paid' => true,
             'payment_failed' => true,
             'vendor_down' => true,
-            'billing_reminder' => true,
             'product_updates' => false,
             'marketing' => false,
         ];
@@ -125,11 +124,6 @@ class Merchant extends Authenticatable
     public function webhooks(): HasMany
     {
         return $this->hasMany(MerchantWebhook::class, 'merchant_id');
-    }
-
-    public function subscription(): HasOne
-    {
-        return $this->hasOne(MerchantSubscription::class, 'merchant_id');
     }
 
     public function approvedBy(): BelongsTo

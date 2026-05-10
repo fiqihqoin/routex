@@ -6,9 +6,6 @@ import {
   Plug,
   KeyRound,
   User,
-  CreditCard,
-  Bell,
-  LifeBuoy,
   LogOut,
   Loader2,
 } from "lucide-react";
@@ -45,9 +42,6 @@ const groups: { label: string; items: Item[] }[] = [
     label: "Account",
     items: [
       { label: "Profile", to: "/portal/profile", icon: User },
-      { label: "Billing", to: "/portal/billing", icon: CreditCard },
-      { label: "Notifications", to: "/portal/notifications", icon: Bell },
-      { label: "Support", to: "/portal/support", icon: LifeBuoy },
     ],
   },
 ];
