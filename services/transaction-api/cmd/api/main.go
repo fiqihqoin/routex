@@ -101,6 +101,12 @@ func main() {
 					}
 					continue
 				}
+
+				if event["type"] == "routing_rules_updated" {
+					routerEngine.Load(ctx)
+					log.Println("Hot-reloaded global routing rules")
+					continue
+				}
 			}
 
 			// Default: reload all configs

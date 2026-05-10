@@ -33,5 +33,18 @@ class AppServiceProvider extends ServiceProvider
         Gate::guessPolicyNamesUsing(function (string $modelClass) {
             return 'App\\Policies\\' . class_basename($modelClass) . 'Policy';
         });
+
+        // Sync global routing rules to Go service via Redis
+        \App\Models\RoutingRuleGlobal::saved(function () {
+            \Illuminate\Support\Facades\Redis::publish('config:update', json_encode([
+                'type' => 'routing_rules_updated'
+            ]));
+        });
+
+        \App\Models\RoutingRuleGlobal::deleted(function () {
+            \Illuminate\Support\Facades\Redis::publish('config:update', json_encode([
+                'type' => 'routing_rules_updated'
+            ]));
+        });
     }
 }

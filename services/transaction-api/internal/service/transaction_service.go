@@ -130,7 +130,7 @@ func (s *transactionService) GenerateQRIS(ctx context.Context, apiKey string, id
 	}
 	fmt.Printf("[GenerateQRIS] Found %d eligible vendors\n", len(eligible))
 
-	ranked := s.router.Route(ctx, req.Amount, eligible)
+	ranked := s.router.Route(ctx, req.Amount, env, eligible)
 	fmt.Printf("[GenerateQRIS] After routing, %d vendors ranked\n", len(ranked))
 
 	var selectedAccount *domain.MerchantVendorCredential

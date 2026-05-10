@@ -5,7 +5,6 @@ import {
   Webhook,
   Plug,
   KeyRound,
-  GitBranch,
   User,
   CreditCard,
   Bell,
@@ -39,7 +38,6 @@ const groups: { label: string; items: Item[] }[] = [
     items: [
       { label: "Vendor Setup", to: "/portal/vendors", icon: Plug },
       { label: "API Keys", to: "/portal/api-keys", icon: KeyRound },
-      { label: "Routing Rules", to: "/portal/routing", icon: GitBranch, soon: true },
     ],
   },
   {

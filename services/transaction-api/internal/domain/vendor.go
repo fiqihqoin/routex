@@ -33,10 +33,11 @@ func (c *MerchantVendorCredential) GetBaseURL() string {
 }
 
 type RoutingRule struct {
-	VendorID  string  `json:"vendor_id"`
-	MinAmount float64 `json:"min_amount"`
-	MaxAmount float64 `json:"max_amount"`
-	Priority  int     `json:"priority"` // Higher value = Higher priority
+	VendorID    string  `json:"vendor_id"`
+	MinAmount   float64 `json:"min_amount"`
+	MaxAmount   float64 `json:"max_amount"`
+	Priority    int     `json:"priority"` // Higher value = Higher priority
+	Environment string  `json:"environment"`
 }
 
 type VendorPenalty struct {
@@ -68,7 +69,7 @@ type CircuitBreaker interface {
 
 type Router interface {
 	Load(ctx context.Context) error
-	Route(ctx context.Context, amount float64, eligibleVendors []Vendor) []Vendor
+	Route(ctx context.Context, amount float64, environment string, eligibleVendors []Vendor) []Vendor
 }
 
 type AccountSelector interface {

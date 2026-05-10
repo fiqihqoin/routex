@@ -31,7 +31,8 @@ func (r *basketSizeRouter) Load(ctx context.Context) error {
 	log.Println("Loading basket-size routing rules...")
 
 	var newRules []domain.RoutingRule
-	rows, err := r.db.Query(ctx, "SELECT vendor_id, min_amount, max_amount, priority FROM routing_rules ORDER BY min_amount ASC, priority DESC")
+	query := "SELECT vendor_id, min_amount, max_amount, priority, environment FROM routing_rules_global WHERE is_active = true ORDER BY min_amount ASC, priority DESC"
+	rows, err := r.db.Query(ctx, query)
 	if err != nil {
 		return fmt.Errorf("failed to query routing rules: %w", err)
 	}
@@ -39,7 +40,7 @@ func (r *basketSizeRouter) Load(ctx context.Context) error {
 
 	for rows.Next() {
 		var rule domain.RoutingRule
-		if err := rows.Scan(&rule.VendorID, &rule.MinAmount, &rule.MaxAmount, &rule.Priority); err != nil {
+		if err := rows.Scan(&rule.VendorID, &rule.MinAmount, &rule.MaxAmount, &rule.Priority, &rule.Environment); err != nil {
 			return err
 		}
 		newRules = append(newRules, rule)
@@ -53,7 +54,7 @@ func (r *basketSizeRouter) Load(ctx context.Context) error {
 	return nil
 }
 
-func (r *basketSizeRouter) Route(ctx context.Context, amount float64, eligibleVendors []domain.Vendor) []domain.Vendor {
+func (r *basketSizeRouter) Route(ctx context.Context, amount float64, environment string, eligibleVendors []domain.Vendor) []domain.Vendor {
 	start := time.Now()
 	defer func() {
 		metrics.RoutingDuration.Observe(time.Since(start).Seconds())
@@ -72,6 +73,9 @@ func (r *basketSizeRouter) Route(ctx context.Context, amount float64, eligibleVe
 	// 2. Get bracket priorities
 	vendorPriorities := make(map[string]int)
 	for _, rule := range r.rules {
+		if rule.Environment != environment {
+			continue
+		}
 		if amount >= rule.MinAmount && amount <= rule.MaxAmount {
 			vendorPriorities[rule.VendorID] = rule.Priority
 		}

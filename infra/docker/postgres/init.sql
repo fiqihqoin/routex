@@ -103,6 +103,35 @@ INSERT INTO vendors (code, name, sandbox_base_url, production_base_url) VALUES
 ('MIDTRANS', 'Midtrans', 'https://api.sandbox.midtrans.com', 'https://api.midtrans.com'),
 ('XENDIT', 'Xendit', 'https://api.xendit.co', 'https://api.xendit.co');
 
+-- Default routing rules (sandbox)
+-- Round-robin dengan priority sama untuk semua vendor
+INSERT INTO routing_rules_global 
+  (id, environment, vendor_id, min_amount, max_amount, priority, is_active) 
+SELECT 
+  gen_random_uuid(),
+  'sandbox',
+  id,
+  0,
+  999999999,
+  0,
+  true
+FROM vendors
+WHERE is_active = true;
+
+-- Sama untuk production
+INSERT INTO routing_rules_global 
+  (id, environment, vendor_id, min_amount, max_amount, priority, is_active)
+SELECT 
+  gen_random_uuid(),
+  'production',
+  id,
+  0,
+  999999999,
+  0,
+  true
+FROM vendors
+WHERE is_active = true;
+
 -- 7. MERCHANT VENDOR CREDENTIALS
 CREATE TABLE merchant_vendor_credentials (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
