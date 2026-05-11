@@ -3,12 +3,12 @@ import { Link } from "react-router-dom";
 import { Logo } from "./Logo";
 import { Button } from "@/components/ui/button";
 import { usePortal } from "@/components/portal/PortalContext";
+import { config } from "@/lib/config";
 
 const links = [
   { label: "Features", href: "#features" },
   { label: "How it works", href: "#how" },
-  { label: "Pricing", href: "#pricing" },
-  { label: "Docs", href: "#" },
+  { label: "Docs", href: config.docsUrl },
 ];
 
 export const Header = () => {

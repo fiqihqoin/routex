@@ -5,7 +5,6 @@ import { ProblemSolution } from "@/components/routex/ProblemSolution";
 import { Features } from "@/components/routex/Features";
 import { Metrics } from "@/components/routex/Metrics";
 import { HowItWorks } from "@/components/routex/HowItWorks";
-import { Pricing } from "@/components/routex/Pricing";
 import { CtaSection } from "@/components/routex/CtaSection";
 import { Footer } from "@/components/routex/Footer";
 
@@ -20,7 +19,6 @@ const Index = () => {
         <Features />
         <Metrics />
         <HowItWorks />
-        <Pricing />
         <CtaSection />
       </main>
       <Footer />
