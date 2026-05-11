@@ -115,7 +115,9 @@ services:
     build:
       context: ../../services/admin
     container_name: ptms-admin-queue
-    command: php artisan queue:work --sleep=3 --tries=5 --max-time=3600
+    command: >
+      sh -c "php -r 'while(@fsockopen(\"postgres\", 5432) === false) { echo \"Waiting for postgres...\\n\"; sleep(1); }' && 
+            php artisan queue:work --sleep=3 --tries=5 --max-time=3600"
     restart: always
     environment:
       APP_NAME: PTMS-Admin
