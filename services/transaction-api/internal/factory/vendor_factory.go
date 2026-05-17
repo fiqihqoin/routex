@@ -3,8 +3,10 @@ package factory
 import (
 	"errors"
 
+	"github.com/redis/go-redis/v9"
 	"github.com/truechain/ptms/transaction-api/internal/providers"
 	"github.com/truechain/ptms/transaction-api/internal/providers/midtrans"
+	"github.com/truechain/ptms/transaction-api/internal/providers/paydia"
 	"github.com/truechain/ptms/transaction-api/internal/providers/qoinhub"
 	"github.com/truechain/ptms/transaction-api/internal/providers/xendit"
 	"github.com/truechain/ptms/transaction-api/pkg/crypto"
@@ -17,10 +19,12 @@ type VendorFactory interface {
 	CreateForCallback(vendorCode string) (providers.VendorAdapter, error)
 }
 
-type vendorFactory struct{}
+type vendorFactory struct {
+	rdb *redis.Client
+}
 
-func NewVendorFactory() VendorFactory {
-	return &vendorFactory{}
+func NewVendorFactory(rdb *redis.Client) VendorFactory {
+	return &vendorFactory{rdb: rdb}
 }
 
 func (f *vendorFactory) Create(vendorCode string, encryptedCredentials string, baseURL string) (providers.VendorAdapter, string, error) {
@@ -37,6 +41,8 @@ func (f *vendorFactory) Create(vendorCode string, encryptedCredentials string, b
 		adapter = midtrans_adapter.NewMidtransAdapter(baseURL)
 	case "XENDIT":
 		adapter = xendit_adapter.NewXenditAdapter(baseURL)
+	case "PAYDIA":
+		adapter = paydia.NewPaydiaAdapter(baseURL, f.rdb)
 	default:
 		return nil, "", ErrUnsupportedVendor
 	}
@@ -56,6 +62,8 @@ func (f *vendorFactory) CreateForCallback(vendorCode string) (providers.VendorAd
 		return midtrans_adapter.NewMidtransAdapter(dummyBaseURL), nil
 	case "XENDIT":
 		return xendit_adapter.NewXenditAdapter(dummyBaseURL), nil
+	case "PAYDIA":
+		return paydia.NewPaydiaAdapter(dummyBaseURL, f.rdb), nil
 	default:
 		return nil, ErrUnsupportedVendor
 	}

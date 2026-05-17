@@ -54,7 +54,7 @@ func main() {
 	routerEngine := repository.NewBasketSizeRouter(dbPool, txRepo)
 	selector := repository.NewP2CAccountSelector(rdb)
 	limiter := repository.NewRedisRateLimiter(rdb, dbPool)
-	vendorFactory := factory.NewVendorFactory()
+	vendorFactory := factory.NewVendorFactory(rdb)
 
 	registry.Load(ctx)
 	routerEngine.Load(ctx)

@@ -31,4 +31,18 @@ return [
             ['key' => 'webhook_token', 'label' => 'Webhook Verification Token', 'type' => 'password', 'required' => true, 'hint' => 'Settings → Webhooks di dashboard Xendit'],
         ],
     ],
+    'PAYDIA' => [
+        'label' => 'Paydia',
+        'webhook_url' => 'https://api.caishenengine.com/api/v1/callbacks/PAYDIA',
+        'instructions' => 'Login to Paydia Dashboard > Settings > Webhook. Paste the URL below.',
+        'fields' => [
+            ['key' => 'client_id', 'label' => 'Client ID', 'type' => 'text', 'required' => true, 'hint' => 'Client ID dari dashboard Paydia'],
+            ['key' => 'client_secret', 'label' => 'Client Secret', 'type' => 'password', 'required' => true],
+            ['key' => 'private_key', 'label' => 'RSA Private Key', 'type' => 'textarea', 'required' => true, 'hint' => 'PKCS#8 format, termasuk header -----BEGIN RSA PRIVATE KEY-----'],
+            ['key' => 'merchant_id', 'label' => 'Merchant ID', 'type' => 'text', 'required' => true],
+            ['key' => 'store_id', 'label' => 'Store ID', 'type' => 'text', 'required' => false],
+            ['key' => 'terminal_id', 'label' => 'Terminal ID', 'type' => 'text', 'required' => true],
+            ['key' => 'is_production', 'label' => 'Mode Produksi', 'type' => 'boolean', 'required' => false],
+        ],
+    ],
 ];

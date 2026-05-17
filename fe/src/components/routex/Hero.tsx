@@ -68,7 +68,7 @@ export const Hero = () => {
                 <span className="h-2.5 w-2.5 rounded-full bg-yellow-500/60" />
                 <span className="h-2.5 w-2.5 rounded-full bg-teal/80" />
               </div>
-              <div className="text-[11px] font-mono text-muted-foreground">routex.dashboard / live</div>
+              <div className="text-[11px] font-mono text-muted-foreground">caishen.dashboard / live</div>
               <div className="hidden md:flex items-center gap-1 text-[11px] font-mono text-teal">
                 <Activity className="h-3 w-3" /> live
               </div>
@@ -90,19 +90,19 @@ export const Hero = () => {
               {/* CaishenEngine core */}
               <div className="relative rounded-xl border border-teal/30 bg-teal/5 p-4 flex flex-col items-center justify-center">
                 <div className="absolute inset-0 rounded-xl bg-teal/10 blur-2xl -z-10" />
-                <div className="text-[10px] uppercase tracking-wider text-teal font-mono">CaishenEngine Engine</div>
+                <div className="text-[10px] uppercase tracking-wider text-teal font-mono">CaishenEngine</div>
                 <div className="mt-3 grid grid-cols-2 gap-2 w-full text-[11px] font-mono">
                   <div className="rounded-md bg-background/60 border border-border px-2 py-1.5">
                     <div className="text-muted-foreground">success</div>
-                    <div className="text-teal font-semibold">99.5%</div>
+                    <div className="text-teal font-semibold">99.9%</div>
                   </div>
                   <div className="rounded-md bg-background/60 border border-border px-2 py-1.5">
                     <div className="text-muted-foreground">p95</div>
                     <div className="text-teal font-semibold">&lt; 1s</div>
                   </div>
                   <div className="rounded-md bg-background/60 border border-border px-2 py-1.5">
-                    <div className="text-muted-foreground">tps</div>
-                    <div className="text-teal font-semibold">500</div>
+                    <div className="text-muted-foreground">uptime</div>
+                    <div className="text-teal font-semibold">99.9%</div>
                   </div>
                   <div className="rounded-md bg-background/60 border border-border px-2 py-1.5">
                     <div className="text-muted-foreground">decide</div>

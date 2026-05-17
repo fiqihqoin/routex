@@ -1,0 +1,18 @@
+<svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="goldGradientFav" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#C8A028" />
+      <stop offset="50%" stopColor="#E8C84A" />
+      <stop offset="100%" stopColor="#A07820" />
+    </linearGradient>
+  </defs>
+  
+  <path d="M20 50C10 40 5 50 10 60L25 55" stroke="url(#goldGradientFav)" strokeWidth="4" strokeLinecap="round" />
+  <path d="M80 50C90 40 95 50 90 60L75 55" stroke="url(#goldGradientFav)" strokeWidth="4" strokeLinecap="round" />
+  
+  <path d="M35 45H65L70 65H30L35 45Z" fill="url(#goldGradientFav)" />
+  <ellipse cx="50" cy="45" rx="15" ry="5" fill="url(#goldGradientFav)" />
+  <ellipse cx="50" cy="65" rx="20" ry="7" fill="url(#goldGradientFav)" />
+  
+  <path d="M20 75H40L45 65L50 85L55 75H80" stroke="#C0392B" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+</svg>

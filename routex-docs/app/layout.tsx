@@ -15,6 +15,9 @@ export const metadata: Metadata = {
     template: "%s | CaishenEngine Documentation",
     default: "CaishenEngine Documentation",
   },
+  icons: {
+    icon: "/favicon.svg",
+  },
   description: "Official documentation for CaishenEngine - The modern payment solution.",
   openGraph: {
     title: "CaishenEngine Documentation",

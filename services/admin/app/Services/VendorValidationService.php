@@ -34,12 +34,60 @@ class VendorValidationService
                 'QOINHUB' => $this->validateQoinhub($credentials),
                 'MIDTRANS' => $this->validateMidtrans($credentials),
                 'XENDIT' => $this->validateXendit($credentials),
+                'PAYDIA' => $this->validatePaydia($credentials),
                 default => ValidationResult::fail("Validation logic not implemented for {$vendorCode}"),
             };
         } catch (Exception $e) {
             Log::error("Vendor validation error ({$vendorCode}): " . $e->getMessage());
             return ValidationResult::fail('Tidak bisa menghubungi vendor, coba lagi.');
         }
+    }
+
+    protected function validatePaydia(array $creds): ValidationResult
+    {
+        $clientId = $creds['client_id'] ?? '';
+        $privateKeyPem = $creds['private_key'] ?? '';
+        $isProduction = isset($creds['is_production']) && $creds['is_production'];
+
+        $baseUrl = $isProduction ? 'https://api.paydia.id' : 'https://api.paydia.co.id';
+        $endpoint = $baseUrl . '/snap/v1.0/access-token/b2b';
+
+        // Use WIB for timestamp
+        $timestamp = (new \DateTime('now', new \DateTimeZone('Asia/Jakarta')))->format('Y-m-d\TH:i:sP');
+
+        $stringToSign = "{$clientId}|{$timestamp}";
+
+        $privateKey = openssl_pkey_get_private($privateKeyPem);
+        if (!$privateKey) {
+            return ValidationResult::fail('Format Private Key tidak valid');
+        }
+
+        openssl_sign($stringToSign, $signatureBytes, $privateKey, OPENSSL_ALGO_SHA256);
+        $signature = base64_encode($signatureBytes);
+        if (is_resource($privateKey)) {
+            openssl_free_key($privateKey);
+        }
+
+        $response = Http::timeout(10)
+            ->withHeaders([
+                'X-CLIENT-KEY' => $clientId,
+                'X-TIMESTAMP' => $timestamp,
+                'X-SIGNATURE' => $signature,
+                'Content-Type' => 'application/json',
+            ])
+            ->post($endpoint, [
+                'grantType' => 'client_credentials'
+            ]);
+
+        if ($response->status() === 401 || $response->status() === 403) {
+            return ValidationResult::fail('Client ID atau Private Key tidak valid');
+        }
+
+        if ($response->successful() && $response->json('accessToken')) {
+            return ValidationResult::success();
+        }
+
+        return ValidationResult::fail('Paydia validation failed: ' . $response->body());
     }
 
     protected function validateQoinhub(array $creds): ValidationResult
