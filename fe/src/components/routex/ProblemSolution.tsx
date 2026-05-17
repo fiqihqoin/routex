@@ -36,8 +36,9 @@ export const ProblemSolution = () => (
         <div className="rounded-2xl border border-teal/20 bg-teal/5 p-8 md:p-10 relative overflow-hidden">
           <div className="absolute -top-20 -right-20 h-60 w-60 bg-teal/10 rounded-full blur-3xl" />
           <div className="relative">
-            <div className="text-xs uppercase tracking-[0.2em] text-teal font-mono">Routex</div>
-            <h3 className="mt-3 text-2xl md:text-3xl font-bold tracking-tight">Routex fixes all of it</h3>
+            <div className="text-xs uppercase tracking-[0.2em] text-teal font-mono">CaishenEngine</div>
+            <h3 className="mt-3 text-2xl md:text-3xl font-bold tracking-tight">CaishenEngine fixes all of it</h3>
+
             <ul className="mt-8 space-y-5">
               {solutions.map((s, i) => (
                 <li key={i} className="flex gap-4">

@@ -6,7 +6,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { PortalProvider } from "@/components/portal/PortalContext";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
 import PortalDashboard from "./pages/portal/Dashboard";
 import VendorsPage from "./pages/portal/Vendors";
 import VendorCredentialsPage from "./pages/portal/VendorCredentials";
@@ -28,7 +27,6 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
             <Route path="/portal" element={<PortalDashboard />} />
             <Route path="/portal/vendors" element={<VendorsPage />} />
             <Route path="/portal/vendors/:vendorCode/credentials" element={<VendorCredentialsPage />} />

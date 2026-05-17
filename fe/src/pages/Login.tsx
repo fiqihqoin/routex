@@ -15,9 +15,9 @@ import {
 import { cn } from "@/lib/utils";
 
 const vendors = [
-  { name: "Qoinhub", health: 99.8, latency: 220, weight: 0.45 },
-  { name: "Midtrans", health: 99.2, latency: 310, weight: 0.35 },
-  { name: "Xendit", health: 98.4, latency: 380, weight: 0.20 },
+  { name: "Acquirer 1", health: 99.8, latency: 220, weight: 0.45 },
+  { name: "Acquirer 2", health: 99.2, latency: 310, weight: 0.35 },
+  { name: "Acquirer 3", health: 98.4, latency: 380, weight: 0.20 },
 ];
 
 const schema = z.object({
@@ -342,10 +342,7 @@ const Login = () => {
                   </form>
 
                   <p className="mt-8 text-center text-xs text-muted-foreground">
-                    Don't have an account?{" "}
-                    <Link to="/register" className="text-teal hover:text-teal-glow transition-colors font-medium">
-                      Start for free →
-                    </Link>
+                    Don't have an account? Contact us at info@caishenengine.com
                   </p>
                 </>
               ) : (

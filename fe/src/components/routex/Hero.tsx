@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Activity, Zap } from "lucide-react";
 
 const vendors = [
-  { name: "Qoinhub", health: 99.8, latency: 220, weight: 0.45 },
-  { name: "Midtrans", health: 99.2, latency: 310, weight: 0.35 },
-  { name: "Xendit", health: 98.4, latency: 380, weight: 0.20 },
+  { name: "Acquirer 1", health: 99.8, latency: 220, weight: 0.45 },
+  { name: "Acquirer 2", health: 99.2, latency: 310, weight: 0.35 },
+  { name: "Acquirer 3", health: 98.4, latency: 380, weight: 0.20 },
 ];
 
 export const Hero = () => {
@@ -41,20 +40,17 @@ export const Hero = () => {
           </h1>
 
           <p className="mt-6 text-base md:text-lg text-muted-foreground max-w-2xl leading-relaxed">
-            Routex intelligently routes QRIS transactions across multiple payment vendors —
+            CaishenEngine intelligently routes QRIS transactions across multiple payment vendors —
             maximizing success rates, minimizing costs, and protecting your volume at 500 TPS.
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row gap-3">
-            <Link to="/register">
+            <a href="#contact">
               <Button size="lg" variant="hero" className="group w-full sm:w-auto">
-                Start for Free
+                Contact Us
                 <ArrowRight className="transition-transform group-hover:translate-x-1" />
               </Button>
-            </Link>
-            <Button size="lg" variant="heroOutline">
-              View Docs
-            </Button>
+            </a>
           </div>
 
           <p className="mt-6 text-xs text-muted-foreground/80">
@@ -91,10 +87,10 @@ export const Hero = () => {
                 <div className="mt-3 text-[11px] text-teal font-mono">→ routing…</div>
               </div>
 
-              {/* Routex core */}
+              {/* CaishenEngine core */}
               <div className="relative rounded-xl border border-teal/30 bg-teal/5 p-4 flex flex-col items-center justify-center">
                 <div className="absolute inset-0 rounded-xl bg-teal/10 blur-2xl -z-10" />
-                <div className="text-[10px] uppercase tracking-wider text-teal font-mono">Routex Engine</div>
+                <div className="text-[10px] uppercase tracking-wider text-teal font-mono">CaishenEngine Engine</div>
                 <div className="mt-3 grid grid-cols-2 gap-2 w-full text-[11px] font-mono">
                   <div className="rounded-md bg-background/60 border border-border px-2 py-1.5">
                     <div className="text-muted-foreground">success</div>

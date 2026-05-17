@@ -29,7 +29,7 @@ const features = [
   {
     icon: Plug,
     title: "Multi-Vendor, One API",
-    desc: "Clients send one request. Routex handles Qoinhub, Midtrans, and Xendit automatically — zero vendor-specific code.",
+    desc: "Clients send one request. CaishenEngine handles multiple acquirers automatically — zero vendor-specific code.",
   },
 ];
 

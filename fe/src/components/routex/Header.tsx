@@ -8,7 +8,6 @@ import { config } from "@/lib/config";
 const links = [
   { label: "Features", href: "#features" },
   { label: "How it works", href: "#how" },
-  { label: "Docs", href: config.docsUrl },
 ];
 
 export const Header = () => {
@@ -52,25 +51,12 @@ export const Header = () => {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          {!loading && authenticated ? (
+          {!loading && authenticated && (
             <Link to="/portal">
               <Button size="sm" variant="hero">
                 Dashboard
               </Button>
             </Link>
-          ) : (
-            <>
-              <Link to="/login">
-                <Button variant="ghost" size="sm" className="hidden sm:inline-flex text-muted-foreground hover:text-foreground">
-                  Sign in
-                </Button>
-              </Link>
-              <Link to="/register">
-                <Button size="sm" variant="hero">
-                  Start for free
-                </Button>
-              </Link>
-            </>
           )}
         </div>
       </div>

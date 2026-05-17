@@ -3,11 +3,7 @@ import { Logo } from "./Logo";
 const cols = [
   {
     title: "Product",
-    links: ["Features", "Pricing", "Changelog", "Roadmap"],
-  },
-  {
-    title: "Developers",
-    links: ["Documentation", "API Reference", "SDKs", "Status"],
+    links: ["Features", "Roadmap"],
   },
   {
     title: "Company",
@@ -44,7 +40,7 @@ export const Footer = () => (
         ))}
       </div>
       <div className="mt-14 pt-6 border-t border-border flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
-        <div>© 2025 Routex. All rights reserved.</div>
+        <div>© 2025 CaishenEngine. All rights reserved.</div>
         <div className="flex items-center gap-5">
           <a href="#" className="hover:text-foreground transition-colors">Privacy Policy</a>
           <a href="#" className="hover:text-foreground transition-colors">Terms of Service</a>

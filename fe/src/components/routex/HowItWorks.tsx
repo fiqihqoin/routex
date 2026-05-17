@@ -1,7 +1,7 @@
 const steps = [
   {
-    title: "Register & connect your vendors",
-    desc: "Input credentials for Qoinhub, Midtrans, or Xendit from your dashboard. Routex validates them instantly.",
+    title: "Connect your vendors",
+    desc: "Input credentials for your acquirers from your dashboard. CaishenEngine validates them instantly.",
   },
   {
     title: "Get your API key",
@@ -9,11 +9,11 @@ const steps = [
   },
   {
     title: "Send payment requests",
-    desc: "POST /api/v1/transactions with amount, currency, channel. Routex handles everything else.",
+    desc: "POST /api/v1/transactions with amount, currency, channel. CaishenEngine handles everything else.",
   },
   {
     title: "Receive callbacks",
-    desc: "Register your webhook URL. Routex normalizes and delivers payment callbacks from all vendors in a standard format.",
+    desc: "Register your webhook URL. CaishenEngine normalizes and delivers payment callbacks from all vendors in a standard format.",
   },
 ];
 

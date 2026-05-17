@@ -495,13 +495,13 @@ export default function ProfilePage() {
                     </div>
 
                     <div className="sm:col-span-2 space-y-2">
-                       <Label htmlFor="use_case">Kegunaan Routex</Label>
+                       <Label htmlFor="use_case">Kegunaan CaishenEngine</Label>
                        <Textarea 
                          id="use_case" 
                          rows={2} 
                          value={profile.use_case || ""} 
                          onChange={e => setProfile({...profile, use_case: e.target.value})}
-                         placeholder="Ceritakan singkat bagaimana Anda akan menggunakan Routex..."
+                         placeholder="Ceritakan singkat bagaimana Anda akan menggunakan CaishenEngine..."
                          className="bg-portal-elev resize-none"
                        />
                     </div>

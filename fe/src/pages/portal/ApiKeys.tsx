@@ -239,7 +239,7 @@ curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
     'payment_channel' => 'qris'
 ]));
 $response = curl_exec($ch);`,
-    go: (env: string) => `// Use Routex Go SDK or net/http
+    go: (env: string) => `// Use CaishenEngine Go SDK or net/http
 req, _ := http.NewRequest("POST", "https://${env === 'production' ? 'api' : 'sandbox'}.${config.baseDomain}/api/v1/transactions", body)
 req.Header.Set("X-API-Key", "ptms_${env === 'production' ? 'live' : 'sb'}_your_key_here")`
   };
@@ -253,7 +253,7 @@ req.Header.Set("X-API-Key", "ptms_${env === 'production' ? 'live' : 'sb'}_your_k
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-portal-text">API Keys</h1>
             <p className="text-sm text-portal-text-muted mt-1">
-              Kelola API keys untuk autentikasi request ke Routex API di lingkungan <span className="font-bold uppercase text-portal-text">{portalEnv}</span>.
+              Kelola API keys untuk autentikasi request ke CaishenEngine API di lingkungan <span className="font-bold uppercase text-portal-text">{portalEnv}</span>.
             </p>
           </div>
           <Button 
@@ -270,7 +270,7 @@ req.Header.Set("X-API-Key", "ptms_${env === 'production' ? 'live' : 'sb'}_your_k
           <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 flex gap-3 items-start">
             <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0" />
             <p className="text-sm text-amber-600 font-medium">
-              Kamu belum punya API key untuk {portalEnv}. Generate key baru untuk mulai menggunakan Routex API.
+              Kamu belum punya API key untuk {portalEnv}. Generate key baru untuk mulai menggunakan CaishenEngine API.
             </p>
           </div>
         )}

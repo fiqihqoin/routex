@@ -281,7 +281,7 @@ export default function WebhooksPage() {
                </div>
                <h3 className="text-lg font-bold text-portal-text mb-1">Belum ada webhook endpoint</h3>
                <p className="text-sm text-portal-text-muted mb-8 max-w-md">
-                 Daftarkan URL untuk menerima notifikasi pembayaran otomatis dari Routex ke sistem Anda.
+                 Daftarkan URL untuk menerima notifikasi pembayaran otomatis dari CaishenEngine ke sistem Anda.
                </p>
                
                <div className="w-full max-w-lg space-y-4 text-left">
@@ -297,7 +297,7 @@ export default function WebhooksPage() {
                     {urlError ? (
                       <p className="text-xs text-red-500 flex items-center gap-1"><AlertCircle className="h-3 w-3" /> {urlError}</p>
                     ) : (
-                      <p className="text-[11px] text-portal-text-dim italic">Harus HTTPS. Routex akan POST ke URL ini setiap ada pembayaran.</p>
+                      <p className="text-[11px] text-portal-text-dim italic">Harus HTTPS. CaishenEngine akan POST ke URL ini setiap ada pembayaran.</p>
                     )}
                   </div>
                   <Button onClick={handleSave} disabled={isSaving} className="w-full bg-teal hover:bg-teal/90 text-white font-bold h-11">
@@ -383,7 +383,7 @@ export default function WebhooksPage() {
                         <Label className="text-[10px] uppercase font-bold tracking-widest text-portal-text-dim flex items-center gap-2">
                            <Lock className="h-3 w-3" /> Signing Secret
                         </Label>
-                        <p className="text-xs text-portal-text-muted">Gunakan ini untuk memverifikasi keaslian request dari Routex.</p>
+                        <p className="text-xs text-portal-text-muted">Gunakan ini untuk memverifikasi keaslian request dari CaishenEngine.</p>
                      </div>
                      <div className="flex items-center gap-2">
                         <div className="bg-black/40 border border-portal-border rounded-lg px-4 py-2 font-mono text-sm text-portal-text-dim tracking-tight">
@@ -458,7 +458,7 @@ export default function WebhooksPage() {
                  <pre className="bg-black/60 border border-portal-border rounded-xl p-5 font-mono text-xs text-teal-400 overflow-x-auto leading-relaxed">
 {`const crypto = require('crypto');
 
-function verifyRoutexSignature(payload, signature, secret) {
+function verifyCaishenEngineSignature(payload, signature, secret) {
   const [timestampPart, signaturePart] = signature.split(',');
   const timestamp = timestampPart.split('=')[1];
   const v1 = signaturePart.split('=')[1];
@@ -480,7 +480,7 @@ function verifyRoutexSignature(payload, signature, secret) {
 
               <TabsContent value="php" className="mt-4">
                  <pre className="bg-black/60 border border-portal-border rounded-xl p-5 font-mono text-xs text-teal-400 overflow-x-auto leading-relaxed">
-{`function verifyRoutexSignature(string $payload, string $signature, string $secret): bool {
+{`function verifyCaishenEngineSignature(string $payload, string $signature, string $secret): bool {
   [$timestampPart, $signaturePart] = explode(',', $signature);
   $timestamp = explode('=', $timestampPart)[1];
   $v1 = explode('=', $signaturePart)[1];
@@ -515,7 +515,7 @@ function verifyRoutexSignature(payload, signature, secret) {
            </Tabs>
            
            <div className="bg-teal/5 border-l-4 border-teal p-4 rounded-r-xl">
-              <p className="text-xs text-portal-text font-bold mb-2">Header yang dikirim Routex:</p>
+              <p className="text-xs text-portal-text font-bold mb-2">Header yang dikirim CaishenEngine:</p>
               <ul className="space-y-1 font-mono text-[11px] text-portal-text-muted">
                  <li>X-Routex-Signature: t=1778338943,v1=abc123...</li>
                  <li>X-Routex-Event: payment.paid | payment.failed</li>
@@ -547,7 +547,7 @@ function verifyRoutexSignature(payload, signature, secret) {
                     </tr>
                  </thead>
                  <tbody className="divide-y divide-portal-border text-portal-text-muted">
-                    <tr><td className="py-3 pr-4 font-mono text-teal">transaction_id</td><td className="py-3 pr-4">string</td><td className="py-3">ID unik transaksi Routex</td></tr>
+                    <tr><td className="py-3 pr-4 font-mono text-teal">transaction_id</td><td className="py-3 pr-4">string</td><td className="py-3">ID unik transaksi CaishenEngine</td></tr>
                     <tr><td className="py-3 pr-4 font-mono text-teal">status</td><td className="py-3 pr-4">string</td><td className="py-3">paid | failed | expired</td></tr>
                     <tr><td className="py-3 pr-4 font-mono text-teal">amount</td><td className="py-3 pr-4">number</td><td className="py-3">Nominal dalam IDR (satuan rupiah)</td></tr>
                     <tr><td className="py-3 pr-4 font-mono text-teal">vendor_id</td><td className="py-3 pr-4">string</td><td className="py-3">ID Vendor yang memproses (QOINHUB, MIDTRANS, XENDIT)</td></tr>
@@ -629,7 +629,7 @@ function verifyRoutexSignature(payload, signature, secret) {
             <DialogHeader>
               <DialogTitle className="text-red-500">Hapus Konfigurasi Webhook?</DialogTitle>
               <DialogDescription className="pt-2 text-portal-text-muted">
-                 Routex akan berhenti mengirimkan notifikasi pembayaran ke URL Anda. Anda bisa mendaftarkannya kembali kapan saja.
+                 CaishenEngine akan berhenti mengirimkan notifikasi pembayaran ke URL Anda. Anda bisa mendaftarkannya kembali kapan saja.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>

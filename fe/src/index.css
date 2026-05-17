@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:wght@700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,83 +6,87 @@
 
 @layer base {
   :root {
-    --background: 222 47% 5%;
-    --foreground: 210 40% 98%;
+    /* Infrastructure Blue (Navy) */
+    --background: 211 47% 11%;      /* #0F1C2A - Navy Darker */
+    --foreground: 42 53% 90%;       /* #F5ECD7 - Warm White */
 
-    --card: 222 40% 8%;
-    --card-foreground: 210 40% 98%;
+    --card: 210 38% 16%;           /* #1A2A3A - Navy Dark */
+    --card-foreground: 42 53% 90%;  /* #F5ECD7 */
 
-    --popover: 222 40% 8%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 210 38% 16%;
+    --popover-foreground: 42 53% 90%;
 
-    --primary: 168 100% 42%;
-    --primary-foreground: 222 47% 5%;
+    /* Prosperity Gold */
+    --primary: 45 67% 47%;          /* #C8A028 - Main Gold */
+    --primary-foreground: 211 47% 11%;
 
-    --secondary: 222 30% 12%;
-    --secondary-foreground: 210 40% 98%;
+    /* Infrastructure Blue Main */
+    --secondary: 207 41% 30%;       /* #2D4F6C - Navy Main */
+    --secondary-foreground: 42 53% 90%;
 
-    --muted: 222 30% 12%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 210 38% 16%;
+    --muted-foreground: 200 18% 73%; /* #B0BEC5 - Gray Main */
 
-    --accent: 270 70% 60%;
-    --accent-foreground: 210 40% 98%;
+    /* Traffic Red */
+    --accent: 6 63% 46%;            /* #C0392B - Red Main */
+    --accent-foreground: 42 53% 90%;
 
-    --destructive: 0 70% 55%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 6 63% 46%;
+    --destructive-foreground: 42 53% 90%;
 
-    --border: 222 30% 14%;
-    --input: 222 30% 14%;
-    --ring: 168 100% 42%;
+    --border: 45 67% 47% / 0.2;     /* Gold border rgba(200, 160, 40, 0.2) */
+    --input: 45 67% 47% / 0.2;
+    --ring: 45 67% 47%;
 
     --radius: 0.75rem;
 
-    --teal: 168 100% 42%;
-    --teal-glow: 168 100% 55%;
-    --purple: 270 70% 60%;
+    --teal: 45 67% 47%;             /* Map teal to Gold */
+    --teal-glow: 48 77% 60%;        /* Map teal-glow to Gold Light */
+    --purple: 6 63% 46%;           /* Map purple to Red */
 
-    --gradient-hero: radial-gradient(ellipse at top, hsl(168 100% 42% / 0.15), transparent 60%), radial-gradient(ellipse at bottom right, hsl(270 70% 60% / 0.12), transparent 60%);
-    --gradient-cta: linear-gradient(135deg, hsl(168 100% 42%), hsl(270 70% 60%));
-    --gradient-text: linear-gradient(135deg, hsl(210 40% 98%), hsl(168 100% 70%));
-    --gradient-card: linear-gradient(135deg, hsl(222 40% 9%), hsl(222 40% 7%));
+    --gradient-hero: radial-gradient(ellipse at top, hsl(45 67% 47% / 0.15), transparent 60%), radial-gradient(ellipse at bottom right, hsl(6 63% 46% / 0.12), transparent 60%);
+    --gradient-cta: linear-gradient(135deg, hsl(45 67% 47%), hsl(48 77% 60%));
+    --gradient-text: linear-gradient(135deg, hsl(42 53% 90%), hsl(45 67% 65%));
+    --gradient-card: linear-gradient(135deg, hsl(210 38% 16%), hsl(211 47% 11%));
 
-    --shadow-glow: 0 0 40px hsl(168 100% 42% / 0.3);
-    --shadow-card: 0 1px 0 hsl(210 40% 98% / 0.05) inset, 0 8px 24px hsl(0 0% 0% / 0.4);
-    --shadow-elegant: 0 20px 60px -20px hsl(168 100% 42% / 0.4);
+    --shadow-glow: 0 0 40px hsl(45 67% 47% / 0.3);
+    --shadow-card: 0 1px 0 hsl(42 53% 90% / 0.05) inset, 0 8px 24px hsl(0 0% 0% / 0.4);
+    --shadow-elegant: 0 20px 60px -20px hsl(45 67% 47% / 0.4);
 
     /* Portal design tokens */
-    --portal-bg: 222 47% 7%;          /* #0A0E1A */
-    --portal-surface: 230 49% 10%;    /* #0D1225 */
-    --portal-elev: 220 40% 11%;       /* #111827 */
-    --portal-border: 214 32% 17%;     /* #1E2A3A */
-    --portal-text: 210 40% 96%;       /* #F1F5F9 */
-    --portal-text-muted: 215 20% 65%; /* #94A3B8 */
-    --portal-text-dim: 215 19% 35%;   /* #475569 */
-    --success: 160 84% 39%;
-    --warning: 38 92% 50%;
-    --danger: 0 84% 60%;
+    --portal-bg: 211 47% 11%;          /* #0F1C2A */
+    --portal-surface: 210 38% 16%;    /* #1A2A3A */
+    --portal-elev: 207 41% 30%;       /* #2D4F6C */
+    --portal-border: 45 67% 47% / 0.15;
+    --portal-text: 42 53% 90%;       /* #F5ECD7 */
+    --portal-text-muted: 200 18% 73%; /* #B0BEC5 */
+    --portal-text-dim: 200 18% 54%;   /* #78909C */
+    --success: 45 67% 47%;
+    --warning: 48 77% 60%;
+    --danger: 6 63% 46%;
 
-    --sidebar-background: 222 47% 5%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 168 100% 42%;
-    --sidebar-primary-foreground: 222 47% 5%;
-    --sidebar-accent: 222 30% 12%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 222 30% 14%;
-    --sidebar-ring: 168 100% 42%;
+    --sidebar-background: 210 38% 16%;
+    --sidebar-foreground: 42 53% 90%;
+    --sidebar-primary: 45 67% 47%;
+    --sidebar-primary-foreground: 211 47% 11%;
+    --sidebar-accent: 207 41% 30%;
+    --sidebar-accent-foreground: 42 53% 90%;
+    --sidebar-border: 45 67% 47% / 0.1;
+    --sidebar-ring: 45 67% 47%;
   }
 
   .light {
-    --background: 0 0% 100%;
-    --foreground: 222 47% 5%;
+    --background: 42 53% 95%;
+    --foreground: 211 47% 11%;
 
     --card: 0 0% 98%;
-    --card-foreground: 222 47% 5%;
+    --card-foreground: 211 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 5%;
+    --popover-foreground: 211 47% 11%;
 
-    --primary: 168 100% 42%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 45 67% 47%;
+    --primary-foreground: 42 53% 90%;
 
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222 47.4% 11.2%;
@@ -90,18 +94,18 @@
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 210 40% 96.1%;
+    --accent: 6 63% 46%;
     --accent-foreground: 222 47.4% 11.2%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 6 63% 46%;
+    --destructive-foreground: 42 53% 90%;
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 168 100% 42%;
+    --ring: 45 67% 47%;
 
     /* Portal light tokens */
-    --portal-bg: 210 40% 98%;
+    --portal-bg: 42 53% 95%;
     --portal-surface: 0 0% 100%;
     --portal-elev: 210 40% 96%;
     --portal-border: 214 32% 91%;
@@ -152,8 +156,8 @@
 
   .card-hover:hover {
     transform: translateY(-3px);
-    border-color: hsl(var(--teal) / 0.4);
-    box-shadow: 0 8px 30px hsl(var(--teal) / 0.1);
+    border-color: hsl(var(--primary) / 0.4);
+    box-shadow: 0 8px 30px hsl(var(--primary) / 0.1);
   }
 
   .noise::before {
@@ -174,8 +178,8 @@
 }
 
 @keyframes pulse-ring {
-  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--teal) / 0.5); }
-  50% { box-shadow: 0 0 0 8px hsl(var(--teal) / 0); }
+  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.5); }
+  50% { box-shadow: 0 0 0 8px hsl(var(--primary) / 0); }
 }
 
 @keyframes fade-up {

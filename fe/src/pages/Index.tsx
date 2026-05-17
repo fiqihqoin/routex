@@ -1,11 +1,10 @@
 import { Header } from "@/components/routex/Header";
 import { Hero } from "@/components/routex/Hero";
-import { VendorStrip } from "@/components/routex/VendorStrip";
 import { ProblemSolution } from "@/components/routex/ProblemSolution";
 import { Features } from "@/components/routex/Features";
 import { Metrics } from "@/components/routex/Metrics";
 import { HowItWorks } from "@/components/routex/HowItWorks";
-import { CtaSection } from "@/components/routex/CtaSection";
+import { ContactSection } from "@/components/routex/ContactSection";
 import { Footer } from "@/components/routex/Footer";
 
 const Index = () => {
@@ -14,12 +13,11 @@ const Index = () => {
       <Header />
       <main>
         <Hero />
-        <VendorStrip />
         <ProblemSolution />
         <Features />
         <Metrics />
         <HowItWorks />
-        <CtaSection />
+        <ContactSection />
       </main>
       <Footer />
     </div>
