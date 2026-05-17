@@ -26,20 +26,25 @@ RUN composer install \
 # Copy application files
 COPY . .
 
-# Copy NGINX dan supervisor config
+# Copy configs
 COPY nginx.conf /etc/nginx/http.d/default.conf
 COPY supervisord.conf /etc/supervisord.conf
 
-# Update PHP-FPM port ke 9001 (karena 9000 dipakai NGINX)
-RUN sed -i 's/listen = 9000/listen = 127.0.0.1:9001/' \
-    /usr/local/etc/php-fpm.d/www.conf
+# PHP-FPM listen di 9001 (9000 dipakai NGINX)
+# Fix di www.conf DAN docker.conf (docker.conf yang jadi override)
+RUN sed -i 's|^listen = .*|listen = 127.0.0.1:9001|' \
+    /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's|^listen = .*|listen = 127.0.0.1:9001|' \
+    /usr/local/etc/php-fpm.d/docker.conf && \
+    echo "PHP-FPM listen config:" && \
+    grep "^listen" /usr/local/etc/php-fpm.d/docker.conf
 
-# Cleanup dan final setup
+# Final setup
 RUN rm -f .env && \
     php artisan storage:link 2>/dev/null || true && \
     chown -R www-data:www-data storage bootstrap/cache && \
-    chown -R www-data:www-data /var/lib/nginx && \
-    mkdir -p /run/nginx
+    mkdir -p /run/nginx && \
+    chown -R www-data:www-data /var/lib/nginx /run/nginx
 
 EXPOSE 9000
 

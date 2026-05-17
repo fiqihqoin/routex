@@ -12,21 +12,21 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | Routex Documentation",
-    default: "Routex Documentation",
+    template: "%s | CaishenEngine Documentation",
+    default: "CaishenEngine Documentation",
   },
-  description: "Official documentation for Routex - The modern payment solution.",
+  description: "Official documentation for CaishenEngine - The modern payment solution.",
   openGraph: {
-    title: "Routex Documentation",
+    title: "CaishenEngine Documentation",
     description: "The modern payment solution for your business.",
     url: config.docsUrl,
-    siteName: "Routex Docs",
+    siteName: "CaishenEngine Docs",
     locale: "id_ID",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Routex Documentation",
+    title: "CaishenEngine Documentation",
     description: "The modern payment solution for your business.",
   },
 };

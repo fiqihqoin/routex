@@ -41,10 +41,10 @@ export async function generateMetadata({ params }: DocPageProps) {
     title: doc.meta.title,
     description: doc.meta.description,
     openGraph: {
-      title: `${doc.meta.title} | Routex Docs`,
+      title: `${doc.meta.title} | CaishenEngine Docs`,
       description: doc.meta.description,
       url: `${baseUrl}/${lang}/docs/${slug}`,
-      siteName: 'Routex Documentation',
+      siteName: 'CaishenEngine Documentation',
       type: 'article',
       images: [{
         url: `${baseUrl}/og-image.png`,

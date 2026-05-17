@@ -1,31 +1,31 @@
 ---
-title: Introduction to Routex
-description: What is Routex and how it works as a payment routing middleware for businesses
+title: Introduction to CaishenEngine
+description: What is CaishenEngine and how it works as a payment routing middleware for businesses
 lastUpdated: '2026-05-10'
 ---
 
-# Introduction to Routex
+# Introduction to CaishenEngine
 
-Routex is a **payment traffic management system** that 
+CaishenEngine is a **payment traffic management system** that 
 sits between your application and payment gateways. 
-Routex intelligently routes, limits, and protects 
+CaishenEngine intelligently routes, limits, and protects 
 your payment transaction traffic.
 
 <Callout type="info">
-Routex is **not** a payment gateway. Routex only 
+CaishenEngine is **not** a payment gateway. CaishenEngine only 
 routes requests — it does not process transactions, 
 card tokenization, or fund settlements.
 </Callout>
 
-## How Routex Works
+## How CaishenEngine Works
 
-The QRIS payment flow through Routex:
+The QRIS payment flow through CaishenEngine:
 
-1. **Generate** — Your application calls Routex API → 
-   Routex selects the optimal vendor → returns the 
+1. **Generate** — Your application calls CaishenEngine API → 
+   CaishenEngine selects the optimal vendor → returns the 
    QRIS code.
 2. **Pay** — User scans the QRIS via banking/e-wallet app.
-3. **Callback** — Vendor notifies Routex → Routex 
+3. **Callback** — Vendor notifies CaishenEngine → CaishenEngine 
    forwards the normalized callback to your webhook URL.
 
 ## Key Advantages
@@ -50,7 +50,7 @@ transaction state is tracked in real-time.
 
 ## Supported Vendors
 
-Routex supports three payment gateways for 
+CaishenEngine supports three payment gateways for 
 QRIS transactions:
 
 | Vendor | Environment | Status |

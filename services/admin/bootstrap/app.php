@@ -13,6 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Trust all proxies (untuk NGINX reverse proxy)
+        $middleware->trustProxies(at: '*');
+        
         $middleware->validateCsrfTokens(except: [
             'portal/*',
         ]);

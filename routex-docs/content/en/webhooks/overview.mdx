@@ -6,7 +6,7 @@ lastUpdated: '2026-05-10'
 
 # Webhook Overview
 
-Webhooks allow Routex to automatically send notifications to your server whenever a transaction status change occurs (e.g., when a payment is successful).
+Webhooks allow CaishenEngine to automatically send notifications to your server whenever a transaction status change occurs (e.g., when a payment is successful).
 
 ## Why Use Webhooks?
 
@@ -15,7 +15,7 @@ Without webhooks, your server would have to perform polling (repeatedly calling 
 ## Webhook Flow
 
 1. User completes the QRIS payment.
-2. Vendor (e.g., Midtrans) sends a notification to Routex.
-3. Routex processes the data and normalizes its format.
-4. Routex sends a POST request to your registered Webhook URL.
+2. Vendor (e.g., Midtrans) sends a notification to CaishenEngine.
+3. CaishenEngine processes the data and normalizes its format.
+4. CaishenEngine sends a POST request to your registered Webhook URL.
 5. Your server processes the data and responds with 200 OK.

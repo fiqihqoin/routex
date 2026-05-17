@@ -90,7 +90,7 @@ export default function MobileNav({ lang }: { lang: Lang }) {
                   <circle cx="21" cy="6" r="1.5" fill="currentColor" />
                   <circle cx="21" cy="12" r="1.5" fill="currentColor" opacity="0.6" />
                 </svg>
-                <span className="text-lg font-bold tracking-tight text-foreground leading-none">Routex</span>
+                <span className="text-lg font-bold tracking-tight text-foreground leading-none">CaishenEngine</span>
               </div>
               <span className="text-[10px] font-bold text-teal bg-teal/10 px-2 py-0.5 rounded-full border border-teal/20 uppercase tracking-wider">docs</span>
             </div>

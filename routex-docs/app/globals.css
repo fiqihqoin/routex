@@ -3,6 +3,7 @@
 
 @theme {
   --font-sans: "Inter", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "sans-serif";
+  --font-serif: "Playfair Display", "Georgia", "serif";
   
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
@@ -67,29 +68,29 @@
 
 @layer base {
   :root {
-    /* Background layers */
-    --background: 222 47% 5%;          /* #0A0E1A */
-    --surface: 222 40% 8%;             /* card bg */
-    --surface-elevated: 220 40% 11%;   /* #111827 */
+    /* Infrastructure Blue (Navy) */
+    --background: 211 47% 11%;      /* #0F1C2A - Navy Darker */
+    --surface: 210 38% 16%;         /* #1A2A3A - Navy Dark */
+    --surface-elevated: 207 41% 30%; /* #2D4F6C - Navy Main */
     
     /* Borders */
-    --border: 222 30% 14%;
-    --border-subtle: 214 32% 17%;      /* #1E2A3A */
+    --border: 45 67% 47% / 0.2;     /* Gold border */
+    --border-subtle: 45 67% 47% / 0.1;
     
     /* Text */
-    --foreground: 210 40% 98%;         /* #F1F5F9 */
-    --text-muted: 215 20% 65%;         /* #94A3B8 */
-    --text-dim: 215 19% 35%;           /* #475569 */
+    --foreground: 42 53% 90%;       /* #F5ECD7 - Warm White */
+    --text-muted: 200 18% 73%;      /* #B0BEC5 - Gray Main */
+    --text-dim: 200 18% 54%;        /* #78909C - Gray Dark */
     
-    /* Brand colors */
-    --teal: 168 100% 42%;              /* #00D4AA */
-    --teal-glow: 168 100% 55%;
-    --purple: 270 70% 60%;             /* accent */
+    /* Brand colors (Mapped to CaishenEngine) */
+    --teal: 45 67% 47%;              /* #C8A028 - Prosperity Gold */
+    --teal-glow: 48 77% 60%;
+    --purple: 6 63% 46%;             /* #C0392B - Traffic Red */
     
     /* Status */
-    --success: 160 84% 39%;
-    --warning: 38 92% 50%;
-    --danger: 0 84% 60%;
+    --success: 45 67% 47%;
+    --warning: 48 77% 60%;
+    --danger: 6 63% 46%;
     
     /* Docs specific */
     --sidebar-width: 280px;
@@ -132,7 +133,7 @@
   }
 
   .gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-br from-[#F1F5F9] to-[#00D4AA];
+    @apply bg-clip-text text-transparent bg-gradient-to-br from-[#F5ECD7] to-[#C8A028];
   }
 
   .shadow-glow {
@@ -141,7 +142,7 @@
 
   .shadow-card {
     box-shadow: 
-      0 1px 0 hsl(210 40% 98% / 0.05) inset,
+      0 1px 0 hsl(42 53% 90% / 0.05) inset,
       0 8px 24px hsl(0 0% 0% / 0.4);
   }
 

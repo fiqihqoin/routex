@@ -1,16 +1,16 @@
 ---
 title: Retry & DLQ
-description: How Routex handles webhook delivery failures
+description: How CaishenEngine handles webhook delivery failures
 lastUpdated: '2026-05-10'
 ---
 
 # Retry & DLQ
 
-If your server fails to receive a webhook (returns a status other than 200), Routex will attempt to resend it.
+If your server fails to receive a webhook (returns a status other than 200), CaishenEngine will attempt to resend it.
 
 ## Retry Policy
 
-Routex will attempt a maximum of **10 retries** with exponential intervals:
+CaishenEngine will attempt a maximum of **10 retries** with exponential intervals:
 1. 1 minute
 2. 5 minutes
 3. 15 minutes
@@ -18,4 +18,4 @@ Routex will attempt a maximum of **10 retries** with exponential intervals:
 
 ## Dead Letter Queue (DLQ)
 
-If it still fails after 10 attempts, the webhook will enter the DLQ. You can view and trigger manual resends through the Routex Dashboard.
+If it still fails after 10 attempts, the webhook will enter the DLQ. You can view and trigger manual resends through the CaishenEngine Dashboard.

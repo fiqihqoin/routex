@@ -1,6 +1,6 @@
 ---
 title: Best Practices
-description: Best tips and practices for secure and efficient Routex integration
+description: Best tips and practices for secure and efficient CaishenEngine integration
 lastUpdated: '2026-05-10'
 ---
 
@@ -17,5 +17,5 @@ Follow these guidelines to ensure your integration runs optimally.
 ## Performance
 
 1. **Handle Timeouts**: Set a request timeout of at least 30 seconds.
-2. **Implement Retries**: Use exponential backoff if a request to Routex fails (status 5xx).
+2. **Implement Retries**: Use exponential backoff if a request to CaishenEngine fails (status 5xx).
 3. **Use Idempotency**: Always send the `X-Idempotency-Key` to avoid double charging.

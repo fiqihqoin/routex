@@ -1,35 +1,35 @@
 ---
-title: Pengenalan Routex
-description: Apa itu Routex dan bagaimana cara kerjanya sebagai middleware payment routing untuk bisnis Indonesia
+title: Pengenalan CaishenEngine
+description: Apa itu CaishenEngine dan bagaimana cara kerjanya sebagai middleware payment routing untuk bisnis Indonesia
 lastUpdated: '2026-05-10'
 ---
 
-# Pengenalan Routex
+# Pengenalan CaishenEngine
 
-Routex adalah **payment traffic management system** yang 
+CaishenEngine adalah **payment traffic management system** yang 
 berada di antara aplikasimu dan payment gateway. 
-Routex secara cerdas merouting, membatasi, dan 
+CaishenEngine secara cerdas merouting, membatasi, dan 
 melindungi traffic transaksi pembayaran.
 
 <Callout type="info">
-Routex **bukan** payment gateway. Routex hanya 
+CaishenEngine **bukan** payment gateway. CaishenEngine hanya 
 merouting request — tidak memproses transaksi, 
 tokenisasi kartu, atau settlement dana.
 </Callout>
 
-## Cara Kerja Routex
+## Cara Kerja CaishenEngine
 
-Alur pembayaran QRIS melalui Routex:
+Alur pembayaran QRIS melalui CaishenEngine:
 
-1. **Generate** — Aplikasimu call Routex API → 
-   Routex memilih vendor optimal → mengembalikan 
+1. **Generate** — Aplikasimu call CaishenEngine API → 
+   CaishenEngine memilih vendor optimal → mengembalikan 
    QRIS code
 2. **Bayar** — User scan QRIS via banking/e-wallet app
-3. **Callback** — Vendor notifikasi Routex → Routex 
+3. **Callback** — Vendor notifikasi CaishenEngine → CaishenEngine 
    forward callback yang sudah dinormalisasi ke 
    webhook URL kamu
 
-## Keunggulan Routex
+## Keunggulan CaishenEngine
 
 ### Maksimalkan Success Rate
 Routing otomatis menghindari vendor yang bermasalah 
@@ -51,7 +51,7 @@ status transaksi terlacak secara real-time.
 
 ## Vendor yang Didukung
 
-Routex mendukung tiga payment gateway untuk 
+CaishenEngine mendukung tiga payment gateway untuk 
 transaksi QRIS:
 
 | Vendor | Environment | Status |

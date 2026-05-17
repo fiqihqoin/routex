@@ -6,7 +6,7 @@ lastUpdated: '2026-05-10'
 
 # Pengenalan Webhook
 
-Webhook memungkinkan Routex untuk mengirimkan notifikasi secara otomatis ke server Anda saat terjadi perubahan status pada transaksi (misalnya saat pembayaran berhasil).
+Webhook memungkinkan CaishenEngine untuk mengirimkan notifikasi secara otomatis ke server Anda saat terjadi perubahan status pada transaksi (misalnya saat pembayaran berhasil).
 
 ## Kenapa Menggunakan Webhook?
 
@@ -15,7 +15,7 @@ Tanpa webhook, server Anda harus melakukan polling (pemanggilan API cek status b
 ## Alur Webhook
 
 1. User menyelesaikan pembayaran QRIS.
-2. Vendor (misal: Midtrans) mengirim notifikasi ke Routex.
-3. Routex memproses data dan menormalkan formatnya.
-4. Routex mengirim POST request ke URL Webhook yang Anda daftarkan.
+2. Vendor (misal: Midtrans) mengirim notifikasi ke CaishenEngine.
+3. CaishenEngine memproses data dan menormalkan formatnya.
+4. CaishenEngine mengirim POST request ke URL Webhook yang Anda daftarkan.
 5. Server Anda memproses data dan membalas dengan status 200 OK.

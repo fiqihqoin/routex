@@ -19,7 +19,7 @@ export default async function DocsHomePage({ params }: { params: Promise<{ lang:
             Documentation
           </div>
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 gradient-text leading-[1.1]">
-            Routex API Documentation
+            CaishenEngine API Documentation
           </h1>
           <p className="max-w-2xl text-lg md:text-xl text-text-muted leading-relaxed mb-10">
             {l === 'id' 

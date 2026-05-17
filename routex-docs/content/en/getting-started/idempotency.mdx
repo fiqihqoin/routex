@@ -6,7 +6,7 @@ lastUpdated: '2026-05-10'
 
 # Idempotency
 
-Routex supports idempotency to prevent accidental duplicate transaction creation.
+CaishenEngine supports idempotency to prevent accidental duplicate transaction creation.
 
 ## How to Use
 
@@ -16,7 +16,7 @@ Include the `X-Idempotency-Key` header with a unique UUID value for every transa
 X-Idempotency-Key: your-unique-uuid
 ```
 
-If Routex receives a second request with the same key within 24 hours, Routex will return the same response without re-processing the transaction.
+If CaishenEngine receives a second request with the same key within 24 hours, CaishenEngine will return the same response without re-processing the transaction.
 
 <Callout type="tip">
 Use your system's Order ID as the Idempotency Key to ensure safe synchronization.

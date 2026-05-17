@@ -1,6 +1,6 @@
-# Routex Documentation
+# CaishenEngine Documentation
 
-This is the official documentation site for Routex, built with Next.js 16, Tailwind CSS v4, and MDX.
+This is the official documentation site for CaishenEngine, built with Next.js 16, Tailwind CSS v4, and MDX.
 
 ## Getting Started
 

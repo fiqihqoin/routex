@@ -23,14 +23,32 @@ export default function DocsHeader({ lang }: { lang: Lang }) {
           </button>
           
           <Link href={`/${lang}/docs`} className="flex items-center gap-2.5 group">
-            <div className="flex items-center gap-2">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="text-teal transition-transform group-hover:scale-110">
-                <path d="M3 6h7l4 6h7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M3 18h7l4-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.7" />
-                <circle cx="21" cy="6" r="1.5" fill="currentColor" />
-                <circle cx="21" cy="12" r="1.5" fill="currentColor" opacity="0.6" />
-              </svg>
-              <span className="text-lg font-bold tracking-tight text-foreground leading-none">Routex</span>
+            <div className="flex items-center gap-3">
+              <div className="relative flex items-center justify-center">
+                <svg width="32" height="32" viewBox="0 0 100 100" fill="none" className="transition-transform group-hover:scale-110">
+                  <defs>
+                    <linearGradient id="goldGradientDocs" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#C8A028" />
+                      <stop offset="50%" stopColor="#E8C84A" />
+                      <stop offset="100%" stopColor="#A07820" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M20 50C10 40 5 50 10 60L25 55" stroke="url(#goldGradientDocs)" strokeWidth="3" strokeLinecap="round" />
+                  <path d="M80 50C90 40 95 50 90 60L75 55" stroke="url(#goldGradientDocs)" strokeWidth="3" strokeLinecap="round" />
+                  <path d="M35 45H65L70 65H30L35 45Z" fill="url(#goldGradientDocs)" />
+                  <ellipse cx="50" cy="45" rx="15" ry="5" fill="url(#goldGradientDocs)" />
+                  <ellipse cx="50" cy="65" rx="20" ry="7" fill="url(#goldGradientDocs)" />
+                  <path d="M20 75H40L45 65L50 85L55 75H80" stroke="#C0392B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <div className="flex flex-col -gap-1">
+                <span className="text-lg font-bold tracking-tight text-[#C8A028]" style={{ fontFamily: "'Playfair Display', serif" }}>
+                  CAISHEN
+                </span>
+                <span className="text-[7px] font-light tracking-[4px] text-[#C8A028]">
+                  ENGINE
+                </span>
+              </div>
             </div>
             <span className="text-[10px] font-bold text-teal bg-teal/10 px-2 py-0.5 rounded-full border border-teal/20 uppercase tracking-wider">docs</span>
           </Link>

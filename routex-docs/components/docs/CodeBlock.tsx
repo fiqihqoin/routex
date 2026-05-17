@@ -99,7 +99,7 @@ export default function CodeBlock({ children, language, filename, showLineNumber
                   <span className="table-cell">
                     {line.map((token, key) => {
                       const tokenProps = getTokenProps({ token, key });
-                      // Custom Routex theme colors
+                      // Custom CaishenEngine theme colors
                       if (token.types.includes('keyword')) tokenProps.style = { ...tokenProps.style, color: 'hsl(var(--purple))' };
                       if (token.types.includes('string')) tokenProps.style = { ...tokenProps.style, color: 'hsl(160 70% 65%)' };
                       if (token.types.includes('number')) tokenProps.style = { ...tokenProps.style, color: 'hsl(38 92% 70%)' };
