@@ -1,14 +1,10 @@
 APP_ENV=production
 PORT=8080
 
-DB_HOST=postgres
-DB_PORT=5432
-DB_USER=ptms_user
-DB_PASSWORD=routex_pass
-DB_NAME=ptms_db
-DB_SSLMODE=disable
+DATABASE_URL=postgres://ptms_user:ptms_password@ptms-postgres:5432/ptms_db?sslmode=disable
 
-REDIS_URL=redis:6379
-RABBITMQ_URL=amqp://routex:lhaN3cfjRM5MM3jK@rabbitmq:5672/
+REDIS_URL=ptms-redis:6379
+RABBITMQ_URL=amqp://guest:guest@ptms-rabbitmq:5672/
 
 JWT_SECRET=your_super_secret_jwt_key
+ROUTEX_ENVIRONMENT=sandbox

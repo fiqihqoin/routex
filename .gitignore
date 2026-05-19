@@ -6,6 +6,7 @@ sandboxxenditkey-digitoken.md
 
 # Environment files
 .env
+.env.go
 .env.local
 .env.*.local
 

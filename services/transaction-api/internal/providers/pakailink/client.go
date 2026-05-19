@@ -1,4 +1,4 @@
-package paydia
+package pakailink
 
 import (
 	"bytes"
@@ -15,7 +15,7 @@ import (
 	"github.com/truechain/ptms/transaction-api/internal/providers/snapbi"
 )
 
-type PaydiaCredentials struct {
+type PakailinkCredentials struct {
 	ClientID     string `json:"client_id"`
 	ClientSecret string `json:"client_secret"`
 	PrivateKey   string `json:"private_key"`
@@ -25,35 +25,38 @@ type PaydiaCredentials struct {
 	IsProduction bool   `json:"is_production"`
 }
 
-type PaydiaAdapter struct {
+type PakailinkAdapter struct {
 	baseURL string
 	rdb     *redis.Client
 	client  *http.Client
 }
 
-func NewPaydiaAdapter(baseURL string, rdb *redis.Client) *PaydiaAdapter {
-	return &PaydiaAdapter{
+func NewPakailinkAdapter(baseURL string, rdb *redis.Client) *PakailinkAdapter {
+	return &PakailinkAdapter{
 		baseURL: baseURL,
 		rdb:     rdb,
 		client:  &http.Client{Timeout: 10 * time.Second},
 	}
 }
 
-func (a *PaydiaAdapter) getBaseURL(creds PaydiaCredentials) string {
-	if creds.IsProduction {
-		return "https://api.paydia.id"
+func (a *PakailinkAdapter) getBaseURL(creds PakailinkCredentials) string {
+	if a.baseURL != "" {
+		return a.baseURL
 	}
-	return "https://api.paydia.co.id"
+	if creds.IsProduction {
+		return "https://api.pakaidonk.id"
+	}
+	return "https://dev-api.pakaidonk.id"
 }
 
-func (a *PaydiaAdapter) GenerateQRIS(ctx context.Context, req providers.GenerateQRISRequest) (*providers.QRISResponse, error) {
-	var creds PaydiaCredentials
+func (a *PakailinkAdapter) GenerateQRIS(ctx context.Context, req providers.GenerateQRISRequest) (*providers.QRISResponse, error) {
+	var creds PakailinkCredentials
 	if err := json.Unmarshal([]byte(req.Credentials), &creds); err != nil {
 		return nil, err
 	}
 
 	baseURL := a.getBaseURL(creds)
-	cacheKey := fmt.Sprintf("paydia:token:%s", creds.ClientID)
+	cacheKey := fmt.Sprintf("pakailink:token:%s", creds.ClientID)
 	accessToken, err := snapbi.GetAccessToken(ctx, a.rdb, a.client, creds.ClientID, creds.PrivateKey, baseURL, cacheKey)
 	if err != nil {
 		return nil, err
@@ -75,12 +78,11 @@ func (a *PaydiaAdapter) GenerateQRIS(ctx context.Context, req providers.Generate
 			"value":    fmt.Sprintf("%.2f", req.Amount),
 			"currency": "IDR",
 		},
-		"feeAmount": map[string]interface{}{
-			"value":    "0.00",
-			"currency": "IDR",
-		},
 		"validityPeriod": validityPeriodStr,
-		"additionalInfo": map[string]interface{}{},
+		"additionalInfo": map[string]interface{}{
+			"callbackUrl": "https://api.caishenengine.com/api/v1/callbacks/PAKAILINK", // Fallback, usually overwritten by PTMS core logic if needed
+			"type":        "statis",
+		},
 	}
 	if creds.StoreID != "" {
 		bodyMap["storeId"] = creds.StoreID
@@ -116,8 +118,9 @@ func (a *PaydiaAdapter) GenerateQRIS(ctx context.Context, req providers.Generate
 		return nil, err
 	}
 
-	if resData.ResponseCode != "2005700" {
-		return nil, fmt.Errorf("paydia error: %s - %s", resData.ResponseCode, resData.ResponseMessage)
+	// PakaiLink success code: 2004700
+	if resData.ResponseCode != "2004700" {
+		return nil, fmt.Errorf("pakailink error: %s - %s", resData.ResponseCode, resData.ResponseMessage)
 	}
 
 	expiresAtUTC := validityPeriod.UTC()
@@ -129,14 +132,14 @@ func (a *PaydiaAdapter) GenerateQRIS(ctx context.Context, req providers.Generate
 	}, nil
 }
 
-func (a *PaydiaAdapter) CheckStatus(ctx context.Context, vendorTxID string, credentials string) (*providers.StatusResponse, error) {
-	var creds PaydiaCredentials
+func (a *PakailinkAdapter) CheckStatus(ctx context.Context, vendorTxID string, credentials string) (*providers.StatusResponse, error) {
+	var creds PakailinkCredentials
 	if err := json.Unmarshal([]byte(credentials), &creds); err != nil {
 		return nil, err
 	}
 
 	baseURL := a.getBaseURL(creds)
-	cacheKey := fmt.Sprintf("paydia:token:%s", creds.ClientID)
+	cacheKey := fmt.Sprintf("pakailink:token:%s", creds.ClientID)
 	accessToken, err := snapbi.GetAccessToken(ctx, a.rdb, a.client, creds.ClientID, creds.PrivateKey, baseURL, cacheKey)
 	if err != nil {
 		return nil, err
@@ -145,14 +148,10 @@ func (a *PaydiaAdapter) CheckStatus(ctx context.Context, vendorTxID string, cred
 	wibLocation, _ := time.LoadLocation("Asia/Jakarta")
 	now := time.Now().In(wibLocation)
 	timestamp := now.Format("2006-01-02T15:04:05-07:00")
-	path := "/snap/v1.0/qr/qr-mpm-query"
+	path := "/snap/v1.0/qr/qr-mpm-status"
 
 	bodyMap := map[string]interface{}{
-		"originalReferenceNo": vendorTxID,
-		"merchantId":          creds.MerchantID,
-	}
-	if creds.StoreID != "" {
-		bodyMap["externalStoreId"] = creds.StoreID
+		"originalPartnerReferenceNo": vendorTxID, // PakaiLink uses partnerRef for inquiry too
 	}
 
 	bodyBytes, _ := json.Marshal(bodyMap)
@@ -175,6 +174,7 @@ func (a *PaydiaAdapter) CheckStatus(ctx context.Context, vendorTxID string, cred
 
 	var resData struct {
 		LatestTransactionStatus string `json:"latestTransactionStatus"`
+		PaidTime                string `json:"paidTime"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&resData); err != nil {
 		return nil, err
@@ -183,31 +183,39 @@ func (a *PaydiaAdapter) CheckStatus(ctx context.Context, vendorTxID string, cred
 	status := "failed"
 	if resData.LatestTransactionStatus == "00" {
 		status = "paid"
-	} else if resData.LatestTransactionStatus == "01" {
+	} else if resData.LatestTransactionStatus == "01" || resData.LatestTransactionStatus == "03" {
 		status = "pending_payment"
+	}
+
+	var paidAt *time.Time
+	if resData.PaidTime != "" {
+		if t, err := time.Parse(time.RFC3339, resData.PaidTime); err == nil {
+			paidAt = &t
+		}
 	}
 
 	return &providers.StatusResponse{
 		VendorTransactionID: vendorTxID,
 		Status:              status,
+		PaidAt:              paidAt,
 	}, nil
 }
 
-func (a *PaydiaAdapter) VerifyCallback(payload []byte, signature string, secret string) bool {
+func (a *PakailinkAdapter) VerifyCallback(payload []byte, signature string, secret string) bool {
 	var data map[string]interface{}
 	json.Unmarshal(payload, &data)
 
 	timestamp := ""
 	if ts, ok := data["timestamp"].(string); ok {
 		timestamp = ts
-	} else if ts, ok := data["transactionDate"].(string); ok {
+	} else if ts, ok := data["paidTime"].(string); ok {
 		timestamp = ts
 	}
 
 	return snapbi.VerifyHmacSignature(payload, timestamp, signature, secret)
 }
 
-func (a *PaydiaAdapter) NormalizeCallback(payload []byte) (*providers.NormalizedCallback, error) {
+func (a *PakailinkAdapter) NormalizeCallback(payload []byte) (*providers.NormalizedCallback, error) {
 	var data map[string]interface{}
 	if err := json.Unmarshal(payload, &data); err != nil {
 		return nil, err
@@ -222,34 +230,34 @@ func (a *PaydiaAdapter) NormalizeCallback(payload []byte) (*providers.Normalized
 	rawStatus := fmt.Sprintf("%v", data["latestTransactionStatus"])
 	if rawStatus == "00" {
 		status = "paid"
-	} else if rawStatus == "01" {
+	} else if rawStatus == "01" || rawStatus == "03" {
 		status = "pending_payment"
 	}
 
 	paidAt := time.Now()
-	if dateStr, ok := data["transactionDate"].(string); ok {
+	if dateStr, ok := data["paidTime"].(string); ok {
 		if parsed, err := time.Parse(time.RFC3339, dateStr); err == nil {
 			paidAt = parsed
 		}
 	}
 
 	return &providers.NormalizedCallback{
-		VendorTransactionID: fmt.Sprintf("%v", data["referenceNo"]),
+		VendorTransactionID: fmt.Sprintf("%v", data["originalReferenceNo"]),
 		ReferenceID:         fmt.Sprintf("%v", data["originalPartnerReferenceNo"]),
 		Status:              status,
 		Amount:              amount,
 		PaidAt:              paidAt,
-		VendorID:            "PAYDIA",
+		VendorID:            "PAKAILINK",
 	}, nil
 }
 
-func (a *PaydiaAdapter) Validate(ctx context.Context, credsStr string) error {
-	var creds PaydiaCredentials
+func (a *PakailinkAdapter) Validate(ctx context.Context, credsStr string) error {
+	var creds PakailinkCredentials
 	if err := json.Unmarshal([]byte(credsStr), &creds); err != nil {
 		return err
 	}
 	baseURL := a.getBaseURL(creds)
-	cacheKey := fmt.Sprintf("paydia:validate:%s", creds.ClientID)
+	cacheKey := fmt.Sprintf("pakailink:validate:%s", creds.ClientID)
 	_, err := snapbi.GetAccessToken(ctx, a.rdb, a.client, creds.ClientID, creds.PrivateKey, baseURL, cacheKey)
 	return err
 }

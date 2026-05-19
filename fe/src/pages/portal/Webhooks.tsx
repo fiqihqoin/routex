@@ -550,7 +550,7 @@ function verifyCaishenEngineSignature(payload, signature, secret) {
                     <tr><td className="py-3 pr-4 font-mono text-teal">transaction_id</td><td className="py-3 pr-4">string</td><td className="py-3">ID unik transaksi CaishenEngine</td></tr>
                     <tr><td className="py-3 pr-4 font-mono text-teal">status</td><td className="py-3 pr-4">string</td><td className="py-3">paid | failed | expired</td></tr>
                     <tr><td className="py-3 pr-4 font-mono text-teal">amount</td><td className="py-3 pr-4">number</td><td className="py-3">Nominal dalam IDR (satuan rupiah)</td></tr>
-                    <tr><td className="py-3 pr-4 font-mono text-teal">vendor_id</td><td className="py-3 pr-4">string</td><td className="py-3">ID Vendor yang memproses (QOINHUB, MIDTRANS, XENDIT, PAYDIA)</td></tr>
+                    <tr><td className="py-3 pr-4 font-mono text-teal">vendor_id</td><td className="py-3 pr-4">string</td><td className="py-3">ID Vendor yang memproses (QOINHUB, MIDTRANS, XENDIT, PAYDIA, PAKAILINK)</td></tr>
                  </tbody>
               </table>
            </div>
@@ -565,6 +565,15 @@ function verifyCaishenEngineSignature(payload, signature, secret) {
                     <p className="text-xs font-mono text-portal-text-muted mt-1">https://api.caishenengine.com/api/v1/callbacks/PAYDIA</p>
                  </div>
                  <Button size="sm" variant="ghost" className="text-teal hover:text-teal hover:bg-teal/10" onClick={() => copyToClipboard("https://api.caishenengine.com/api/v1/callbacks/PAYDIA", "Paydia Callback URL")}>
+                    <Copy className="h-4 w-4" />
+                 </Button>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-portal-elev border border-portal-border rounded-lg">
+                 <div>
+                    <p className="text-sm font-bold text-portal-text">PakaiLink</p>
+                    <p className="text-xs font-mono text-portal-text-muted mt-1">https://api.caishenengine.com/api/v1/callbacks/PAKAILINK</p>
+                 </div>
+                 <Button size="sm" variant="ghost" className="text-teal hover:text-teal hover:bg-teal/10" onClick={() => copyToClipboard("https://api.caishenengine.com/api/v1/callbacks/PAKAILINK", "PakaiLink Callback URL")}>
                     <Copy className="h-4 w-4" />
                  </Button>
               </div>

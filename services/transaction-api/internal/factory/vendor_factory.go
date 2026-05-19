@@ -6,6 +6,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/truechain/ptms/transaction-api/internal/providers"
 	"github.com/truechain/ptms/transaction-api/internal/providers/midtrans"
+	"github.com/truechain/ptms/transaction-api/internal/providers/pakailink"
 	"github.com/truechain/ptms/transaction-api/internal/providers/paydia"
 	"github.com/truechain/ptms/transaction-api/internal/providers/qoinhub"
 	"github.com/truechain/ptms/transaction-api/internal/providers/xendit"
@@ -43,6 +44,8 @@ func (f *vendorFactory) Create(vendorCode string, encryptedCredentials string, b
 		adapter = xendit_adapter.NewXenditAdapter(baseURL)
 	case "PAYDIA":
 		adapter = paydia.NewPaydiaAdapter(baseURL, f.rdb)
+	case "PAKAILINK":
+		adapter = pakailink.NewPakailinkAdapter(baseURL, f.rdb)
 	default:
 		return nil, "", ErrUnsupportedVendor
 	}
@@ -64,6 +67,8 @@ func (f *vendorFactory) CreateForCallback(vendorCode string) (providers.VendorAd
 		return xendit_adapter.NewXenditAdapter(dummyBaseURL), nil
 	case "PAYDIA":
 		return paydia.NewPaydiaAdapter(dummyBaseURL, f.rdb), nil
+	case "PAKAILINK":
+		return pakailink.NewPakailinkAdapter(dummyBaseURL, f.rdb), nil
 	default:
 		return nil, ErrUnsupportedVendor
 	}

@@ -102,7 +102,8 @@ INSERT INTO vendors (code, name, sandbox_base_url, production_base_url) VALUES
 ('QOINHUB', 'Qoinhub', 'https://sandbox.qoinhub.id', 'https://api.qoinhub.id'),
 ('MIDTRANS', 'Midtrans', 'https://api.sandbox.midtrans.com', 'https://api.midtrans.com'),
 ('XENDIT', 'Xendit', 'https://api.xendit.co', 'https://api.xendit.co'),
-('PAYDIA', 'Paydia', 'https://api.paydia.co.id', 'https://api.paydia.id');
+('PAYDIA', 'Paydia', 'https://api.paydia.co.id', 'https://api.paydia.id'),
+('PAKAILINK', 'PakaiLink', 'https://dev-api.pakaidonk.id', 'https://api.pakaidonk.id');
 
 -- Default routing rules (sandbox)
 -- Round-robin dengan priority sama untuk semua vendor

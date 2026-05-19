@@ -45,4 +45,18 @@ return [
             ['key' => 'is_production', 'label' => 'Mode Produksi', 'type' => 'boolean', 'required' => false],
         ],
     ],
+    'PAKAILINK' => [
+        'label' => 'PakaiLink (Pakaidonk)',
+        'webhook_url' => 'https://api.caishenengine.com/api/v1/callbacks/PAKAILINK',
+        'instructions' => 'Login to Pakaidonk Dashboard > Settings > Webhook. Paste the URL below.',
+        'fields' => [
+            ['key' => 'client_id', 'label' => 'Client ID', 'type' => 'text', 'required' => true, 'hint' => 'Client ID dari dashboard Pakaidonk'],
+            ['key' => 'client_secret', 'label' => 'Client Secret', 'type' => 'password', 'required' => true],
+            ['key' => 'private_key', 'label' => 'RSA Private Key', 'type' => 'textarea', 'required' => true, 'hint' => 'PKCS#8 format, generate dengan: openssl pkcs8 -topk8 -in rsa_private_key.pem -out pkcs8_rsa_private_key.pem -nocrypt'],
+            ['key' => 'merchant_id', 'label' => 'Merchant ID', 'type' => 'text', 'required' => true],
+            ['key' => 'store_id', 'label' => 'Store ID', 'type' => 'text', 'required' => false],
+            ['key' => 'terminal_id', 'label' => 'Terminal ID', 'type' => 'text', 'required' => true],
+            ['key' => 'is_production', 'label' => 'Mode Produksi', 'type' => 'boolean', 'required' => false],
+        ],
+    ],
 ];
