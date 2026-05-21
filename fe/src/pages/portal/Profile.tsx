@@ -135,7 +135,7 @@ export default function ProfilePage() {
 
   const fetchProfile = async () => {
     try {
-      const res = await fetch("/portal/profile");
+      const res = await fetch("/api/portal/profile");
       const data = await res.json();
       setProfile(data.profile);
     } catch (err) {
@@ -145,7 +145,7 @@ export default function ProfilePage() {
 
   const fetchSessions = async () => {
     try {
-      const res = await fetch("/portal/profile/sessions");
+      const res = await fetch("/api/portal/profile/sessions");
       const data = await res.json();
       setSessions(data.sessions);
     } catch (err) {
@@ -164,7 +164,7 @@ export default function ProfilePage() {
     
     setSaving(true);
     try {
-      const res = await fetch("/portal/profile/info", {
+      const res = await fetch("/api/portal/profile/info", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -194,7 +194,7 @@ export default function ProfilePage() {
 
   const handleRequestEmail = async () => {
     try {
-      const res = await fetch("/portal/profile/email/change", {
+      const res = await fetch("/api/portal/profile/email/change", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: newEmail, current_password: emailConfirmPassword })
@@ -214,7 +214,7 @@ export default function ProfilePage() {
 
   const handleCancelEmail = async () => {
     try {
-      await fetch("/portal/profile/email/cancel", { method: "POST" });
+      await fetch("/api/portal/profile/email/cancel", { method: "POST" });
       fetchProfile();
       toast({ title: "Dibatalkan", description: "Perubahan email dibatalkan." });
     } catch (err) { /* ignore */ }
@@ -222,7 +222,7 @@ export default function ProfilePage() {
 
   const handleChangePassword = async () => {
     try {
-      const res = await fetch("/portal/profile/password", {
+      const res = await fetch("/api/portal/profile/password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -247,7 +247,7 @@ export default function ProfilePage() {
 
   const handleRevokeSession = async (id: string) => {
     try {
-      const res = await fetch(`/portal/profile/sessions/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/portal/profile/sessions/${id}`, { method: "DELETE" });
       if (res.ok) {
         toast({ title: "Sesi dicabut", description: "Perangkat berhasil di-logout." });
         fetchSessions();
@@ -257,7 +257,7 @@ export default function ProfilePage() {
 
   const handleRevokeAll = async () => {
     try {
-      await fetch("/portal/profile/sessions", { method: "DELETE" });
+      await fetch("/api/portal/profile/sessions", { method: "DELETE" });
       toast({ title: "Sesi dibersihkan", description: "Semua perangkat lain telah di-logout." });
       fetchSessions();
     } catch (err) { /* ignore */ }
@@ -265,7 +265,7 @@ export default function ProfilePage() {
 
   const handleSetup2FA = async () => {
     try {
-      const res = await fetch("/portal/profile/2fa/enable", { method: "POST" });
+      const res = await fetch("/api/portal/profile/2fa/enable", { method: "POST" });
       const data = await res.json();
       setTwoFactorSecret(data);
       setTwoStep(1);
@@ -276,7 +276,7 @@ export default function ProfilePage() {
   const handleFetchRecoveryCodes = async () => {
     setIsFetchingCodes(true);
     try {
-      const res = await fetch("/portal/profile/2fa/recovery-codes", {
+      const res = await fetch("/api/portal/profile/2fa/recovery-codes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -305,7 +305,7 @@ export default function ProfilePage() {
 
   const handleConfirm2FA = async () => {
     try {
-      const res = await fetch("/portal/profile/2fa/confirm", {
+      const res = await fetch("/api/portal/profile/2fa/confirm", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ otp: otpValue })
@@ -324,7 +324,7 @@ export default function ProfilePage() {
 
   const handleDisable2FA = async () => {
     try {
-      const res = await fetch("/portal/profile/2fa", {
+      const res = await fetch("/api/portal/profile/2fa", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password: disable2FAPassword })
@@ -343,7 +343,7 @@ export default function ProfilePage() {
 
   const handleDeleteAccount = async () => {
     try {
-      const res = await fetch("/portal/profile/account", {
+      const res = await fetch("/api/portal/profile/account", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password: deletePassword, confirmation: "DELETE" })

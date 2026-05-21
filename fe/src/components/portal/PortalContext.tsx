@@ -41,7 +41,7 @@ export const PortalProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await fetch("/portal/me", {
+        const res = await fetch("/api/portal/me", {
           headers: { "Accept": "application/json" }
         });
         
@@ -76,7 +76,7 @@ export const PortalProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     try {
-      await fetch("/portal/logout", {
+      await fetch("/api/portal/logout", {
         method: "POST",
         headers: {
           "Accept": "application/json",

@@ -19,7 +19,7 @@ export default function VendorsPage() {
 
   const fetchVendors = () => {
     setLoading(true);
-    fetch(`/portal/vendors`, {
+    fetch(`/api/portal/vendors`, {
       headers: { 
         "Accept": "application/json",
         "X-CaishenEngine-Environment": env
@@ -38,7 +38,7 @@ export default function VendorsPage() {
   const onToggle = async (code: string) => {
     setToggling(code);
     try {
-      const res = await fetch(`/portal/vendors/${code}/toggle`, {
+      const res = await fetch(`/api/portal/vendors/${code}/toggle`, {
         method: "PATCH",
         headers: {
           "Accept": "application/json",

@@ -39,7 +39,7 @@ export default function VendorCredentialsPage() {
     setSuccess(null);
     setLoading(true);
 
-    fetch(`/portal/vendors/${vendorCode}/credentials`, {
+    fetch(`/api/portal/vendors/${vendorCode}/credentials`, {
       headers: {
         "Accept": "application/json",
         "X-CaishenEngine-Environment": env
@@ -76,7 +76,7 @@ export default function VendorCredentialsPage() {
     setSuccess(null);
 
     try {
-      const res = await fetch(`/portal/vendors/${vendorCode}/credentials`, {
+      const res = await fetch(`/api/portal/vendors/${vendorCode}/credentials`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

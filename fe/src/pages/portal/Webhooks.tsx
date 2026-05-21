@@ -90,7 +90,7 @@ export default function WebhooksPage() {
   const fetchWebhook = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`/portal/webhooks?env=${env}`, {
+      const res = await fetch(`/api/portal/webhooks?env=${env}`, {
         headers: { "Accept": "application/json" }
       });
       const data = await res.json();
@@ -135,7 +135,7 @@ export default function WebhooksPage() {
     setIsSaving(true);
     setUrlError(null);
     try {
-      const res = await fetch("/portal/webhooks", {
+      const res = await fetch("/api/portal/webhooks", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -162,7 +162,7 @@ export default function WebhooksPage() {
 
   const handleRotate = async () => {
     try {
-      const res = await fetch("/portal/webhooks/rotate-secret", {
+      const res = await fetch("/api/portal/webhooks/rotate-secret", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -186,7 +186,7 @@ export default function WebhooksPage() {
     setIsTesting(true);
     setTestResult(null);
     try {
-      const res = await fetch("/portal/webhooks/test", {
+      const res = await fetch("/api/portal/webhooks/test", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -209,7 +209,7 @@ export default function WebhooksPage() {
 
   const handleReenable = async () => {
     try {
-      const res = await fetch("/portal/webhooks/reenable", {
+      const res = await fetch("/api/portal/webhooks/reenable", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -229,7 +229,7 @@ export default function WebhooksPage() {
 
   const handleDelete = async () => {
     try {
-      const res = await fetch("/portal/webhooks", {
+      const res = await fetch("/api/portal/webhooks", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

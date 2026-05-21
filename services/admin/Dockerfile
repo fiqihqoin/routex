@@ -39,6 +39,20 @@ RUN sed -i 's|^listen = .*|listen = 127.0.0.1:9001|' \
     echo "PHP-FPM listen config:" && \
     grep "^listen" /usr/local/etc/php-fpm.d/docker.conf
 
+# PHP-FPM Pool Configuration - Optimized for high throughput
+# Increase from default 5 to 50 workers for better concurrency
+RUN sed -i 's|^pm.max_children = .*|pm.max_children = 50|' \
+    /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's|^pm.start_servers = .*|pm.start_servers = 10|' \
+    /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's|^pm.min_spare_servers = .*|pm.min_spare_servers = 5|' \
+    /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i 's|^pm.max_spare_servers = .*|pm.max_spare_servers = 20|' \
+    /usr/local/etc/php-fpm.d/www.conf && \
+    echo "pm.max_requests = 500" >> /usr/local/etc/php-fpm.d/www.conf && \
+    echo "PHP-FPM pool config:" && \
+    grep -E "^pm\." /usr/local/etc/php-fpm.d/www.conf
+
 # Final setup
 RUN rm -f .env && \
     php artisan storage:link 2>/dev/null || true && \

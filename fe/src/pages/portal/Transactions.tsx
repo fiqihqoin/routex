@@ -149,7 +149,7 @@ export default function TransactionsPage() {
   const fetchStats = async () => {
     setIsStatsLoading(true);
     try {
-      const res = await fetch(`/portal/transactions/stats?environment=${env}&date_range=${filters.date_range}`, {
+      const res = await fetch(`/api/portal/transactions/stats?environment=${env}&date_range=${filters.date_range}`, {
         headers: { "Accept": "application/json" }
       });
       const data = await res.json();
@@ -175,7 +175,7 @@ export default function TransactionsPage() {
       if (filters.search) params.append("search", filters.search);
       // Date handling would go here
 
-      const res = await fetch(`/portal/transactions?${params.toString()}`, {
+      const res = await fetch(`/api/portal/transactions?${params.toString()}`, {
         headers: { "Accept": "application/json" }
       });
       const data = await res.json();
@@ -198,7 +198,7 @@ export default function TransactionsPage() {
   const fetchDetail = async (id: string) => {
     setIsDetailLoading(true);
     try {
-      const res = await fetch(`/portal/transactions/${id}`, {
+      const res = await fetch(`/api/portal/transactions/${id}`, {
         headers: { "Accept": "application/json" }
       });
       const data = await res.json();

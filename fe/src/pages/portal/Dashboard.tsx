@@ -135,7 +135,7 @@ function DashboardContent() {
         setError(null);
         
         try {
-            const res = await fetch(`/portal/dashboard?env=${env}&range=${range}`, {
+            const res = await fetch(`/api/portal/dashboard?env=${env}&range=${range}`, {
                 headers: { 
                     "Accept": "application/json",
                     "X-CaishenEngine-Environment": env

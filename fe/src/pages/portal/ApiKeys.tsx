@@ -83,7 +83,7 @@ export default function ApiKeysPage() {
   const fetchKeys = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch("/portal/api-keys", {
+      const res = await fetch("/api/portal/api-keys", {
         headers: { 
           "Accept": "application/json",
           "X-CaishenEngine-Environment": portalEnv
@@ -113,7 +113,7 @@ export default function ApiKeysPage() {
     if (!newKeyName) return;
     setIsGenerating(true);
     try {
-      const res = await fetch("/portal/api-keys/generate", {
+      const res = await fetch("/api/portal/api-keys/generate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -150,7 +150,7 @@ export default function ApiKeysPage() {
     if (!revokeConfirm) return;
     setIsRevoking(true);
     try {
-      const res = await fetch(`/portal/api-keys/${revokeConfirm.keyId}/revoke`, {
+      const res = await fetch(`/api/portal/api-keys/${revokeConfirm.keyId}/revoke`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -178,7 +178,7 @@ export default function ApiKeysPage() {
 
   const handleUpdateName = async (id: string, name: string) => {
     try {
-      const res = await fetch(`/portal/api-keys/${id}/name`, {
+      const res = await fetch(`/api/portal/api-keys/${id}/name`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

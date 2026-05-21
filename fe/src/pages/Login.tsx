@@ -88,7 +88,7 @@ const Login = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/portal/login", {
+      const response = await fetch("/api/portal/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -132,7 +132,7 @@ const Login = () => {
     const code = isRecoveryMode ? recoveryCode : otpValue;
 
     try {
-      const response = await fetch("/portal/login/2fa", {
+      const response = await fetch("/api/portal/login/2fa", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

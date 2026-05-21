@@ -31,11 +31,27 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	dbPool, err := pgxpool.New(ctx, os.Getenv("DATABASE_URL"))
+	// Configure database connection pool for high throughput
+	dbConfig, err := pgxpool.ParseConfig(os.Getenv("DATABASE_URL"))
+	if err != nil {
+		log.Fatalf("Unable to parse DATABASE_URL: %v", err)
+	}
+
+	// Optimize pool settings for concurrent load
+	// Default was 4, increased to 25 for better concurrent query handling
+	dbConfig.MaxConns = 25
+	dbConfig.MinConns = 5
+	dbConfig.MaxConnLifetime = time.Hour
+	dbConfig.MaxConnIdleTime = 30 * time.Minute
+	dbConfig.HealthCheckPeriod = time.Minute
+
+	dbPool, err := pgxpool.NewWithConfig(ctx, dbConfig)
 	if err != nil {
 		log.Fatalf("Unable to connect to database: %v", err)
 	}
 	defer dbPool.Close()
+
+	log.Printf("Database pool configured: MaxConns=%d, MinConns=%d", dbConfig.MaxConns, dbConfig.MinConns)
 
 	rdb := redis.NewClient(&redis.Options{
 		Addr: os.Getenv("REDIS_URL"),
@@ -154,7 +170,16 @@ func main() {
 
 	port := os.Getenv("PORT")
 	if port == "" { port = "8080" }
-	srv := &http.Server{ Addr: ":" + port, Handler: r }
+
+	// HTTP server with proper timeouts to prevent resource exhaustion
+	srv := &http.Server{
+		Addr:           ":" + port,
+		Handler:        r,
+		ReadTimeout:    15 * time.Second,  // Max time to read request
+		WriteTimeout:   15 * time.Second,  // Max time to write response
+		IdleTimeout:    60 * time.Second,  // Max time for keep-alive connections
+		MaxHeaderBytes: 1 << 20,           // 1 MB max header size
+	}
 
 	go func() {
 		log.Printf("CaishenEngine Transaction API running on port %s", port)
