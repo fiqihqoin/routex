@@ -1,0 +1,52 @@
+---
+title: Autentikasi
+description: Cara mengautentikasi request ke CaishenEngine API menggunakan API key
+lastUpdated: '2026-05-10'
+---
+
+# Autentikasi
+
+CaishenEngine menggunakan API key untuk autentikasi semua 
+request.
+
+## Format API Key
+
+CaishenEngine menggunakan dua jenis API key yang berbeda 
+berdasarkan environment:
+
+| Prefix | Environment | Endpoint |
+|--------|-------------|----------|
+| `caishenengine_sb_` | Sandbox | `sandbox.caishenengine.com` |
+| `caishenengine_live_` | Production | `api.caishenengine.com` |
+
+<Callout type="danger">
+Menggunakan sandbox key di production endpoint 
+(atau sebaliknya) akan menghasilkan error 
+`ENVIRONMENT_MISMATCH`.
+</Callout>
+
+## Cara Menggunakan API Key
+
+Sertakan API key di header setiap request:
+
+```bash
+X-API-Key: caishenengine_sb_your_api_key_here
+```
+
+Contoh request lengkap:
+
+```bash
+curl -X POST https://sandbox.caishenengine.com/api/v1/transactions \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: caishenengine_sb_your_key_here" \
+  -d '{ ... }'
+```
+
+## Error Autentikasi
+
+| Error Code | HTTP Status | Deskripsi |
+|------------|-------------|-----------|
+| `MISSING_API_KEY` | 401 | Header X-API-Key tidak ada |
+| `INVALID_API_KEY` | 401 | API key tidak valid atau sudah direvoke |
+| `ENVIRONMENT_MISMATCH` | 403 | API key tidak sesuai dengan environment endpoint |
+| `USER_DISABLED` | 403 | Akun merchant dinonaktifkan |

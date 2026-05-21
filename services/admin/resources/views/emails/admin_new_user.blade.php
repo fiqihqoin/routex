@@ -34,6 +34,6 @@
         </a>
     </p>
     
-    <p style="color: #6B7280; font-size: 12px; margin-top: 30px;">Ini adalah email otomatis sistem PTMS.</p>
+    <p style="color: #6B7280; font-size: 12px; margin-top: 30px;">Ini adalah email otomatis sistem CaishenEngine.</p>
 </body>
 </html>

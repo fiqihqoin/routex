@@ -9,7 +9,7 @@ import {
   LogOut,
   Loader2,
 } from "lucide-react";
-import { Logo } from "@/components/routex/Logo";
+import { Logo } from "@/components/caishenengine/Logo";
 import { usePortal } from "@/components/portal/PortalContext";
 
 type Item = {

@@ -36,7 +36,7 @@ func DecryptRaw(ciphertextStr string) (string, error) {
 		return "", nil
 	}
 
-	keyStr := os.Getenv("PTMS_APP_KEY")
+	keyStr := os.Getenv("CaishenEngine_APP_KEY")
 	if strings.HasPrefix(keyStr, "base64:") {
 		keyStr = keyStr[7:]
 	}

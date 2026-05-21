@@ -31,7 +31,7 @@ func NewRabbitMQPublisher(url string) (Publisher, error) {
 
 	// Declare exchange for penalties
 	err = ch.ExchangeDeclare(
-		"ptms.events", // name
+		"caishenengine.events", // name
 		"topic",       // type
 		true,          // durable
 		false,         // auto-deleted

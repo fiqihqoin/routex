@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Routex Portal</title>
+    <title>Register - CaishenEngine Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-lg">
         <div>
-            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Daftar Akun Routex</h2>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Daftar Akun CaishenEngine</h2>
             <p class="mt-2 text-center text-sm text-gray-600">Mulai integrasi pembayaran kamu sekarang</p>
         </div>
         <form class="mt-8 space-y-6" action="{{ route('portal.register') }}" method="POST">

@@ -1,11 +1,11 @@
-import { Header } from "@/components/routex/Header";
-import { Hero } from "@/components/routex/Hero";
-import { ProblemSolution } from "@/components/routex/ProblemSolution";
-import { Features } from "@/components/routex/Features";
-import { Metrics } from "@/components/routex/Metrics";
-import { HowItWorks } from "@/components/routex/HowItWorks";
-import { ContactSection } from "@/components/routex/ContactSection";
-import { Footer } from "@/components/routex/Footer";
+import { Header } from "@/components/caishenengine/Header";
+import { Hero } from "@/components/caishenengine/Hero";
+import { ProblemSolution } from "@/components/caishenengine/ProblemSolution";
+import { Features } from "@/components/caishenengine/Features";
+import { Metrics } from "@/components/caishenengine/Metrics";
+import { HowItWorks } from "@/components/caishenengine/HowItWorks";
+import { ContactSection } from "@/components/caishenengine/ContactSection";
+import { Footer } from "@/components/caishenengine/Footer";
 
 const Index = () => {
   return (

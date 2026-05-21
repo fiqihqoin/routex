@@ -15,9 +15,9 @@
 </head>
 <body>
     <div class="container">
-        <h2>Akun Routex kamu sudah aktif!</h2>
+        <h2>Akun CaishenEngine kamu sudah aktif!</h2>
         <p>Halo {{ $user->name }},</p>
-        <p>Selamat! Pendaftaran akun merchant kamu telah disetujui. Kamu sekarang bisa mulai mengintegrasikan Routex ke sistem pembayaran kamu.</p>
+        <p>Selamat! Pendaftaran akun merchant kamu telah disetujui. Kamu sekarang bisa mulai mengintegrasikan CaishenEngine ke sistem pembayaran kamu.</p>
 
         <h3>🔑 API Keys</h3>
         <p>Gunakan API Keys di bawah ini untuk mulai bertransaksi. Ingat, Sandbox untuk testing dan Production untuk transaksi riil.</p>
@@ -27,7 +27,7 @@
             <h4 style="margin-top:0; color: #92400e;">🧪 Sandbox Environment</h4>
             <p style="font-size: 13px;">Gunakan key ini untuk tahap pengembangan dan testing.</p>
             <div class="key-box">{{ $sandboxApiKey }}</div>
-            <div class="endpoint">Endpoint: https://sandbox.routex.id/api/v1</div>
+            <div class="endpoint">Endpoint: https://sandbox.caishenengine.id/api/v1</div>
         </div>
 
         <!-- Production Section -->
@@ -35,7 +35,7 @@
             <h4 style="margin-top:0; color: #0d9488;">🚀 Production Environment</h4>
             <p style="font-size: 13px;">Gunakan key ini hanya setelah sistem kamu siap menerima pembayaran asli.</p>
             <div class="key-box">{{ $productionApiKey }}</div>
-            <div class="endpoint">Endpoint: https://api.routex.id/api/v1</div>
+            <div class="endpoint">Endpoint: https://api.caishenengine.id/api/v1</div>
         </div>
 
         <div class="warning">
@@ -48,7 +48,7 @@
 
         <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 40px 0 20px;">
         <p style="font-size: 12px; color: #94a3b8; text-align: center;">
-            Routex — Intelligent QRIS Payment Routing<br>
+            CaishenEngine — Intelligent QRIS Payment Routing<br>
             Jl. HR Rasuna Said, Jakarta, Indonesia
         </p>
     </div>

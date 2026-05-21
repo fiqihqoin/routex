@@ -86,7 +86,7 @@ export default function ApiKeysPage() {
       const res = await fetch("/portal/api-keys", {
         headers: { 
           "Accept": "application/json",
-          "X-Routex-Environment": portalEnv
+          "X-CaishenEngine-Environment": portalEnv
         }
       });
       const data = await res.json();
@@ -119,7 +119,7 @@ export default function ApiKeysPage() {
           "Content-Type": "application/json",
           "Accept": "application/json",
           "X-XSRF-TOKEN": document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] || "",
-          "X-Routex-Environment": portalEnv
+          "X-CaishenEngine-Environment": portalEnv
         },
         body: JSON.stringify({
           name: newKeyName,
@@ -216,7 +216,7 @@ export default function ApiKeysPage() {
   const codeSnippets = {
     curl: (env: string) => `curl -X POST https://${env === 'production' ? 'api' : 'sandbox'}.${config.baseDomain}/api/v1/transactions \\
   -H "Content-Type: application/json" \\
-  -H "X-API-Key: ptms_${env === 'production' ? 'live' : 'sb'}_your_key_here" \\
+  -H "X-API-Key: caishenengine_${env === 'production' ? 'live' : 'sb'}_your_key_here" \\
   -d '{"amount": 10000, "currency": "IDR", "payment_channel": "qris"}'`,
     node: (env: string) => `const axios = require('axios');
 
@@ -225,13 +225,13 @@ axios.post('https://${env === 'production' ? 'api' : 'sandbox'}.${config.baseDom
   currency: 'IDR',
   payment_channel: 'qris'
 }, {
-  headers: { 'X-API-Key': 'ptms_${env === 'production' ? 'live' : 'sb'}_your_key_here' }
+  headers: { 'X-API-Key': 'caishenengine_${env === 'production' ? 'live' : 'sb'}_your_key_here' }
 });`,
     php: (env: string) => `$ch = curl_init('https://${env === 'production' ? 'api' : 'sandbox'}.${config.baseDomain}/api/v1/transactions');
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     'Content-Type: application/json',
-    'X-API-Key: ptms_${env === 'production' ? 'live' : 'sb'}_your_key_here'
+    'X-API-Key: caishenengine_${env === 'production' ? 'live' : 'sb'}_your_key_here'
 ]);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
     'amount' => 10000,
@@ -241,7 +241,7 @@ curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
 $response = curl_exec($ch);`,
     go: (env: string) => `// Use CaishenEngine Go SDK or net/http
 req, _ := http.NewRequest("POST", "https://${env === 'production' ? 'api' : 'sandbox'}.${config.baseDomain}/api/v1/transactions", body)
-req.Header.Set("X-API-Key", "ptms_${env === 'production' ? 'live' : 'sb'}_your_key_here")`
+req.Header.Set("X-API-Key", "caishenengine_${env === 'production' ? 'live' : 'sb'}_your_key_here")`
   };
 
   return (

@@ -2,7 +2,7 @@
 <html>
 <body>
     <h2>Halo {{ $user->name }},</h2>
-    <p>Terima kasih telah mendaftar di Routex.</p>
+    <p>Terima kasih telah mendaftar di CaishenEngine.</p>
     <p>Silakan klik tombol di bawah ini untuk memverifikasi alamat email kamu:</p>
     <p>
         <a href="{{ $verificationUrl }}" 
@@ -13,6 +13,6 @@
     <p>Link ini berlaku selama 24 jam.</p>
     <p>Jika kamu tidak merasa melakukan pendaftaran ini, silakan abaikan email ini.</p>
     <br>
-    <p>Salam,<br>Tim Routex</p>
+    <p>Salam,<br>Tim CaishenEngine</p>
 </body>
 </html>

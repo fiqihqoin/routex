@@ -20,7 +20,7 @@ class PasswordChangedNotificationMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Password akun Routex kamu berhasil diubah',
+            subject: 'Password akun CaishenEngine kamu berhasil diubah',
         );
     }
 

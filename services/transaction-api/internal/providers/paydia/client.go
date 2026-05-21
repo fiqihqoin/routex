@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
-	"github.com/truechain/ptms/transaction-api/internal/providers"
-	"github.com/truechain/ptms/transaction-api/internal/providers/snapbi"
+	"github.com/truechain/caishenengine/transaction-api/internal/providers"
+	"github.com/truechain/caishenengine/transaction-api/internal/providers/snapbi"
 )
 
 type PaydiaCredentials struct {

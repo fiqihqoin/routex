@@ -1,0 +1,31 @@
+---
+title: Integrasi Node.js
+description: Panduan integrasi CaishenEngine API menggunakan Node.js dan Fetch
+lastUpdated: '2026-05-10'
+---
+
+# Integrasi Node.js
+
+Berikut adalah contoh lengkap cara melakukan request generate QRIS di Node.js.
+
+## Contoh Kode
+
+<CodeBlock language="javascript" filename="caishenengine.js">
+{`const createTransaction = async (orderId, amount) => {
+  const response = await fetch('https://sandbox.caishenengine.com/api/v1/transactions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-API-Key': process.env.caishenengine_API_KEY,
+      'X-Idempotency-Key': orderId
+    },
+    body: JSON.stringify({
+      amount: amount,
+      currency: 'IDR',
+      payment_channel: 'qris'
+    })
+  });
+
+  return await response.json();
+};`}
+</CodeBlock>

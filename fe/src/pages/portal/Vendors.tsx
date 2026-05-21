@@ -22,7 +22,7 @@ export default function VendorsPage() {
     fetch(`/portal/vendors`, {
       headers: { 
         "Accept": "application/json",
-        "X-Routex-Environment": env
+        "X-CaishenEngine-Environment": env
       }
     })
       .then(res => res.json())
@@ -43,7 +43,7 @@ export default function VendorsPage() {
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
-          "X-Routex-Environment": env,
+          "X-CaishenEngine-Environment": env,
           "X-XSRF-TOKEN": document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] || ""
         }
       });

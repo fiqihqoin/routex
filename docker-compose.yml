@@ -5,7 +5,7 @@ services:
   # ==================== NGINX ====================
   nginx:
     image: nginx:alpine
-    container_name: routex-nginx
+    container_name: caishenengine-nginx
     restart: always
     ports:
       - "80:80"
@@ -19,28 +19,34 @@ services:
       - transaction-api
       - docs
     networks:
-      - routex-net
+      - caishenengine-net
 
   # ==================== FE (Homepage + Merchant Portal) ====================
   fe:
-    image: fiqihqoin/routex-fe:latest
-    container_name: routex-fe
+    build:
+      context: ./fe
+    image: fiqihqoin/caishenengine-fe:latest
+    container_name: caishenengine-fe
     restart: always
     networks:
-      - routex-net
+      - caishenengine-net
 
   # ==================== DOCS ====================
   docs:
-    image: fiqihqoin/routex-docs:latest
-    container_name: routex-docs
+    build:
+      context: ./caishenengine-docs
+    image: fiqihqoin/caishenengine-docs:latest
+    container_name: caishenengine-docs
     restart: always
     networks:
-      - routex-net
+      - caishenengine-net
 
   # ==================== LARAVEL ADMIN ====================
   admin:
-    image: fiqihqoin/routex-admin:latest
-    container_name: routex-admin
+    build:
+      context: ./services/admin
+    image: fiqihqoin/caishenengine-admin:latest
+    container_name: caishenengine-admin
     restart: always
     env_file: .env.admin
     depends_on:
@@ -49,12 +55,14 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - routex-net
+      - caishenengine-net
 
   # ==================== LARAVEL QUEUE WORKER ====================
   admin-queue:
-    image: fiqihqoin/routex-admin:latest
-    container_name: routex-admin-queue
+    build:
+      context: ./services/admin
+    image: fiqihqoin/caishenengine-admin:latest
+    container_name: caishenengine-admin-queue
     restart: always
     command: php artisan queue:work --sleep=3 --tries=5 --max-time=3600
     env_file: .env.admin
@@ -64,12 +72,14 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - routex-net
+      - caishenengine-net
 
   # ==================== GO TRANSACTION API ====================
   transaction-api:
-    image: fiqihqoin/routex-go-api:latest
-    container_name: routex-transaction-api
+    build:
+      context: ./services/transaction-api
+    image: fiqihqoin/caishenengine-go-api:latest
+    container_name: caishenengine-transaction-api
     restart: always
     env_file: .env.go
     depends_on:
@@ -80,31 +90,31 @@ services:
       rabbitmq:
         condition: service_healthy
     networks:
-      - routex-net
+      - caishenengine-net
 
   # ==================== POSTGRESQL ====================
   postgres:
     image: postgres:16-alpine
-    container_name: routex-postgres
+    container_name: caishenengine-postgres
     restart: always
     environment:
-      POSTGRES_DB: ptms_db
-      POSTGRES_USER: ptms_user
+      POSTGRES_DB: caishenengine_db
+      POSTGRES_USER: caishenengine_user
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-p5Nv5gM5aLycakSV}
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ptms_user -d ptms_db"]
+      test: ["CMD-SHELL", "pg_isready -U caishenengine_user -d caishenengine_db"]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - routex-net
+      - caishenengine-net
 
   # ==================== REDIS ====================
   redis:
     image: redis:7-alpine
-    container_name: routex-redis
+    container_name: caishenengine-redis
     restart: always
     command: redis-server --appendonly yes
     volumes:
@@ -115,15 +125,15 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - routex-net
+      - caishenengine-net
 
   # ==================== RABBITMQ ====================
   rabbitmq:
     image: rabbitmq:3.13-management-alpine
-    container_name: routex-rabbitmq
+    container_name: caishenengine-rabbitmq
     restart: always
     environment:
-      RABBITMQ_DEFAULT_USER: routex
+      RABBITMQ_DEFAULT_USER: caishenengine
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-lhaN3cfjRM5MM3jK}
     volumes:
       - ./data/rabbitmq:/var/lib/rabbitmq
@@ -133,8 +143,8 @@ services:
       timeout: 10s
       retries: 5
     networks:
-      - routex-net
+      - caishenengine-net
 
 networks:
-  routex-net:
+  caishenengine-net:
     driver: bridge

@@ -19,12 +19,12 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
-	"github.com/truechain/ptms/transaction-api/internal/domain"
-	"github.com/truechain/ptms/transaction-api/internal/handler"
-	"github.com/truechain/ptms/transaction-api/internal/repository"
-	"github.com/truechain/ptms/transaction-api/internal/service"
-	"github.com/truechain/ptms/transaction-api/internal/factory"
-	"github.com/truechain/ptms/transaction-api/pkg/messaging"
+	"github.com/truechain/caishenengine/transaction-api/internal/domain"
+	"github.com/truechain/caishenengine/transaction-api/internal/handler"
+	"github.com/truechain/caishenengine/transaction-api/internal/repository"
+	"github.com/truechain/caishenengine/transaction-api/internal/service"
+	"github.com/truechain/caishenengine/transaction-api/internal/factory"
+	"github.com/truechain/caishenengine/transaction-api/pkg/messaging"
 )
 
 func main() {
@@ -60,11 +60,11 @@ func main() {
 	routerEngine.Load(ctx)
 	limiter.Load(ctx)
 
-	routeEnv := os.Getenv("ROUTEX_ENVIRONMENT")
+	routeEnv := os.Getenv("caishenengine_ENVIRONMENT")
 	if routeEnv == "" {
 		routeEnv = "sandbox"
 	}
-	log.Printf("Starting with ROUTEX_ENVIRONMENT: %s", routeEnv)
+	log.Printf("Starting with caishenengine_ENVIRONMENT: %s", routeEnv)
 
 	txService := service.NewTransactionService(
 		txRepo,
@@ -157,7 +157,7 @@ func main() {
 	srv := &http.Server{ Addr: ":" + port, Handler: r }
 
 	go func() {
-		log.Printf("PTMS Transaction API running on port %s", port)
+		log.Printf("CaishenEngine Transaction API running on port %s", port)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("listen: %s\n", err)
 		}
@@ -230,9 +230,9 @@ func APIKeyMiddleware(db *pgxpool.Pool, rdb *redis.Client) func(http.Handler) ht
 
 		validate_env:
 			// 8. Validate environment match
-			routexEnv := r.Header.Get("X-Routex-Environment")
-			if routexEnv != "" && cachedData.Environment != routexEnv {
-				msg := fmt.Sprintf("Key ini adalah %s key, gunakan %s.routex.id", 
+			caishenengineEnv := r.Header.Get("X-CaishenEngine-Environment")
+			if caishenengineEnv != "" && cachedData.Environment != caishenengineEnv {
+				msg := fmt.Sprintf("Key ini adalah %s key, gunakan %s.caishenengine.id", 
 					cachedData.Environment, cachedData.Environment)
 				respondError(w, r, 403, "ENVIRONMENT_MISMATCH", msg)
 				return

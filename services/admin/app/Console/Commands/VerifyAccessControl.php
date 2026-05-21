@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Gate;
 
 class VerifyAccessControl extends Command
 {
-    protected $signature = 'routex:verify-access-control';
+    protected $signature = 'caishenengine:verify-access-control';
     protected $description = 'Verify access control, policy registration, and guard separation';
 
     public function handle()

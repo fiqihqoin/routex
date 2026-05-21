@@ -13,11 +13,11 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
-	"github.com/truechain/ptms/transaction-api/internal/domain"
-	"github.com/truechain/ptms/transaction-api/internal/factory"
-	"github.com/truechain/ptms/transaction-api/internal/providers"
-	"github.com/truechain/ptms/transaction-api/pkg/messaging"
-	"github.com/truechain/ptms/transaction-api/pkg/metrics"
+	"github.com/truechain/caishenengine/transaction-api/internal/domain"
+	"github.com/truechain/caishenengine/transaction-api/internal/factory"
+	"github.com/truechain/caishenengine/transaction-api/internal/providers"
+	"github.com/truechain/caishenengine/transaction-api/pkg/messaging"
+	"github.com/truechain/caishenengine/transaction-api/pkg/metrics"
 )
 
 type transactionService struct {
@@ -418,7 +418,7 @@ func (s *transactionService) forwardToUser(ctx context.Context, merchantID strin
 		},
 	}
 	if s.publisher != nil {
-		s.publisher.Publish(ctx, "", "ptms.callbacks", job)
+		s.publisher.Publish(ctx, "", "caishenengine.callbacks", job)
 	}
 }
 

@@ -13,7 +13,7 @@ class EncryptedCredentials implements CastsAttributes
     {
         if (!$value) return [];
 
-        $key = base64_decode(env('PTMS_CREDENTIALS_KEY'));
+        $key = base64_decode(env('CaishenEngine_CREDENTIALS_KEY'));
         $data = base64_decode($value);
 
         $nonceSize = 12; // GCM standard
@@ -45,7 +45,7 @@ class EncryptedCredentials implements CastsAttributes
     {
         if (!$value) return null;
 
-        $key = base64_decode(env('PTMS_CREDENTIALS_KEY'));
+        $key = base64_decode(env('CaishenEngine_CREDENTIALS_KEY'));
         $plaintext = json_encode($value);
         
         $nonce = openssl_random_pseudo_bytes(12);

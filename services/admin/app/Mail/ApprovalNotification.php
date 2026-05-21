@@ -22,7 +22,7 @@ class ApprovalNotification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Akun Routex kamu sudah aktif!',
+            subject: 'Akun CaishenEngine kamu sudah aktif!',
         );
     }
 

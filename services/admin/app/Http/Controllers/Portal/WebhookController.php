@@ -116,7 +116,7 @@ class WebhookController extends Controller
             ->firstOrFail();
 
         $testPayload = [
-            'transaction_id' => 'ptms_test_' . Str::random(16),
+            'transaction_id' => 'caishenengine_test_' . Str::random(16),
             'vendor_transaction_id' => 'vendor_test_123',
             'status' => 'paid',
             'amount' => 10000,
@@ -136,9 +136,9 @@ class WebhookController extends Controller
             $response = Http::timeout(10)
                 ->withHeaders([
                     'Content-Type' => 'application/json',
-                    'X-Routex-Signature' => $signature,
-                    'X-Routex-Event' => 'payment.paid',
-                    'X-Routex-Delivery-ID' => 'test_' . Str::random(8),
+                    'X-CaishenEngine-Signature' => $signature,
+                    'X-CaishenEngine-Event' => 'payment.paid',
+                    'X-CaishenEngine-Delivery-ID' => 'test_' . Str::random(8),
                 ])
                 ->post($webhook->url, $testPayload);
             

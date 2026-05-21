@@ -1,0 +1,41 @@
+---
+title: Integrasi Go
+description: Panduan integrasi CaishenEngine API menggunakan Go (Golang)
+lastUpdated: '2026-05-10'
+---
+
+# Integrasi Go
+
+Contoh integrasi menggunakan standard library `net/http` di Go.
+
+## Contoh Kode
+
+<CodeBlock language="go" filename="caishenengine.go">
+{`package main
+
+import (
+    "bytes"
+    "encoding/json"
+    "net/http"
+)
+
+func createQRIS(orderId string, amount int) {
+    url := "https://sandbox.caishenengine.com/api/v1/transactions"
+    payload := map[string]interface{}{
+        "amount": amount,
+        "currency": "IDR",
+        "payment_channel": "qris",
+    }
+    
+    jsonPayload, _ := json.Marshal(payload)
+    req, _ := http.NewRequest("POST", url, bytes.NewBuffer(jsonPayload))
+    
+    req.Header.Set("X-API-Key", "your_key")
+    req.Header.Set("X-Idempotency-Key", orderId)
+    req.Header.Set("Content-Type", "application/json")
+    
+    client := &http.Client{}
+    resp, _ := client.Do(req)
+    defer resp.Body.Close()
+}`}
+</CodeBlock>

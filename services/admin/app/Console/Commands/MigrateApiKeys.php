@@ -15,7 +15,7 @@ class MigrateApiKeys extends Command
      *
      * @var string
      */
-    protected $signature = 'routex:migrate-api-keys';
+    protected $signature = 'caishenengine:migrate-api-keys';
 
     /**
      * The console command description.

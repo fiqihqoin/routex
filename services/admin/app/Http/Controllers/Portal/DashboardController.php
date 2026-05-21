@@ -51,7 +51,7 @@ class DashboardController extends Controller
     public function dashboard(Request $request): JsonResponse
     {
         $merchant = Auth::guard('portal')->user();
-        $env = $request->header('X-Routex-Environment', $request->query('env', 'sandbox'));
+        $env = $request->header('X-CaishenEngine-Environment', $request->query('env', 'sandbox'));
         $range = $request->query('range', '7d');
 
         // Logic range to dates
@@ -87,7 +87,7 @@ class DashboardController extends Controller
     public function volumeChart(Request $request): JsonResponse
     {
         $merchant = Auth::guard('portal')->user();
-        $env = $request->header('X-Routex-Environment', $request->query('env', 'sandbox'));
+        $env = $request->header('X-CaishenEngine-Environment', $request->query('env', 'sandbox'));
         $range = $request->query('range', '7d');
 
         $rangeDays = match($range) {

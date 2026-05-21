@@ -17,7 +17,7 @@ class VendorController extends Controller
     {
         if ($request->wantsJson() || $request->is('api/*')) {
             $merchant = Auth::guard('portal')->user();
-            $environment = $request->header('X-Routex-Environment', 'sandbox');
+            $environment = $request->header('X-CaishenEngine-Environment', 'sandbox');
             $vendors = Vendor::all();
 
             // Fetch credentials for this merchant in the specific environment

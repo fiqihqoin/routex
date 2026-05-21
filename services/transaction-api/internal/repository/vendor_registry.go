@@ -8,8 +8,8 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
-	"github.com/truechain/ptms/transaction-api/internal/domain"
-	"github.com/truechain/ptms/transaction-api/pkg/crypto"
+	"github.com/truechain/caishenengine/transaction-api/internal/domain"
+	"github.com/truechain/caishenengine/transaction-api/pkg/crypto"
 )
 
 type vendorRegistry struct {

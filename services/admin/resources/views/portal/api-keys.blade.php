@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>API Keys - Routex Portal</title>
+    <title>API Keys - CaishenEngine Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -13,7 +13,7 @@
         <div class="max-w-6xl mx-auto py-8 px-4">
             <div class="mb-8">
                 <h1 class="text-3xl font-bold text-gray-900">API Keys</h1>
-                <p class="mt-2 text-gray-600">Kelola API keys untuk mengakses Routex API</p>
+                <p class="mt-2 text-gray-600">Kelola API keys untuk mengakses CaishenEngine API</p>
             </div>
 
             <!-- Sandbox API Key Card -->
@@ -33,7 +33,7 @@
                     <!-- Hint -->
                     <p class="text-sm text-gray-600 mb-4">
                         Gunakan untuk testing.<br>
-                        <span class="font-mono text-xs bg-gray-100 px-2 py-1 rounded">Endpoint: sandbox.routex.id</span>
+                        <span class="font-mono text-xs bg-gray-100 px-2 py-1 rounded">Endpoint: sandbox.caishenengine.id</span>
                     </p>
 
                     <!-- Key Display -->
@@ -90,7 +90,7 @@
                     <!-- Hint -->
                     <p class="text-sm text-gray-600 mb-4">
                         Gunakan untuk transaksi real.<br>
-                        <span class="font-mono text-xs bg-gray-100 px-2 py-1 rounded">Endpoint: api.routex.id</span>
+                        <span class="font-mono text-xs bg-gray-100 px-2 py-1 rounded">Endpoint: api.caishenengine.id</span>
                     </p>
 
                     <!-- Key Display -->

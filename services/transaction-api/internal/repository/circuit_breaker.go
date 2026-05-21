@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
-	"github.com/truechain/ptms/transaction-api/internal/domain"
-	"github.com/truechain/ptms/transaction-api/pkg/messaging"
-	"github.com/truechain/ptms/transaction-api/pkg/metrics"
+	"github.com/truechain/caishenengine/transaction-api/internal/domain"
+	"github.com/truechain/caishenengine/transaction-api/pkg/messaging"
+	"github.com/truechain/caishenengine/transaction-api/pkg/metrics"
 )
 
 type redisCircuitBreaker struct {
@@ -155,7 +155,7 @@ func (cb *redisCircuitBreaker) transitionTo(ctx context.Context, vendorID string
 
 		// Publish to RabbitMQ
 		if cb.publisher != nil {
-			cb.publisher.Publish(ctx, "ptms.events", "vendor.cb.transition", map[string]interface{}{
+			cb.publisher.Publish(ctx, "caishenengine.events", "vendor.cb.transition", map[string]interface{}{
 				"vendor_id":   vendorID,
 				"environment": env,
 				"old_state":   oldState,

@@ -42,7 +42,7 @@ export default function VendorCredentialsPage() {
     fetch(`/portal/vendors/${vendorCode}/credentials`, {
       headers: {
         "Accept": "application/json",
-        "X-Routex-Environment": env
+        "X-CaishenEngine-Environment": env
       }
     })
       .then(res => res.json())
@@ -82,7 +82,7 @@ export default function VendorCredentialsPage() {
           "Content-Type": "application/json",
           "Accept": "application/json",
           "X-XSRF-TOKEN": getCookie("XSRF-TOKEN") || "",
-          "X-Routex-Environment": env
+          "X-CaishenEngine-Environment": env
         },
         // We only send credentials now, account_name is gone
         body: JSON.stringify({

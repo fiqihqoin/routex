@@ -138,7 +138,7 @@ function DashboardContent() {
             const res = await fetch(`/portal/dashboard?env=${env}&range=${range}`, {
                 headers: { 
                     "Accept": "application/json",
-                    "X-Routex-Environment": env
+                    "X-CaishenEngine-Environment": env
                 },
                 credentials: 'include',
             });

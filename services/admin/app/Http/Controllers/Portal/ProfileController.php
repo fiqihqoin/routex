@@ -261,7 +261,7 @@ class ProfileController extends Controller
         session(['pending_2fa_secret' => Crypt::encryptString($secret)]);
 
         $qrCodeUrl = $google2fa->getQRCodeUrl(
-            'Routex',
+            'CaishenEngine',
             $merchant->email,
             $secret
         );
@@ -391,7 +391,7 @@ class ProfileController extends Controller
             $merchant->update([
                 'deleted_at' => now(),
                 'status' => 'rejected',
-                'email' => 'deleted_' . $merchant->id . '@deleted.routex.id',
+                'email' => 'deleted_' . $merchant->id . '@deleted.caishenengine.id',
                 'name' => 'Deleted Account',
                 'company_name' => null,
                 'phone_number' => null,

@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/truechain/ptms/transaction-api/internal/providers"
+	"github.com/truechain/caishenengine/transaction-api/internal/providers"
 )
 
 type xenditAdapter struct {

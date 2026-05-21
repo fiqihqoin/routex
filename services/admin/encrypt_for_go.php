@@ -10,7 +10,7 @@ if ($argc < 2) {
 $credentials = $argv[1];
 
 // Get the encryption key from environment
-$keyStr = getenv('PTMS_APP_KEY');
+$keyStr = getenv('CaishenEngine_APP_KEY');
 if (strpos($keyStr, 'base64:') === 0) {
     $keyStr = substr($keyStr, 7);
 }

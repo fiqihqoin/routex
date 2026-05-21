@@ -25,7 +25,7 @@ class VerificationEmail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Verifikasi email akun Routex kamu',
+            subject: 'Verifikasi email akun CaishenEngine kamu',
         );
     }
 

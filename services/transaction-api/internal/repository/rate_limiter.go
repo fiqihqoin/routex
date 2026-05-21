@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
-	"github.com/truechain/ptms/transaction-api/internal/domain"
+	"github.com/truechain/caishenengine/transaction-api/internal/domain"
 )
 
 // Lua Script for Sliding Window Rate Limiting

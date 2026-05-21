@@ -289,7 +289,7 @@ export default function WebhooksPage() {
                     <Label htmlFor="webhook-url">Callback URL</Label>
                     <Input 
                       id="webhook-url"
-                      placeholder="https://your-app.com/webhooks/routex"
+                      placeholder="https://your-app.com/webhooks/caishenengine"
                       value={urlInput}
                       onChange={e => setUrlInput(e.target.value)}
                       className={cn("h-11 bg-portal-elev", urlError && "border-red-500 focus-visible:ring-red-500")}
@@ -517,9 +517,9 @@ function verifyCaishenEngineSignature(payload, signature, secret) {
            <div className="bg-teal/5 border-l-4 border-teal p-4 rounded-r-xl">
               <p className="text-xs text-portal-text font-bold mb-2">Header yang dikirim CaishenEngine:</p>
               <ul className="space-y-1 font-mono text-[11px] text-portal-text-muted">
-                 <li>X-Routex-Signature: t=1778338943,v1=abc123...</li>
-                 <li>X-Routex-Event: payment.paid | payment.failed</li>
-                 <li>X-Routex-Delivery-ID: test_8a2b3c4d</li>
+                 <li>X-CaishenEngine-Signature: t=1778338943,v1=abc123...</li>
+                 <li>X-CaishenEngine-Event: payment.paid | payment.failed</li>
+                 <li>X-CaishenEngine-Delivery-ID: test_8a2b3c4d</li>
               </ul>
            </div>
         </div>
@@ -528,7 +528,7 @@ function verifyCaishenEngineSignature(payload, signature, secret) {
         <PortalCard title="Format Payload">
            <pre className="bg-black/40 p-4 rounded-lg font-mono text-xs text-teal-400 mb-6">
 {`{
-  "transaction_id": "ptms_20260509_abc123",
+  "transaction_id": "caishenengine_20260509_abc123",
   "vendor_transaction_id": "QNH-xxx",
   "status": "paid",
   "amount": 50000,

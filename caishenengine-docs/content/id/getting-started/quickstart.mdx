@@ -1,0 +1,78 @@
+---
+title: Quick Start
+description: Mulai terima pembayaran QRIS via CaishenEngine dalam 5 menit
+lastUpdated: '2026-05-10'
+---
+
+# Quick Start
+
+Panduan ini memandu kamu untuk generate QRIS pertama 
+melalui CaishenEngine dalam waktu 5 menit.
+
+## Prasyarat
+
+- Akun CaishenEngine yang sudah aktif 
+  ([Daftar di sini](https://app.caishenengine.com/register))
+- Minimal satu vendor yang sudah dikonfigurasi di 
+  portal CaishenEngine
+- API Key sandbox (didapat setelah akun diapprove)
+
+## Langkah 1 — Dapatkan API Key
+
+Setelah akun diapprove, kamu akan mendapat email 
+berisi dua API key:
+
+- **Sandbox Key** — dimulai dengan `caishenengine_sb_`
+- **Production Key** — dimulai dengan `caishenengine_live_`
+
+Untuk development, gunakan sandbox key terlebih dahulu.
+
+<Callout type="warning">
+Jangan pernah expose API key di client-side code 
+atau repository publik. Gunakan environment variables.
+</Callout>
+
+## Langkah 2 — Generate QRIS
+
+<ApiEndpoint method="POST" endpoint="/api/v1/transactions" />
+
+Request pertamamu:
+
+```bash
+curl -X POST https://sandbox.caishenengine.com/api/v1/transactions \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: caishenengine_sb_your_key_here" \
+  -H "X-Idempotency-Key: order-12345" \
+  -d '{
+    "amount": 50000,
+    "currency": "IDR",
+    "payment_channel": "qris"
+  }'
+```
+
+Response sukses:
+
+```json
+{
+  "transaction_id": "caishenengine_20260510_a1b2c3d4",
+  "status": "pending_payment",
+  "qris_code": "00020101021226...",
+  "amount": 50000,
+  "currency": "IDR",
+  "payment_channel": "qris",
+  "expires_at": "2026-05-10T14:47:00Z",
+  "created_at": "2026-05-10T14:32:00Z"
+}
+```
+
+## Langkah 3 — Cek Status Transaksi
+
+```bash
+curl https://sandbox.caishenengine.com/api/v1/transactions/caishenengine_20260510_a1b2c3d4 \
+  -H "X-API-Key: caishenengine_sb_your_key_here"
+```
+
+## Langkah 4 — Setup Webhook (Opsional)
+
+Daftarkan webhook URL di [portal CaishenEngine](https://app.caishenengine.com/portal/webhooks) 
+untuk menerima notifikasi saat pembayaran selesai.

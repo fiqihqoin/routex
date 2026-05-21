@@ -10,8 +10,8 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
-	"github.com/truechain/ptms/transaction-api/internal/domain"
-	"github.com/truechain/ptms/transaction-api/pkg/messaging"
+	"github.com/truechain/caishenengine/transaction-api/internal/domain"
+	"github.com/truechain/caishenengine/transaction-api/pkg/messaging"
 )
 
 type postgresTransactionRepo struct {
@@ -154,7 +154,7 @@ func (r *postgresTransactionRepo) UpdatePenalty(ctx context.Context, vendorID st
 	}
 
 	if r.publisher != nil {
-		r.publisher.Publish(ctx, "ptms.events", "vendor.penalty.updated", map[string]interface{}{
+		r.publisher.Publish(ctx, "caishenengine.events", "vendor.penalty.updated", map[string]interface{}{
 			"vendor_id":  vendorID,
 			"credential_id": credentialID,
 			"points":     points,

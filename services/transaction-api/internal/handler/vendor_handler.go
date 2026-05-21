@@ -9,8 +9,8 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/redis/go-redis/v9"
-	"github.com/truechain/ptms/transaction-api/internal/domain"
-	"github.com/truechain/ptms/transaction-api/internal/factory"
+	"github.com/truechain/caishenengine/transaction-api/internal/domain"
+	"github.com/truechain/caishenengine/transaction-api/internal/factory"
 )
 
 type VendorHandler struct {
@@ -34,7 +34,7 @@ func (h *VendorHandler) GetVendorHealth(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	env := r.Header.Get("X-Routex-Environment")
+	env := r.Header.Get("X-CaishenEngine-Environment")
 	if env == "" {
 		env = "sandbox"
 	}

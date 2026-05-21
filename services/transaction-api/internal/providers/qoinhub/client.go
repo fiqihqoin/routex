@@ -19,7 +19,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/truechain/ptms/transaction-api/internal/providers"
+	"github.com/truechain/caishenengine/transaction-api/internal/providers"
 )
 
 type qoinhubAdapter struct {
@@ -89,12 +89,12 @@ func (a *qoinhubAdapter) GenerateQRIS(ctx context.Context, req providers.Generat
 						"currency": "IDR",
 					},
 					"quantity": "1",
-					"name":     "Payment via Routex",
+					"name":     "Payment via CaishenEngine",
 				},
 			},
 			"customerDetails": map[string]interface{}{
-				"email":     "customer@routex.id",
-				"firstName": "Routex",
+				"email":     "customer@caishenengine.id",
+				"firstName": "CaishenEngine",
 				"lastName":  "User",
 				"phone":     "081234567890",
 			},

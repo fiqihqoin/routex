@@ -67,7 +67,7 @@ class ApiKey extends Model
 
     public static function generate(string $merchantId, string $environment, string $name = 'Default', ?string $ip = null): array
     {
-        $prefix = $environment === 'sandbox' ? 'ptms_sb_' : 'ptms_live_';
+        $prefix = $environment === 'sandbox' ? 'caishenengine_sb_' : 'caishenengine_live_';
         $plainKey = $prefix . bin2hex(random_bytes(24));
         $hash = hash('sha256', $plainKey);
         $keyPrefix = substr($plainKey, 0, 12);

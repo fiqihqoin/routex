@@ -13,8 +13,8 @@ import (
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
-	"github.com/truechain/ptms/transaction-api/internal/domain"
-	"github.com/truechain/ptms/transaction-api/pkg/security"
+	"github.com/truechain/caishenengine/transaction-api/internal/domain"
+	"github.com/truechain/caishenengine/transaction-api/pkg/security"
 )
 
 type callbackConsumer struct {
@@ -36,27 +36,27 @@ func NewCallbackConsumer(amqpURL string, repo domain.TransactionRepository) (dom
 	}
 
 	// Declare Main Queue
-	_, err = ch.QueueDeclare("ptms.callbacks", true, false, false, false, nil)
+	_, err = ch.QueueDeclare("caishenengine.callbacks", true, false, false, false, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	// Declare DLQ
-	_, err = ch.QueueDeclare("ptms.callbacks.dlq", true, false, false, false, nil)
+	_, err = ch.QueueDeclare("caishenengine.callbacks.dlq", true, false, false, false, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	// Declare Retry Queue
 	_, err = ch.QueueDeclare(
-		"ptms.callbacks.retry",
+		"caishenengine.callbacks.retry",
 		true,
 		false,
 		false,
 		false,
 		amqp.Table{
 			"x-dead-letter-exchange":    "",
-			"x-dead-letter-routing-key": "ptms.callbacks",
+			"x-dead-letter-routing-key": "caishenengine.callbacks",
 		},
 	)
 	if err != nil {
@@ -75,7 +75,7 @@ func NewCallbackConsumer(amqpURL string, repo domain.TransactionRepository) (dom
 
 func (c *callbackConsumer) Start(ctx context.Context) {
 	msgs, err := c.channel.Consume(
-		"ptms.callbacks",
+		"caishenengine.callbacks",
 		"",    // consumer
 		false, // auto-ack (we use manual ack)
 		false,
@@ -148,7 +148,7 @@ func (c *callbackConsumer) handleDelivery(ctx context.Context, d amqp.Delivery) 
 		delay := delays[job.RetryCount-1]
 
 		newBody, _ := json.Marshal(job)
-		err := c.channel.PublishWithContext(ctx, "", "ptms.callbacks.retry", false, false, amqp.Publishing{
+		err := c.channel.PublishWithContext(ctx, "", "caishenengine.callbacks.retry", false, false, amqp.Publishing{
 			ContentType: "application/json",
 			Body:        newBody,
 			Expiration:  delay,
@@ -170,7 +170,7 @@ func (c *callbackConsumer) handleDelivery(ctx context.Context, d amqp.Delivery) 
 
 func (c *callbackConsumer) moveToDLQ(ctx context.Context, d amqp.Delivery, job domain.CallbackJob) {
 	log.Printf("Callback for tx %s failed. Moving to DLQ.", job.TransactionID)
-	err := c.channel.PublishWithContext(ctx, "", "ptms.callbacks.dlq", false, false, amqp.Publishing{
+	err := c.channel.PublishWithContext(ctx, "", "caishenengine.callbacks.dlq", false, false, amqp.Publishing{
 		ContentType: "application/json",
 		Body:        d.Body,
 	})
@@ -217,9 +217,9 @@ func (c *callbackConsumer) deliver(job domain.CallbackJob) bool {
 	}
 	
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Routex-Signature", fullSignature)
-	req.Header.Set("X-Routex-Event", "payment." + job.Data.Status)
-	req.Header.Set("X-Routex-Delivery-ID", job.TransactionID + "-" + strconv.Itoa(job.RetryCount))
+	req.Header.Set("X-CaishenEngine-Signature", fullSignature)
+	req.Header.Set("X-CaishenEngine-Event", "payment." + job.Data.Status)
+	req.Header.Set("X-CaishenEngine-Delivery-ID", job.TransactionID + "-" + strconv.Itoa(job.RetryCount))
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -233,7 +233,7 @@ func (c *callbackConsumer) deliver(job domain.CallbackJob) bool {
 
 func (c *callbackConsumer) checkAlerting(ctx context.Context) {
 	// 1. Check DLQ Depth
-	q, err := c.channel.QueueInspect("ptms.callbacks.dlq")
+	q, err := c.channel.QueueInspect("caishenengine.callbacks.dlq")
 	if err == nil && q.Messages > 1000 {
 		log.Println("ALERT: DLQ depth exceeded 1000 messages!")
 	}

@@ -4,13 +4,13 @@ import (
 	"errors"
 
 	"github.com/redis/go-redis/v9"
-	"github.com/truechain/ptms/transaction-api/internal/providers"
-	"github.com/truechain/ptms/transaction-api/internal/providers/midtrans"
-	"github.com/truechain/ptms/transaction-api/internal/providers/pakailink"
-	"github.com/truechain/ptms/transaction-api/internal/providers/paydia"
-	"github.com/truechain/ptms/transaction-api/internal/providers/qoinhub"
-	"github.com/truechain/ptms/transaction-api/internal/providers/xendit"
-	"github.com/truechain/ptms/transaction-api/pkg/crypto"
+	"github.com/truechain/caishenengine/transaction-api/internal/providers"
+	"github.com/truechain/caishenengine/transaction-api/internal/providers/midtrans"
+	"github.com/truechain/caishenengine/transaction-api/internal/providers/pakailink"
+	"github.com/truechain/caishenengine/transaction-api/internal/providers/paydia"
+	"github.com/truechain/caishenengine/transaction-api/internal/providers/qoinhub"
+	"github.com/truechain/caishenengine/transaction-api/internal/providers/xendit"
+	"github.com/truechain/caishenengine/transaction-api/pkg/crypto"
 )
 
 var ErrUnsupportedVendor = errors.New("ErrUnsupportedVendor: vendor code not recognized")

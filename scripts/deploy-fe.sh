@@ -8,7 +8,7 @@ if [ ! -f .env ]; then
   echo "⚠️ fe/.env tidak ditemukan! Menggunakan default."
 fi
 echo "🐳 Packaging into Docker image ($PLATFORM) using Buildx..."
-docker buildx build --pull --no-cache --platform $PLATFORM -t $DOCKER_USER/routex-fe:$TAG --load .
-docker push $DOCKER_USER/routex-fe:$TAG
+docker buildx build --pull --no-cache --platform $PLATFORM -t $DOCKER_USER/caishenengine-fe:$TAG --load .
+docker push $DOCKER_USER/caishenengine-fe:$TAG
 
 echo "✅ Frontend pushed."

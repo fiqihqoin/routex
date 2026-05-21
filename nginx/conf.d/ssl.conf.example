@@ -1,16 +1,16 @@
 # ==================== FE (Homepage + Merchant Portal) ====================
 server {
     listen 80;
-    server_name routex.web.id app.routex.web.id;
+    server_name caishenengine.com app.caishenengine.com;
     return 301 https://$host$request_uri;
 }
 
 server {
     listen 443 ssl;
-    server_name routex.web.id app.routex.web.id;
+    server_name caishenengine.com app.caishenengine.com;
 
-    ssl_certificate /etc/nginx/certs/routex.crt;
-    ssl_certificate_key /etc/nginx/certs/routex.key;
+    ssl_certificate /etc/nginx/certs/caishenengine.crt;
+    ssl_certificate_key /etc/nginx/certs/caishenengine.key;
 
     location / {
         proxy_pass http://fe:80;
@@ -24,16 +24,16 @@ server {
 # ==================== DOCS ====================
 server {
     listen 80;
-    server_name docs.routex.web.id;
+    server_name docs.caishenengine.com;
     return 301 https://$host$request_uri;
 }
 
 server {
     listen 443 ssl;
-    server_name docs.routex.web.id;
+    server_name docs.caishenengine.com;
 
-    ssl_certificate /etc/nginx/certs/routex.crt;
-    ssl_certificate_key /etc/nginx/certs/routex.key;
+    ssl_certificate /etc/nginx/certs/caishenengine.crt;
+    ssl_certificate_key /etc/nginx/certs/caishenengine.key;
 
     location / {
         proxy_pass http://docs:3000;
@@ -47,16 +47,16 @@ server {
 # ==================== LARAVEL ADMIN ====================
 server {
     listen 80;
-    server_name admin.routex.web.id;
+    server_name admin.caishenengine.com;
     return 301 https://$host$request_uri;
 }
 
 server {
     listen 443 ssl;
-    server_name admin.routex.web.id;
+    server_name admin.caishenengine.com;
 
-    ssl_certificate /etc/nginx/certs/routex.crt;
-    ssl_certificate_key /etc/nginx/certs/routex.key;
+    ssl_certificate /etc/nginx/certs/caishenengine.crt;
+    ssl_certificate_key /etc/nginx/certs/caishenengine.key;
 
     location / {
         proxy_pass http://admin:80;
@@ -70,16 +70,16 @@ server {
 # ==================== TRANSACTION API (Internal & External) ====================
 server {
     listen 80;
-    server_name api.routex.web.id sandbox.routex.web.id production.routex.web.id;
+    server_name api.caishenengine.com sandbox.caishenengine.com production.caishenengine.com;
     return 301 https://$host$request_uri;
 }
 
 server {
     listen 443 ssl;
-    server_name api.routex.web.id sandbox.routex.web.id production.routex.web.id;
+    server_name api.caishenengine.com sandbox.caishenengine.com production.caishenengine.com;
 
-    ssl_certificate /etc/nginx/certs/routex.crt;
-    ssl_certificate_key /etc/nginx/certs/routex.key;
+    ssl_certificate /etc/nginx/certs/caishenengine.crt;
+    ssl_certificate_key /etc/nginx/certs/caishenengine.key;
 
     location / {
         proxy_pass http://transaction-api:8080;

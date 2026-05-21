@@ -1,0 +1,30 @@
+---
+title: Signature Verification
+description: Ensuring webhook data security with HMAC verification
+lastUpdated: '2026-05-10'
+---
+
+# Signature Verification
+
+To ensure that the received data is genuinely from CaishenEngine, you must verify the `X-CaishenEngine-Signature` header.
+
+## Algorithm
+
+CaishenEngine uses **HMAC-SHA256** with the request payload as the data and your **Webhook Secret** as the key.
+
+## How to Verify (Node.js)
+
+```javascript
+const crypto = require('crypto');
+
+function verify(payload, signature, secret) {
+  const hmac = crypto.createHmac('sha256', secret);
+  hmac.update(JSON.stringify(payload));
+  const digest = hmac.digest('hex');
+  return digest === signature;
+}
+```
+
+<Callout type="danger">
+Ignore the request if the signature does not match. Do not process the transaction before successful verification.
+</Callout>

@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
-	"github.com/truechain/ptms/transaction-api/internal/providers"
-	"github.com/truechain/ptms/transaction-api/internal/providers/snapbi"
+	"github.com/truechain/caishenengine/transaction-api/internal/providers"
+	"github.com/truechain/caishenengine/transaction-api/internal/providers/snapbi"
 )
 
 type PakailinkCredentials struct {
@@ -80,7 +80,7 @@ func (a *PakailinkAdapter) GenerateQRIS(ctx context.Context, req providers.Gener
 		},
 		"validityPeriod": validityPeriodStr,
 		"additionalInfo": map[string]interface{}{
-			"callbackUrl": "https://api.caishenengine.com/api/v1/callbacks/PAKAILINK", // Fallback, usually overwritten by PTMS core logic if needed
+			"callbackUrl": "https://api.caishenengine.com/api/v1/callbacks/PAKAILINK", // Fallback, usually overwritten by CaishenEngine core logic if needed
 			"type":        "statis",
 		},
 	}

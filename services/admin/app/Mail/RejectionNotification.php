@@ -21,7 +21,7 @@ class RejectionNotification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Update pendaftaran akun Routex',
+            subject: 'Update pendaftaran akun CaishenEngine',
         );
     }
 

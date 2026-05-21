@@ -23,7 +23,7 @@ class VendorCredentialController extends Controller
         $merchant = Auth::guard('portal')->user();
         $vendor = Vendor::where('code', $vendorCode)->firstOrFail();
         $config = config("vendor_credentials.{$vendorCode}");
-        $environment = $request->header('X-Routex-Environment', 'sandbox');
+        $environment = $request->header('X-CaishenEngine-Environment', 'sandbox');
 
         if (!$config) {
             if ($request->wantsJson()) return response()->json(['error' => 'Vendor config not found'], 404);
@@ -74,7 +74,7 @@ class VendorCredentialController extends Controller
 
         $validated = $request->validate($rules);
         $credentials = $validated['credentials'];
-        $environment = $request->header('X-Routex-Environment', 'sandbox');
+        $environment = $request->header('X-CaishenEngine-Environment', 'sandbox');
 
         // --- TEST CONNECTION ---
         $validationResult = $this->validationService->validate($vendorCode, $credentials);
@@ -112,7 +112,7 @@ class VendorCredentialController extends Controller
     {
         $merchant = Auth::guard('portal')->user();
         $vendor = Vendor::where('code', $vendorCode)->firstOrFail();
-        $environment = $request->header('X-Routex-Environment', 'sandbox');
+        $environment = $request->header('X-CaishenEngine-Environment', 'sandbox');
 
         $credential = $merchant->vendorCredentials()
             ->where('vendor_id', $vendor->id)

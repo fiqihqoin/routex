@@ -4,7 +4,7 @@ import { ArrowLeft, Eye, EyeOff, AlertCircle, Loader2, Activity, Zap, ShieldChec
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Logo } from "@/components/routex/Logo";
+import { Logo } from "@/components/caishenengine/Logo";
 import { z } from "zod";
 import { usePortal } from "@/components/portal/PortalContext";
 import { 
@@ -210,7 +210,7 @@ const Login = () => {
                     <span className="h-2 w-2 rounded-full bg-yellow-500/60" />
                     <span className="h-2 w-2 rounded-full bg-teal/80" />
                   </div>
-                  <div className="text-[10px] font-mono text-muted-foreground">routex.dashboard / live</div>
+                  <div className="text-[10px] font-mono text-muted-foreground">caishenengine.dashboard / live</div>
                   <div className="flex items-center gap-1 text-[10px] font-mono text-teal">
                     <Activity className="h-3 w-3" /> active
                   </div>
