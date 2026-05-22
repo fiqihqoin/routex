@@ -509,7 +509,7 @@ req.Header.Set("X-API-Key", "caishenengine_${env === 'production' ? 'live' : 'sb
                 <div className="space-y-2 text-center">
                   <div className="text-[11px] font-bold text-portal-text-dim uppercase tracking-widest">Target Integration</div>
                   <div className="text-sm font-semibold text-portal-text">
-                    {portalEnv === 'production' ? 'https://api.${config.baseDomain}/api/v1' : 'https://sandbox.${config.baseDomain}/api/v1'}
+                    {portalEnv === 'production' ? `https://api.${config.baseDomain}/api/v1` : `https://sandbox.${config.baseDomain}/api/v1`}
                   </div>
                 </div>
 
