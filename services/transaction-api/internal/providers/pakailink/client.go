@@ -22,7 +22,6 @@ type PakailinkCredentials struct {
 	MerchantID   string `json:"merchant_id"`
 	StoreID      string `json:"store_id"`
 	TerminalID   string `json:"terminal_id"`
-	IsProduction bool   `json:"is_production"`
 }
 
 type PakailinkAdapter struct {
@@ -39,23 +38,13 @@ func NewPakailinkAdapter(baseURL string, rdb *redis.Client) *PakailinkAdapter {
 	}
 }
 
-func (a *PakailinkAdapter) getBaseURL(creds PakailinkCredentials) string {
-	if a.baseURL != "" {
-		return a.baseURL
-	}
-	if creds.IsProduction {
-		return "https://api.pakaidonk.id"
-	}
-	return "https://dev-api.pakaidonk.id"
-}
-
 func (a *PakailinkAdapter) GenerateQRIS(ctx context.Context, req providers.GenerateQRISRequest) (*providers.QRISResponse, error) {
 	var creds PakailinkCredentials
 	if err := json.Unmarshal([]byte(req.Credentials), &creds); err != nil {
 		return nil, err
 	}
 
-	baseURL := a.getBaseURL(creds)
+	baseURL := a.baseURL
 	cacheKey := fmt.Sprintf("pakailink:token:%s", creds.ClientID)
 	accessToken, err := snapbi.GetAccessToken(ctx, a.rdb, a.client, creds.ClientID, creds.PrivateKey, baseURL, cacheKey)
 	if err != nil {
@@ -80,7 +69,7 @@ func (a *PakailinkAdapter) GenerateQRIS(ctx context.Context, req providers.Gener
 		},
 		"validityPeriod": validityPeriodStr,
 		"additionalInfo": map[string]interface{}{
-			"callbackUrl": "https://api.caishenengine.com/api/v1/callbacks/PAKAILINK", // Fallback, usually overwritten by CaishenEngine core logic if needed
+			"callbackUrl": "https://api.caishenengine.com/api/v1/callbacks/PAKAILINK", 
 			"type":        "statis",
 		},
 	}
@@ -118,7 +107,6 @@ func (a *PakailinkAdapter) GenerateQRIS(ctx context.Context, req providers.Gener
 		return nil, err
 	}
 
-	// PakaiLink success code: 2004700
 	if resData.ResponseCode != "2004700" {
 		return nil, fmt.Errorf("pakailink error: %s - %s", resData.ResponseCode, resData.ResponseMessage)
 	}
@@ -138,7 +126,7 @@ func (a *PakailinkAdapter) CheckStatus(ctx context.Context, vendorTxID string, c
 		return nil, err
 	}
 
-	baseURL := a.getBaseURL(creds)
+	baseURL := a.baseURL
 	cacheKey := fmt.Sprintf("pakailink:token:%s", creds.ClientID)
 	accessToken, err := snapbi.GetAccessToken(ctx, a.rdb, a.client, creds.ClientID, creds.PrivateKey, baseURL, cacheKey)
 	if err != nil {
@@ -151,7 +139,7 @@ func (a *PakailinkAdapter) CheckStatus(ctx context.Context, vendorTxID string, c
 	path := "/snap/v1.0/qr/qr-mpm-status"
 
 	bodyMap := map[string]interface{}{
-		"originalPartnerReferenceNo": vendorTxID, // PakaiLink uses partnerRef for inquiry too
+		"originalPartnerReferenceNo": vendorTxID,
 	}
 
 	bodyBytes, _ := json.Marshal(bodyMap)
@@ -256,7 +244,7 @@ func (a *PakailinkAdapter) Validate(ctx context.Context, credsStr string) error 
 	if err := json.Unmarshal([]byte(credsStr), &creds); err != nil {
 		return err
 	}
-	baseURL := a.getBaseURL(creds)
+	baseURL := a.baseURL
 	cacheKey := fmt.Sprintf("pakailink:validate:%s", creds.ClientID)
 	_, err := snapbi.GetAccessToken(ctx, a.rdb, a.client, creds.ClientID, creds.PrivateKey, baseURL, cacheKey)
 	return err

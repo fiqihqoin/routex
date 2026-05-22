@@ -42,7 +42,6 @@ return [
             ['key' => 'merchant_id', 'label' => 'Merchant ID', 'type' => 'text', 'required' => true],
             ['key' => 'store_id', 'label' => 'Store ID', 'type' => 'text', 'required' => false],
             ['key' => 'terminal_id', 'label' => 'Terminal ID', 'type' => 'text', 'required' => true],
-            ['key' => 'is_production', 'label' => 'Mode Produksi', 'type' => 'boolean', 'required' => false],
         ],
     ],
     'PAKAILINK' => [
@@ -56,7 +55,6 @@ return [
             ['key' => 'merchant_id', 'label' => 'Merchant ID', 'type' => 'text', 'required' => true],
             ['key' => 'store_id', 'label' => 'Store ID', 'type' => 'text', 'required' => false],
             ['key' => 'terminal_id', 'label' => 'Terminal ID', 'type' => 'text', 'required' => true],
-            ['key' => 'is_production', 'label' => 'Mode Produksi', 'type' => 'boolean', 'required' => false],
         ],
     ],
 ];

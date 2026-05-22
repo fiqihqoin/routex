@@ -22,7 +22,6 @@ type PaydiaCredentials struct {
 	MerchantID   string `json:"merchant_id"`
 	StoreID      string `json:"store_id"`
 	TerminalID   string `json:"terminal_id"`
-	IsProduction bool   `json:"is_production"`
 }
 
 type PaydiaAdapter struct {
@@ -39,20 +38,13 @@ func NewPaydiaAdapter(baseURL string, rdb *redis.Client) *PaydiaAdapter {
 	}
 }
 
-func (a *PaydiaAdapter) getBaseURL(creds PaydiaCredentials) string {
-	if creds.IsProduction {
-		return "https://api.paydia.id"
-	}
-	return "https://api.paydia.co.id"
-}
-
 func (a *PaydiaAdapter) GenerateQRIS(ctx context.Context, req providers.GenerateQRISRequest) (*providers.QRISResponse, error) {
 	var creds PaydiaCredentials
 	if err := json.Unmarshal([]byte(req.Credentials), &creds); err != nil {
 		return nil, err
 	}
 
-	baseURL := a.getBaseURL(creds)
+	baseURL := a.baseURL
 	cacheKey := fmt.Sprintf("paydia:token:%s", creds.ClientID)
 	accessToken, err := snapbi.GetAccessToken(ctx, a.rdb, a.client, creds.ClientID, creds.PrivateKey, baseURL, cacheKey)
 	if err != nil {
@@ -135,7 +127,7 @@ func (a *PaydiaAdapter) CheckStatus(ctx context.Context, vendorTxID string, cred
 		return nil, err
 	}
 
-	baseURL := a.getBaseURL(creds)
+	baseURL := a.baseURL
 	cacheKey := fmt.Sprintf("paydia:token:%s", creds.ClientID)
 	accessToken, err := snapbi.GetAccessToken(ctx, a.rdb, a.client, creds.ClientID, creds.PrivateKey, baseURL, cacheKey)
 	if err != nil {
@@ -248,7 +240,7 @@ func (a *PaydiaAdapter) Validate(ctx context.Context, credsStr string) error {
 	if err := json.Unmarshal([]byte(credsStr), &creds); err != nil {
 		return err
 	}
-	baseURL := a.getBaseURL(creds)
+	baseURL := a.baseURL
 	cacheKey := fmt.Sprintf("paydia:validate:%s", creds.ClientID)
 	_, err := snapbi.GetAccessToken(ctx, a.rdb, a.client, creds.ClientID, creds.PrivateKey, baseURL, cacheKey)
 	return err

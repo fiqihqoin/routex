@@ -374,7 +374,7 @@ func (s *transactionService) HandleVendorCallback(ctx context.Context, vendorID 
 		secret = fmt.Sprintf("%v", credsMap["server_key"]) 
 	case "XENDIT":
 		secret = fmt.Sprintf("%v", credsMap["webhook_token"]) 
-	case "QOINHUB":
+	case "QOINHUB", "PAYDIA", "PAKAILINK":
 		secret = fmt.Sprintf("%v", credsMap["client_secret"]) 
 	}
 
