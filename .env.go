@@ -6,5 +6,6 @@ DATABASE_URL=postgres://caishenengine_user:p5Nv5gM5aLycakSV@caishenengine-postgr
 REDIS_URL=caishenengine-redis:6379
 RABBITMQ_URL=amqp://caishenengine:lhaN3cfjRM5MM3jK@caishenengine-rabbitmq:5672/
 
-JWT_SECRET=your_super_secret_jwt_key
+JWT_SECRET=KPcszAS8rMdfJVBgNW0EKXZzK04Cij3yAFii3qWsvX7
 caishenengine_ENVIRONMENT=sandbox
+CaishenEngine_APP_KEY=base64:H9SO6s8jlpW01g060jiWdVMCuJcK1GhxXpiutlUwzFU=
