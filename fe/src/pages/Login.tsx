@@ -178,73 +178,75 @@ const Login = () => {
     <main className="min-h-screen bg-background text-foreground">
       <div className="grid min-h-screen lg:grid-cols-5">
         {/* LEFT CONTAINER (UI HEAVY) */}
-        <aside className="relative hidden lg:flex lg:col-span-3 flex-col overflow-hidden border-r border-border bg-[hsl(222_45%_7%)] p-10">
+        <aside className="relative hidden lg:flex lg:col-span-3 flex-col overflow-hidden border-r border-border bg-[hsl(222_45%_7%)] p-12">
           <div className="absolute inset-0 bg-gradient-hero pointer-events-none opacity-80" />
           <div className="absolute inset-0 grid-bg pointer-events-none animate-grid-drift opacity-40" />
           <div className="absolute -top-40 -left-20 w-[600px] h-[600px] rounded-full bg-teal/5 blur-3xl pointer-events-none" />
 
-          <div className="relative flex items-center justify-between">
-            <Logo />
-            <Link
-              to="/"
-              className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" /> Back to home
-            </Link>
-          </div>
+          <div className="relative w-full max-w-xl mx-auto flex flex-col h-full">
+            <div className="flex items-center justify-between">
+              <Logo />
+              <Link
+                to="/"
+                className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ArrowLeft className="h-3.5 w-3.5" /> Back to home
+              </Link>
+            </div>
 
-          <div className="relative flex-1 flex flex-col justify-center max-w-lg animate-fade-up">
-            <h1 className="text-5xl xl:text-6xl font-bold tracking-tight leading-[1.05]">
-              {requires2FA ? "Security Check." : "Welcome back."}
-            </h1>
-            <p className="mt-4 text-lg text-muted-foreground">
-              {requires2FA ? "One more step to secure your account." : "Route smarter. Scale faster."}
-            </p>
+            <div className="relative flex-1 flex flex-col justify-center animate-fade-up">
+              <h1 className="text-5xl xl:text-6xl font-bold tracking-tight leading-[1.05]">
+                {requires2FA ? "Security Check." : "Welcome back."}
+              </h1>
+              <p className="mt-4 text-lg text-muted-foreground">
+                {requires2FA ? "One more step to secure your account." : "Route smarter. Scale faster."}
+              </p>
 
-            {/* DASHBOARD PREVIEW UI */}
-            {!requires2FA && (
-              <div className="mt-10 relative rounded-2xl border border-border bg-gradient-card p-5 shadow-[0_30px_80px_-30px_hsl(var(--teal)/0.3)]">
-                <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
-                  <div className="flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full bg-destructive/60" />
-                    <span className="h-2 w-2 rounded-full bg-yellow-500/60" />
-                    <span className="h-2 w-2 rounded-full bg-teal/80" />
-                  </div>
-                  <div className="text-[10px] font-mono text-muted-foreground">caishenengine.dashboard / live</div>
-                  <div className="flex items-center gap-1 text-[10px] font-mono text-teal">
-                    <Activity className="h-3 w-3" /> active
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-3 items-stretch">
-                  <div className="rounded-lg border border-border bg-background/40 p-3 font-mono text-[10px] flex flex-col justify-between">
-                    <div className="text-muted-foreground uppercase tracking-wider">incoming</div>
-                    <div className="mt-2 text-foreground truncate">
-                      <span className="text-purple-400">POST</span> /api/v1/tx
+              {/* DASHBOARD PREVIEW UI */}
+              {!requires2FA && (
+                <div className="mt-12 relative rounded-2xl border border-border bg-gradient-card p-6 shadow-[0_30px_80px_-30px_hsl(var(--teal)/0.3)]">
+                  <div className="flex items-center justify-between border-b border-border pb-4 mb-5">
+                    <div className="flex items-center gap-1.5">
+                      <span className="h-2 w-2 rounded-full bg-destructive/60" />
+                      <span className="h-2 w-2 rounded-full bg-yellow-500/60" />
+                      <span className="h-2 w-2 rounded-full bg-teal/80" />
                     </div>
-                    <div className="text-teal mt-1">→ routing…</div>
+                    <div className="text-[10px] font-mono text-muted-foreground">caishenengine.dashboard / live</div>
+                    <div className="flex items-center gap-1 text-[10px] font-mono text-teal">
+                      <Activity className="h-3 w-3" /> active
+                    </div>
                   </div>
 
-                  <div className="relative rounded-lg border border-teal/30 bg-teal/5 p-3 text-center flex flex-col items-center justify-center">
-                    <div className="absolute inset-0 rounded-lg bg-teal/10 blur-2xl -z-10" />
-                    <Zap className="h-4 w-4 text-teal mx-auto animate-pulse-ring rounded-full" />
-                    <div className="mt-1 text-[10px] uppercase tracking-wider text-teal font-mono">engine</div>
-                  </div>
+                  <div className="grid grid-cols-3 gap-4 items-stretch">
+                    <div className="rounded-lg border border-border bg-background/40 p-4 font-mono text-[10px] flex flex-col justify-between">
+                      <div className="text-muted-foreground uppercase tracking-wider">incoming</div>
+                      <div className="mt-2 text-foreground truncate">
+                        <span className="text-purple-400">POST</span> /api/v1/tx
+                      </div>
+                      <div className="text-teal mt-1">→ routing…</div>
+                    </div>
 
-                  <div className="rounded-lg border border-border bg-background/40 p-3 font-mono text-[10px] space-y-1">
-                    {vendors.map((v, i) => {
-                      const isActive = i === activeIdx;
-                      return (
-                        <div key={v.name} className="flex items-center justify-between">
-                          <span className={isActive ? "text-foreground font-bold" : "text-muted-foreground"}>{v.name}</span>
-                          <span className={isActive ? "text-teal animate-pulse" : "text-muted-foreground/40"}>●</span>
-                        </div>
-                      );
-                    })}
+                    <div className="relative rounded-lg border border-teal/30 bg-teal/5 p-4 text-center flex flex-col items-center justify-center">
+                      <div className="absolute inset-0 rounded-lg bg-teal/10 blur-2xl -z-10" />
+                      <Zap className="h-4 w-4 text-teal mx-auto animate-pulse-ring rounded-full" />
+                      <div className="mt-1 text-[10px] uppercase tracking-wider text-teal font-mono">engine</div>
+                    </div>
+
+                    <div className="rounded-lg border border-border bg-background/40 p-4 font-mono text-[10px] space-y-1.5">
+                      {vendors.map((v, i) => {
+                        const isActive = i === activeIdx;
+                        return (
+                          <div key={v.name} className="flex items-center justify-between">
+                            <span className={isActive ? "text-foreground font-bold" : "text-muted-foreground"}>{v.name}</span>
+                            <span className={isActive ? "text-teal animate-pulse" : "text-muted-foreground/40"}>●</span>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </aside>
 
