@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 use Carbon\Carbon;
@@ -103,62 +104,67 @@ class DashboardController extends Controller
 
     private function getStats($merchant, $env, $dateFrom, $prevDateFrom, $prevDateTo)
     {
-        // Query current period
-        $cur = DB::table('transactions')
-            ->where('merchant_id', $merchant->id)
-            ->where('environment', $env)
-            ->where('created_at', '>=', $dateFrom)
-            ->selectRaw("
-                COUNT(*) as total,
-                COUNT(*) FILTER (WHERE status = 'paid') as paid,
-                COUNT(*) FILTER (WHERE status = 'pending_payment') as pending,
-                COUNT(*) FILTER (WHERE status IN ('failed', 'expired', 'expired_stale')) as failed,
-                COALESCE(SUM(amount) FILTER (WHERE status = 'paid'), 0) as volume
-            ")
-            ->first();
+        // Cache key based on merchant, environment, and date
+        $cacheKey = "dashboard:stats:{$merchant->id}:{$env}:" . $dateFrom->format('Y-m-d');
 
-        // Query previous period for trends
-        $prev = DB::table('transactions')
-            ->where('merchant_id', $merchant->id)
-            ->where('environment', $env)
-            ->where('created_at', '>=', $prevDateFrom)
-            ->where('created_at', '<', $prevDateTo)
-            ->selectRaw("
-                COUNT(*) as total,
-                COUNT(*) FILTER (WHERE status = 'paid') as paid,
-                COALESCE(SUM(amount) FILTER (WHERE status = 'paid'), 0) as volume
-            ")
-            ->first();
+        return Cache::remember($cacheKey, 300, function () use ($merchant, $env, $dateFrom, $prevDateFrom, $prevDateTo) {
+            // Query current period
+            $cur = DB::table('transactions')
+                ->where('merchant_id', $merchant->id)
+                ->where('environment', $env)
+                ->where('created_at', '>=', $dateFrom)
+                ->selectRaw("
+                    COUNT(*) as total,
+                    COUNT(*) FILTER (WHERE status = 'paid') as paid,
+                    COUNT(*) FILTER (WHERE status = 'pending_payment') as pending,
+                    COUNT(*) FILTER (WHERE status IN ('failed', 'expired', 'expired_stale')) as failed,
+                    COALESCE(SUM(amount) FILTER (WHERE status = 'paid'), 0) as volume
+                ")
+                ->first();
 
-        $calcTrend = function($curVal, $prevVal) {
-            if ($prevVal == 0) return null;
-            $pct = round((($curVal - $prevVal) / $prevVal) * 100, 1);
-            return ['value' => abs($pct), 'up' => $pct >= 0];
-        };
+            // Query previous period for trends
+            $prev = DB::table('transactions')
+                ->where('merchant_id', $merchant->id)
+                ->where('environment', $env)
+                ->where('created_at', '>=', $prevDateFrom)
+                ->where('created_at', '<', $prevDateTo)
+                ->selectRaw("
+                    COUNT(*) as total,
+                    COUNT(*) FILTER (WHERE status = 'paid') as paid,
+                    COALESCE(SUM(amount) FILTER (WHERE status = 'paid'), 0) as volume
+                ")
+                ->first();
 
-        $curRate = $cur->total > 0 ? round($cur->paid / $cur->total * 100, 1) : 0;
-        $prevRate = $prev->total > 0 ? round($prev->paid / $prev->total * 100, 1) : 0;
+            $calcTrend = function($curVal, $prevVal) {
+                if ($prevVal == 0) return null;
+                $pct = round((($curVal - $prevVal) / $prevVal) * 100, 1);
+                return ['value' => abs($pct), 'up' => $pct >= 0];
+            };
 
-        return [
-            'total_transactions' => number_format($cur->total),
-            'success_rate' => $curRate . '%',
-            'total_volume' => 'Rp ' . $this->formatVolume($cur->volume),
-            'avg_response_time' => '-',
-            'trends' => [
-                'total' => $calcTrend($cur->total, $prev->total),
-                'rate' => $calcTrend($curRate, $prevRate),
-                'volume' => $calcTrend($cur->volume, $prev->volume),
-            ],
-            // For mini cards
-            'pending_payment' => [
-                'value' => number_format($cur->pending),
-                'label' => 'Awaiting payment'
-            ],
-            'failed_transactions' => [
-                'value' => number_format($cur->failed),
-                'label' => 'Failed/Expired'
-            ]
-        ];
+            $curRate = $cur->total > 0 ? round($cur->paid / $cur->total * 100, 1) : 0;
+            $prevRate = $prev->total > 0 ? round($prev->paid / $prev->total * 100, 1) : 0;
+
+            return [
+                'total_transactions' => number_format($cur->total),
+                'success_rate' => $curRate . '%',
+                'total_volume' => 'Rp ' . $this->formatVolume($cur->volume),
+                'avg_response_time' => '-',
+                'trends' => [
+                    'total' => $calcTrend($cur->total, $prev->total),
+                    'rate' => $calcTrend($curRate, $prevRate),
+                    'volume' => $calcTrend($cur->volume, $prev->volume),
+                ],
+                // For mini cards
+                'pending_payment' => [
+                    'value' => number_format($cur->pending),
+                    'label' => 'Awaiting payment'
+                ],
+                'failed_transactions' => [
+                    'value' => number_format($cur->failed),
+                    'label' => 'Failed/Expired'
+                ]
+            ];
+        });
     }
 
     private function calculateVolumeChart($merchant, $env, $rangeDays, $dateFrom)

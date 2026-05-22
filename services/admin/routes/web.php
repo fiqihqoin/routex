@@ -26,9 +26,13 @@ use Illuminate\Support\Facades\Route;
 // PUBLIC PORTAL API (Authentication & Registration)
 // ============================================================================
 Route::prefix('api/portal')->name('api.portal.')->group(function () {
-    // Authentication
-    Route::post('/login', [PortalLoginController::class, 'store'])->name('login');
-    Route::post('/login/2fa', [PortalLoginController::class, 'verify2fa'])->name('login.2fa');
+    // Authentication (with rate limiting to prevent brute force attacks)
+    Route::post('/login', [PortalLoginController::class, 'store'])
+        ->middleware('throttle:5,1')
+        ->name('login');
+    Route::post('/login/2fa', [PortalLoginController::class, 'verify2fa'])
+        ->middleware('throttle:5,1')
+        ->name('login.2fa');
     Route::post('/logout', [PortalLoginController::class, 'destroy'])->name('logout');
 
     // Registration (Disabled - Admin registers merchants manually)

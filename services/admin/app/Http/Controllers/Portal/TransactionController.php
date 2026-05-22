@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
@@ -61,30 +62,37 @@ class TransactionController extends Controller
         $environment = $request->input('environment', 'sandbox');
         $dateFrom = $request->input('date_from', now()->subDays(30)->toDateString());
 
-        $stats = DB::table('transactions')
-            ->where('merchant_id', $merchant->id)
-            ->where('environment', $environment)
-            ->whereDate('created_at', '>=', $dateFrom)
-            ->selectRaw("
-                COUNT(*) as total,
-                COUNT(*) FILTER (WHERE status = 'paid') as paid,
-                COUNT(*) FILTER (WHERE status = 'pending_payment') as pending,
-                COUNT(*) FILTER (WHERE status IN ('failed', 'expired', 'expired_stale')) as failed,
-                COALESCE(SUM(amount) FILTER (WHERE status = 'paid'), 0) as total_volume
-            ")
-            ->first();
+        // Cache stats for 5 minutes
+        $cacheKey = "transaction:stats:{$merchant->id}:{$environment}:{$dateFrom}";
 
-        $total = (int) $stats->total;
-        $paid = (int) $stats->paid;
-        $successRate = $total > 0 ? round(($paid / $total) * 100, 2) : 0;
+        $result = Cache::remember($cacheKey, 300, function () use ($merchant, $environment, $dateFrom) {
+            $stats = DB::table('transactions')
+                ->where('merchant_id', $merchant->id)
+                ->where('environment', $environment)
+                ->whereDate('created_at', '>=', $dateFrom)
+                ->selectRaw("
+                    COUNT(*) as total,
+                    COUNT(*) FILTER (WHERE status = 'paid') as paid,
+                    COUNT(*) FILTER (WHERE status = 'pending_payment') as pending,
+                    COUNT(*) FILTER (WHERE status IN ('failed', 'expired', 'expired_stale')) as failed,
+                    COALESCE(SUM(amount) FILTER (WHERE status = 'paid'), 0) as total_volume
+                ")
+                ->first();
 
-        return response()->json([
-            'total' => $total,
-            'paid' => $paid,
-            'pending' => (int) $stats->pending,
-            'failed' => (int) $stats->failed,
-            'total_volume' => (float) $stats->total_volume,
-            'success_rate' => $successRate,
-        ]);
+            $total = (int) $stats->total;
+            $paid = (int) $stats->paid;
+            $successRate = $total > 0 ? round(($paid / $total) * 100, 2) : 0;
+
+            return [
+                'total' => $total,
+                'paid' => $paid,
+                'pending' => (int) $stats->pending,
+                'failed' => (int) $stats->failed,
+                'total_volume' => (float) $stats->total_volume,
+                'success_rate' => $successRate,
+            ];
+        });
+
+        return response()->json($result);
     }
 }

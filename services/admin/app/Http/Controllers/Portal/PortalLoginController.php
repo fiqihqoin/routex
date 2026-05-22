@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\Merchant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,8 +27,17 @@ class PortalLoginController extends Controller
         ]);
 
         $merchant = Merchant::where('email', $credentials['email'])->first();
-        
+
         if (!$merchant || !Hash::check($credentials['password'], $merchant->password_hash)) {
+            // Log failed login attempt
+            AuditLog::log(
+                'login_failed',
+                $merchant?->id,
+                null,
+                'Failed login attempt - invalid credentials',
+                ['email' => $credentials['email']],
+                'failed'
+            );
             throw ValidationException::withMessages(['email' => [trans('auth.failed')]]);
         }
 
@@ -54,6 +64,17 @@ class PortalLoginController extends Controller
 
                 Auth::guard('portal')->login($merchant);
                 $request->session()->regenerate();
+
+                // Log successful login
+                AuditLog::log(
+                    'login_success',
+                    $merchant->id,
+                    null,
+                    'Successful login',
+                    ['email' => $merchant->email],
+                    'success'
+                );
+
                 return response()->json([
                     'message' => 'Login successful',
                     'redirect' => '/portal',
@@ -117,6 +138,16 @@ class PortalLoginController extends Controller
         $request->session()->forget('login.id');
         $request->session()->regenerate();
 
+        // Log successful 2FA login
+        AuditLog::log(
+            'login_2fa_success',
+            $merchant->id,
+            null,
+            'Successful login with 2FA',
+            ['email' => $merchant->email],
+            'success'
+        );
+
         return response()->json([
             'message' => 'Login successful',
             'redirect' => '/portal',
@@ -132,6 +163,20 @@ class PortalLoginController extends Controller
 
     public function destroy(Request $request)
     {
+        $merchant = Auth::guard('portal')->user();
+
+        // Log logout
+        if ($merchant) {
+            AuditLog::log(
+                'logout',
+                $merchant->id,
+                null,
+                'User logged out',
+                ['email' => $merchant->email],
+                'success'
+            );
+        }
+
         Auth::guard('portal')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

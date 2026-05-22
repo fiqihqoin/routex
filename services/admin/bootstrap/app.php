@@ -18,7 +18,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         // Trust all proxies (untuk NGINX reverse proxy)
         $middleware->trustProxies(at: '*');
-        
+
+        // Security middleware
+        $middleware->append(\App\Http\Middleware\ForceHttps::class);
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
+
         $middleware->validateCsrfTokens(except: [
             'api/portal/*',
         ]);
