@@ -132,6 +132,9 @@ class ApiKeyController extends Controller
             'revoked_reason' => $request->input('reason', 'Revoked by user')
         ]);
 
+        // Soft delete to remove from UI list ('nyampah' cleanup)
+        $apiKey->delete();
+
         // Invalidate Go API cache
         Redis::del('apikey:hash:' . $keyHashValue);
 

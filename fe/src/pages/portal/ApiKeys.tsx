@@ -306,7 +306,6 @@ req.Header.Set("X-API-Key", "caishenengine_${env === 'production' ? 'live' : 'sb
                     <th className="px-6 py-4 text-[11px] font-bold uppercase text-portal-text-muted">Name</th>
                     <th className="px-6 py-4 text-[11px] font-bold uppercase text-portal-text-muted">Environment</th>
                     <th className="px-6 py-4 text-[11px] font-bold uppercase text-portal-text-muted">Key</th>
-                    <th className="px-6 py-4 text-[11px] font-bold uppercase text-portal-text-muted">Status</th>
                     <th className="px-6 py-4 text-[11px] font-bold uppercase text-portal-text-muted">Last Used</th>
                     <th className="px-6 py-4 text-[11px] font-bold uppercase text-portal-text-muted text-right">Actions</th>
                   </tr>
@@ -354,20 +353,6 @@ req.Header.Set("X-API-Key", "caishenengine_${env === 'production' ? 'live' : 'sb
                         <div className="flex items-center gap-2 font-mono text-xs text-portal-text-dim">
                           {key.display}
                           <button onClick={() => copyText(key.key_prefix, "Prefix")} className="p-1 hover:text-teal"><Copy className="h-3 w-3" /></button>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-1.5">
-                          <div className={`h-1.5 w-1.5 rounded-full ${
-                            key.status === 'active' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' :
-                            key.status === 'revoked' ? 'bg-red-500' : 'bg-gray-400'
-                          }`} />
-                          <span className={`text-[11px] font-bold uppercase tracking-wider ${
-                            key.status === 'active' ? 'text-green-600' :
-                            key.status === 'revoked' ? 'text-red-600' : 'text-gray-500'
-                          }`}>
-                            {key.status}
-                          </span>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-xs text-portal-text-muted">
@@ -546,15 +531,15 @@ req.Header.Set("X-API-Key", "caishenengine_${env === 'production' ? 'live' : 'sb
           </DialogContent>
         </Dialog>
 
-        {/* MODAL: REVOKE */}
+        {/* MODAL: DELETE (REVOKE & HIDE) */}
         <Dialog open={!!revokeConfirm} onOpenChange={() => setRevokeConfirm(null)}>
           <DialogContent className="bg-portal-surface border-portal-border text-portal-text">
             <DialogHeader>
               <DialogTitle className="text-red-500 flex items-center gap-2">
-                <ShieldAlert className="h-5 w-5" /> Revoke '{revokeConfirm?.keyName}'?
+                <ShieldAlert className="h-5 w-5" /> Delete '{revokeConfirm?.keyName}'?
               </DialogTitle>
               <DialogDescription className="pt-2">
-                Key ini akan langsung tidak bisa digunakan. Aplikasi yang masih menggunakan key ini akan mendapat error 401. Tindakan ini tidak bisa dibatalkan.
+                Key ini akan langsung dihapus dan tidak bisa digunakan kembali. Aplikasi yang masih menggunakan key ini akan mendapat error 401. Tindakan ini tidak bisa dibatalkan.
               </DialogDescription>
             </DialogHeader>
             <div className="py-4 space-y-4">
