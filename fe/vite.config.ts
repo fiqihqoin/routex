@@ -7,13 +7,13 @@ import { componentTagger } from "lovable-tagger";
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
-    port: 8080,
+    port: 5173,
     hmr: {
       overlay: false,
     },
     proxy: {
       "/portal": {
-        target: "https://localhost",
+        target: "http://localhost:8000",
         secure: false,
         changeOrigin: true,
         bypass: (req) => {
@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => ({
         },
       },
       "/login": {
-        target: "https://localhost",
+        target: "http://localhost:8000",
         secure: false,
         changeOrigin: true,
         bypass: (req) => {
@@ -33,7 +33,7 @@ export default defineConfig(({ mode }) => ({
         },
       },
       "/register": {
-        target: "https://localhost",
+        target: "http://localhost:8000",
         secure: false,
         changeOrigin: true,
         bypass: (req) => {
@@ -43,7 +43,12 @@ export default defineConfig(({ mode }) => ({
         },
       },
       "/api": {
-        target: "https://localhost",
+        target: "http://localhost:8000",
+        secure: false,
+        changeOrigin: true,
+      },
+      "/sanctum": {
+        target: "http://localhost:8000",
         secure: false,
         changeOrigin: true,
       },

@@ -31,8 +31,8 @@ Route::prefix('api/portal')->name('api.portal.')->group(function () {
     Route::post('/login/2fa', [PortalLoginController::class, 'verify2fa'])->name('login.2fa');
     Route::post('/logout', [PortalLoginController::class, 'destroy'])->name('logout');
 
-    // Registration
-    Route::post('/register', [RegisterController::class, 'store'])->name('register');
+    // Registration (Disabled - Admin registers merchants manually)
+    // Route::post('/register', [RegisterController::class, 'store'])->name('register');
 
     // Email Verification (public link from email)
     Route::get('/verify-email/{token}', [EmailVerificationController::class, 'verify'])

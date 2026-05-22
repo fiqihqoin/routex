@@ -20,8 +20,6 @@ class ListMerchants extends ListRecords
 
     protected function applyTableDefaultSort(Builder $query): Builder
     {
-        return $query
-            ->orderByRaw("CASE WHEN status = 'pending_approval' THEN 0 ELSE 1 END")
-            ->orderBy('created_at', 'desc');
+        return $query->orderBy('created_at', 'desc');
     }
 }
