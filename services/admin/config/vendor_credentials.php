@@ -57,4 +57,14 @@ return [
             ['key' => 'terminal_id', 'label' => 'Terminal ID', 'type' => 'text', 'required' => true],
         ],
     ],
+    'PAYOK' => [
+        'label' => 'Payok',
+        'webhook_url' => 'https://api.caishenengine.com/api/v1/callbacks/PAYOK',
+        'instructions' => 'Daftarkan URL di bawah ini di dashboard Payok Merchant. Pastikan Anda juga memasukkan Public Key milik Payok di bawah ini untuk memverifikasi callback.',
+        'fields' => [
+            ['key' => 'merchant_id', 'label' => 'Merchant ID', 'type' => 'text', 'required' => true, 'hint' => 'ID unik merchant dari PAYOK'],
+            ['key' => 'merchant_private_key', 'label' => 'Merchant Private Key (RSA PKCS8)', 'type' => 'textarea', 'required' => true, 'hint' => 'Kunci rahasia Anda (Private Key)'],
+            ['key' => 'payok_public_key', 'label' => 'PAYOK Public Key (RSA)', 'type' => 'textarea', 'required' => true, 'hint' => 'Dapatkan Kunci Publik milik PAYOK dari dashboard mereka'],
+        ],
+    ],
 ];

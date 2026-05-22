@@ -8,6 +8,7 @@ import (
 	"github.com/truechain/caishenengine/transaction-api/internal/providers/midtrans"
 	"github.com/truechain/caishenengine/transaction-api/internal/providers/pakailink"
 	"github.com/truechain/caishenengine/transaction-api/internal/providers/paydia"
+	"github.com/truechain/caishenengine/transaction-api/internal/providers/payok"
 	"github.com/truechain/caishenengine/transaction-api/internal/providers/qoinhub"
 	"github.com/truechain/caishenengine/transaction-api/internal/providers/xendit"
 	"github.com/truechain/caishenengine/transaction-api/pkg/crypto"
@@ -46,6 +47,8 @@ func (f *vendorFactory) Create(vendorCode string, encryptedCredentials string, b
 		adapter = paydia.NewPaydiaAdapter(baseURL, f.rdb)
 	case "PAKAILINK":
 		adapter = pakailink.NewPakailinkAdapter(baseURL, f.rdb)
+	case "PAYOK":
+		adapter = payok.NewPayokAdapter(baseURL)
 	default:
 		return nil, "", ErrUnsupportedVendor
 	}
@@ -69,6 +72,8 @@ func (f *vendorFactory) CreateForCallback(vendorCode string) (providers.VendorAd
 		return paydia.NewPaydiaAdapter(dummyBaseURL, f.rdb), nil
 	case "PAKAILINK":
 		return pakailink.NewPakailinkAdapter(dummyBaseURL, f.rdb), nil
+	case "PAYOK":
+		return payok.NewPayokAdapter(dummyBaseURL), nil
 	default:
 		return nil, ErrUnsupportedVendor
 	}

@@ -376,6 +376,8 @@ func (s *transactionService) HandleVendorCallback(ctx context.Context, vendorID 
 		secret = fmt.Sprintf("%v", credsMap["webhook_token"]) 
 	case "QOINHUB", "PAYDIA", "PAKAILINK":
 		secret = fmt.Sprintf("%v", credsMap["client_secret"]) 
+	case "PAYOK":
+		secret = fmt.Sprintf("%v", credsMap["payok_public_key"]) 
 	}
 
 	if !adapter.VerifyCallback(payload, signature, secret) {

@@ -18,7 +18,17 @@ func NewCallbackHandler(service domain.TransactionService) *CallbackHandler {
 
 func (h *CallbackHandler) HandleVendorCallback(w http.ResponseWriter, r *http.Request) {
 	vendorID := chi.URLParam(r, "vendor_id")
+	
+	// Get signature from common headers
 	signature := r.Header.Get("X-Vendor-Signature")
+	if signature == "" {
+		// Try vendor specific headers
+		if vendorID == "PAYOK" {
+			signature = r.Header.Get("sign")
+		} else if vendorID == "MIDTRANS" {
+			signature = r.Header.Get("X-Callback-Signature")
+		}
+	}
 
 	payload, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -32,7 +42,15 @@ func (h *CallbackHandler) HandleVendorCallback(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	// Vendor usually expects 200 OK
+	// Vendor specific success responses
+	if vendorID == "PAYOK" {
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("SUCCESS"))
+		return
+	}
+
+	// Default response for other vendors
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`{"status":"received"}`))
 }
