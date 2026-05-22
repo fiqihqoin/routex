@@ -1,11 +1,12 @@
-export const Logo = ({ className = "", variant = "horizontal" }: { className?: string, variant?: "horizontal" | "compact" }) => {
+export const Logo = ({ className = "", variant = "horizontal", size = "normal" }: { className?: string, variant?: "horizontal" | "compact", size?: "normal" | "sm" }) => {
   const isCompact = variant === "compact";
+  const isSmall = size === "sm";
 
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
-      <div className="relative flex items-center justify-center">
+    <div className={`flex items-center ${isSmall ? 'gap-2' : 'gap-3'} ${className}`}>
+      <div className="relative flex items-center justify-center shrink-0">
         {/* Logo Icon: Gold ingot + wings + heartbeat */}
-        <svg width={isCompact ? "48" : "40"} height={isCompact ? "48" : "40"} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width={isSmall ? "32" : (isCompact ? "48" : "40")} height={isSmall ? "32" : (isCompact ? "48" : "40")} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#C8A028" />
@@ -38,17 +39,17 @@ export const Logo = ({ className = "", variant = "horizontal" }: { className?: s
       </div>
 
       {!isCompact && (
-        <div className="flex flex-col">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl font-bold tracking-tight text-[#C8A028]" style={{ fontFamily: "'Playfair Display', serif" }}>
+        <div className="flex flex-col min-w-0">
+          <div className="flex items-center gap-1.5">
+            <span className={`${isSmall ? 'text-lg' : 'text-2xl'} font-bold tracking-tight text-[#C8A028] whitespace-nowrap`} style={{ fontFamily: "'Playfair Display', serif" }}>
               CAISHEN
             </span>
-            <div className="h-6 w-[1px] bg-[#C8A028]/40" />
-            <span className="text-sm font-light tracking-[14px] text-[#C8A028] mt-1">
+            <div className={`${isSmall ? 'h-4' : 'h-6'} w-[1px] bg-[#C8A028]/40`} />
+            <span className={`${isSmall ? 'text-[10px]' : 'text-sm'} font-light ${isSmall ? 'tracking-[4px]' : 'tracking-[14px]'} text-[#C8A028] mt-1 whitespace-nowrap`}>
               ENGINE
             </span>
           </div>
-          <span className="text-[8px] font-medium tracking-[0.2em] text-[#B0BEC5] uppercase mt-0.5">
+          <span className={`${isSmall ? 'text-[6px]' : 'text-[8px]'} font-medium ${isSmall ? 'tracking-[0.1em]' : 'tracking-[0.2em]'} text-[#B0BEC5] uppercase mt-0.5 truncate`}>
             INTELLIGENT FLOW. INFINITE PROSPERITY.
           </span>
         </div>

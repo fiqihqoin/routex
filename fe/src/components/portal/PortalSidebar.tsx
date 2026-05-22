@@ -52,7 +52,7 @@ export const PortalSidebar = () => {
   if (!user) {
     return (
       <aside className="hidden lg:flex fixed inset-y-0 left-0 w-60 flex-col border-r border-portal-border bg-portal-surface z-40 p-5">
-        <Logo />
+        <Logo size="sm" />
         <div className="mt-10 flex flex-col items-center justify-center text-portal-text-muted">
            <Loader2 className="h-5 w-5 animate-spin mb-2" />
            <span className="text-[10px] uppercase tracking-widest">Loading...</span>
@@ -64,8 +64,7 @@ export const PortalSidebar = () => {
   return (
     <aside className="hidden lg:flex fixed inset-y-0 left-0 w-60 flex-col border-r border-portal-border bg-portal-surface z-40">
       <div className="px-5 pt-5 pb-4 border-b border-portal-border">
-        <Logo />
-        <div className="mt-2 text-[11px] text-portal-text-muted truncate">{user.company}</div>
+        <Logo size="sm" />
       </div>
 
       <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-6">
