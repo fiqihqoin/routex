@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\TransactionResource\Pages;
 use App\Models\Transaction;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,6 +16,16 @@ class TransactionResource extends Resource
     protected static ?string $model = Transaction::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-credit-card';
+
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return false;
+    }
 
     public static function form(Form $form): Form
     {
