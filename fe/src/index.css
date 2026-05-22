@@ -76,42 +76,42 @@
   }
 
   .light {
-    --background: 42 53% 95%;
-    --foreground: 211 47% 11%;
+    --background: 210 40% 98%;      /* #F8FAFC - Subdued light gray-blue */
+    --foreground: 222 47% 11%;      /* #0F172A - Deep Navy */
 
-    --card: 0 0% 98%;
-    --card-foreground: 211 47% 11%;
+    --card: 0 0% 100%;             /* Pure White */
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 211 47% 11%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 45 67% 47%;
-    --primary-foreground: 42 53% 90%;
+    --primary: 45 67% 47%;          /* Caishen Gold */
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222 47.4% 11.2%;
+    --secondary: 210 40% 96%;       /* Light gray-blue */
+    --secondary-foreground: 222 47% 11%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 25% 40%; /* Darker muted text for readability */
 
-    --accent: 6 63% 46%;
-    --accent-foreground: 222 47.4% 11.2%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
 
     --destructive: 6 63% 46%;
-    --destructive-foreground: 42 53% 90%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
     --ring: 45 67% 47%;
 
-    /* Portal light tokens */
-    --portal-bg: 42 53% 95%;
+    /* Portal light tokens - Professional Contrast */
+    --portal-bg: 210 40% 98%;
     --portal-surface: 0 0% 100%;
     --portal-elev: 210 40% 96%;
-    --portal-border: 214 32% 91%;
+    --portal-border: 214 32% 88%;
     --portal-text: 222 47% 11%;
-    --portal-text-muted: 215 16% 47%;
-    --portal-text-dim: 215 16% 65%;
+    --portal-text-muted: 215 25% 35%; /* Significantly darker for clarity */
+    --portal-text-dim: 215 20% 50%;   /* Darker than before */
   }
 }
 

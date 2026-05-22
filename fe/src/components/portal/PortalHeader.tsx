@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ChevronDown, User, LogOut, AlertTriangle } from "lucide-react";
+import { ChevronDown, User, LogOut, AlertTriangle, Beaker } from "lucide-react";
 import { usePortal } from "@/components/portal/PortalContext";
 import {
   DropdownMenu,
@@ -60,11 +60,11 @@ export const PortalHeader = ({ title, breadcrumb }: { title: string; breadcrumb?
         </div>
       </header>
 
-      {isProd && (
-        <div className="sticky top-14 z-20 border-b border-warning/30 bg-warning/10 backdrop-blur-md">
-          <div className="px-5 py-2 flex items-center gap-2 text-xs text-warning">
-            <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-            You are in <span className="font-semibold">Production</span> mode. Transactions will use real money.
+      {!isProd && (
+        <div className="sticky top-14 z-20 border-b border-teal-500/40 bg-teal-500/10 backdrop-blur-md">
+          <div className="px-5 py-2 flex items-center gap-2 text-xs text-teal-400 font-medium">
+            <Beaker className="h-3.5 w-3.5 shrink-0 text-teal-400" />
+            <span className="text-teal-50">You are in <span className="font-bold underline decoration-teal-400/50">Sandbox</span> mode. All transactions are simulated for testing purposes.</span>
           </div>
         </div>
       )}
