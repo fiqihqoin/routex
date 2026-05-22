@@ -386,7 +386,7 @@ export default function WebhooksPage() {
                         <p className="text-xs text-portal-text-muted">Gunakan ini untuk memverifikasi keaslian request dari CaishenEngine.</p>
                      </div>
                      <div className="flex items-center gap-2">
-                        <div className="bg-black/40 border border-portal-border rounded-lg px-4 py-2 font-mono text-sm text-portal-text-dim tracking-tight">
+                        <div className="bg-slate-950 border border-portal-border rounded-lg px-4 py-2 font-mono text-sm text-emerald-400 tracking-tight">
                            {webhook.secret_prefix}
                         </div>
                         <Button variant="ghost" className="text-red-500 hover:text-red-400 hover:bg-red-500/5 text-xs font-bold" onClick={() => setShowRotateModal(true)}>
@@ -448,14 +448,20 @@ export default function WebhooksPage() {
            </div>
            
            <Tabs defaultValue="nodejs" className="w-full">
-              <TabsList className="bg-portal-elev border border-portal-border p-1">
-                 <TabsTrigger value="nodejs">Node.js</TabsTrigger>
-                 <TabsTrigger value="php">PHP</TabsTrigger>
-                 <TabsTrigger value="go">Go</TabsTrigger>
+              <TabsList className="bg-slate-900 border border-portal-border p-1 h-11">
+                 {['nodejs', 'php', 'go'].map(t => (
+                   <TabsTrigger 
+                     key={t}
+                     value={t} 
+                     className="data-[state=active]:bg-slate-800 data-[state=active]:text-emerald-400 text-slate-400 font-bold px-6 h-full transition-all"
+                   >
+                     {t === 'nodejs' ? 'Node.js' : t.toUpperCase()}
+                   </TabsTrigger>
+                 ))}
               </TabsList>
 
               <TabsContent value="nodejs" className="mt-4">
-                 <pre className="bg-black/60 border border-portal-border rounded-xl p-5 font-mono text-xs text-teal-400 overflow-x-auto leading-relaxed">
+                 <pre className="bg-slate-950 border border-portal-border rounded-xl p-5 font-mono text-xs text-emerald-400 overflow-x-auto leading-relaxed">
 {`const crypto = require('crypto');
 
 function verifyCaishenEngineSignature(payload, signature, secret) {
@@ -479,7 +485,7 @@ function verifyCaishenEngineSignature(payload, signature, secret) {
               </TabsContent>
 
               <TabsContent value="php" className="mt-4">
-                 <pre className="bg-black/60 border border-portal-border rounded-xl p-5 font-mono text-xs text-teal-400 overflow-x-auto leading-relaxed">
+                 <pre className="bg-slate-950 border border-portal-border rounded-xl p-5 font-mono text-xs text-emerald-400 overflow-x-auto leading-relaxed">
 {`function verifyCaishenEngineSignature(string $payload, string $signature, string $secret): bool {
   [$timestampPart, $signaturePart] = explode(',', $signature);
   $timestamp = explode('=', $timestampPart)[1];
@@ -497,7 +503,7 @@ function verifyCaishenEngineSignature(payload, signature, secret) {
               </TabsContent>
 
               <TabsContent value="go" className="mt-4">
-                 <pre className="bg-black/60 border border-portal-border rounded-xl p-5 font-mono text-xs text-teal-400 overflow-x-auto leading-relaxed">
+                 <pre className="bg-slate-950 border border-portal-border rounded-xl p-5 font-mono text-xs text-emerald-400 overflow-x-auto leading-relaxed">
 {`func verifySignature(payload []byte, signature string, secret string) bool {
     parts := strings.Split(signature, ",")
     timestamp := strings.Split(parts[0], "=")[1]
@@ -526,7 +532,7 @@ function verifyCaishenEngineSignature(payload, signature, secret) {
 
         {/* PAYLOAD FORMAT */}
         <PortalCard title="Format Payload">
-           <pre className="bg-black/40 p-4 rounded-lg font-mono text-xs text-teal-400 mb-6">
+           <pre className="bg-slate-950 p-4 border border-portal-border rounded-lg font-mono text-xs text-emerald-400 mb-6">
 {`{
   "transaction_id": "caishenengine_20260509_abc123",
   "vendor_transaction_id": "QNH-xxx",
@@ -616,7 +622,7 @@ function verifyCaishenEngineSignature(payload, signature, secret) {
 
               <div className="py-8 space-y-6">
                  <div className="relative group">
-                    <div className="bg-black/60 border-2 border-teal/40 rounded-xl p-5 pr-20 font-mono text-sm break-all text-teal-400">
+                    <div className="bg-slate-950 border-2 border-emerald-500/30 rounded-xl p-5 pr-20 font-mono text-sm break-all text-emerald-400">
                        {newSecretValue}
                     </div>
                     <Button 

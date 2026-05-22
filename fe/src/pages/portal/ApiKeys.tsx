@@ -352,7 +352,6 @@ req.Header.Set("X-API-Key", "caishenengine_${env === 'production' ? 'live' : 'sb
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2 font-mono text-xs text-portal-text-dim">
                           {key.display}
-                          <button onClick={() => copyText(key.key_prefix, "Prefix")} className="p-1 hover:text-teal"><Copy className="h-3 w-3" /></button>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-xs text-portal-text-muted">
@@ -384,21 +383,26 @@ req.Header.Set("X-API-Key", "caishenengine_${env === 'production' ? 'live' : 'sb
           </div>
           
           <Tabs defaultValue="curl" className="w-full">
-            <div className="flex items-center justify-between bg-black/40 border border-portal-border rounded-t-xl px-4 pt-1">
+            <div className="flex items-center justify-between bg-slate-900 border border-portal-border rounded-t-xl px-4 pt-1">
                <TabsList className="bg-transparent border-0 h-10">
                  {['curl', 'node', 'php', 'go'].map(t => (
-                    <TabsTrigger key={t} value={t} className="data-[state=active]:bg-teal/10 data-[state=active]:text-teal border-b-2 border-transparent data-[state=active]:border-teal rounded-none px-4 h-full uppercase text-[10px] font-bold tracking-widest">{t === 'node' ? 'Node.js' : t}</TabsTrigger>
+                    <TabsTrigger 
+                      key={t} 
+                      value={t} 
+                      className="data-[state=active]:bg-emerald-500/10 data-[state=active]:text-emerald-400 text-slate-400 border-b-2 border-transparent data-[state=active]:border-emerald-400 rounded-none px-4 h-full uppercase text-[10px] font-bold tracking-widest hover:text-slate-200 transition-colors"
+                    >
+                      {t === 'node' ? 'Node.js' : t}
+                    </TabsTrigger>
                  ))}
                </TabsList>
-               <div className="text-[10px] font-mono text-portal-text-dim">
-                  Endpoint: {portalEnv === 'production' ? 'https://api.${config.baseDomain}' : 'https://sandbox.${config.baseDomain}'}
-               </div>
-            </div>
+               <div className="text-[10px] font-mono text-slate-500 hidden sm:block">
+                 Endpoint: {portalEnv === 'production' ? `https://api.${config.baseDomain}` : `https://sandbox.${config.baseDomain}`}
+               </div>            </div>
             
             {['curl', 'node', 'php', 'go'].map(lang => (
               <TabsContent key={lang} value={lang} className="mt-0">
                 <div className="relative group">
-                  <pre className="bg-black/60 border-x border-b border-portal-border rounded-b-xl p-5 font-mono text-xs text-teal-400 overflow-x-auto leading-relaxed">
+                  <pre className="bg-slate-950 border-x border-b border-portal-border rounded-b-xl p-5 font-mono text-xs text-emerald-400 overflow-x-auto leading-relaxed">
                     {(codeSnippets as any)[lang](portalEnv)}
                   </pre>
                   <Button 
