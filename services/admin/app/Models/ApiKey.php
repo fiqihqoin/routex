@@ -21,7 +21,6 @@ class ApiKey extends Model
         'key_prefix',
         'name',
         'environment',
-        'scopes',
         'last_used_at',
         'expires_at',
         'revoked_at',
@@ -31,7 +30,6 @@ class ApiKey extends Model
     ];
 
     protected $casts = [
-        'scopes' => 'array',
         'last_used_at' => 'datetime',
         'expires_at' => 'datetime',
         'revoked_at' => 'datetime',
@@ -67,18 +65,21 @@ class ApiKey extends Model
 
     public static function generate(string $merchantId, string $environment, string $name = 'Default', ?string $ip = null): array
     {
-        $prefix = $environment === 'sandbox' ? 'caishenengine_sb_' : 'caishenengine_live_';
-        $plainKey = $prefix . bin2hex(random_bytes(24));
+        $prefix = $environment === 'sandbox' ? 'cs_sb_' : 'cs_live_';
+        $randomPart = bin2hex(random_bytes(24));
+        $plainKey = $prefix . $randomPart;
         $hash = hash('sha256', $plainKey);
-        $keyPrefix = substr($plainKey, 0, 12);
+        
+        // Use the prefix + first 8 chars of random part for visibility in admin
+        $keyPrefix = $prefix . substr($randomPart, 0, 8) . '...';
 
         $apiKey = static::create([
             'merchant_id' => $merchantId,
             'key_hash' => $hash,
+            'plain_key_encrypted' => encrypt($plainKey),
             'key_prefix' => $keyPrefix,
             'name' => $name,
             'environment' => $environment,
-            'scopes' => ['transactions:write', 'transactions:read'],
             'created_by_ip' => $ip,
         ]);
 

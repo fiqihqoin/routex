@@ -16,9 +16,9 @@ class RoutingRuleResource extends Resource
 {
     protected static ?string $model = RoutingRuleGlobal::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-arrows-right-left';
+    protected static bool $shouldRegisterNavigation = false;
 
-    protected static ?string $navigationGroup = 'Configuration';
+    protected static ?string $navigationIcon = 'heroicon-o-arrows-right-left';
 
     protected static ?string $navigationLabel = 'Routing Rules';
 

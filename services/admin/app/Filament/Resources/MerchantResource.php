@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\MerchantResource\Pages;
+use App\Filament\Resources\MerchantResource\RelationManagers;
 use App\Models\Merchant;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -71,7 +72,7 @@ class MerchantResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name')
                     ->label('Contact')
-                    ->searchable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
@@ -83,7 +84,7 @@ class MerchantResource extends Resource
                     }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Registered')
-                    ->dateTime()
+                    ->date()
                     ->sortable(),
             ])
             ->filters([
@@ -95,11 +96,17 @@ class MerchantResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\DeleteAction::make(),
                 ])
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
     }
 
     public static function getPages(): array

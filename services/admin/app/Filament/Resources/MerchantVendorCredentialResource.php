@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\MerchantVendorCredentialResource\Pages;
 use App\Models\MerchantVendorCredential;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -14,37 +15,45 @@ class MerchantVendorCredentialResource extends Resource
 {
     protected static ?string $model = MerchantVendorCredential::class;
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $navigationIcon = 'heroicon-o-key';
 
-    protected static ?string $navigationGroup = 'Configuration';
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return false;
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return false;
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('merchant_id')
-                    ->relationship('merchant', 'email')
-                    ->required()
-                    ->searchable(),
-                Forms\Components\Select::make('vendor_id')
-                    ->relationship('vendor', 'name')
-                    ->required(),
-                Forms\Components\Select::make('environment')
-                    ->options([
-                        'sandbox' => 'Sandbox',
-                        'production' => 'Production',
-                    ])
-                    ->required(),
+                Forms\Components\TextInput::make('merchant.email')
+                    ->label('Merchant')
+                    ->disabled(),
+                Forms\Components\TextInput::make('vendor.name')
+                    ->label('Vendor')
+                    ->disabled(),
+                Forms\Components\TextInput::make('environment')
+                    ->disabled(),
                 Forms\Components\KeyValue::make('credentials')
-                    ->required(),
+                    ->disabled(),
                 Forms\Components\Toggle::make('is_enabled')
-                    ->default(true),
+                    ->disabled(),
                 Forms\Components\TextInput::make('priority')
-                    ->numeric()
-                    ->default(0),
+                    ->disabled(),
                 Forms\Components\TextInput::make('validation_status')
-                    ->disabled()
-                    ->default('unchecked'),
+                    ->disabled(),
             ]);
     }
 
@@ -85,12 +94,10 @@ class MerchantVendorCredentialResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                //
             ]);
     }
 
@@ -98,8 +105,6 @@ class MerchantVendorCredentialResource extends Resource
     {
         return [
             'index' => Pages\ListMerchantVendorCredentials::route('/'),
-            'create' => Pages\CreateMerchantVendorCredential::route('/create'),
-            'edit' => Pages\EditMerchantVendorCredential::route('/{record}/edit'),
         ];
     }
 }
