@@ -42,7 +42,7 @@ type Transaction struct {
 	CallbackDelivered      bool              `json:"callback_delivered"`
 	ReconciliationAttempts int               `json:"reconciliation_attempts"`
 	CreatedAt              time.Time         `json:"created_at"`
-	UpdatedAt              time.Time         `json:"updated_at"`
+	UpdatedAt              *time.Time        `json:"updated_at"`
 }
 
 type EventType string

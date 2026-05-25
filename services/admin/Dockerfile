@@ -4,6 +4,7 @@ WORKDIR /var/www/html
 # Install system dependencies + NGINX + Supervisor
 RUN apk add --no-cache \
     curl unzip libpq-dev \
+    icu-dev libzip-dev \
     nginx \
     supervisor
 
@@ -11,7 +12,8 @@ RUN apk add --no-cache \
 COPY --from=mlocati/php-extension-installer \
     /usr/bin/install-php-extensions \
     /usr/local/bin/
-RUN install-php-extensions pdo_pgsql intl zip redis
+RUN chmod +x /usr/local/bin/install-php-extensions && \
+    install-php-extensions pdo_pgsql intl zip
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer

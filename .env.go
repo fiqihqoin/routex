@@ -1,11 +1,12 @@
 APP_ENV=local
 PORT=8080
 
-DATABASE_URL=postgres://caishenengine_user:p5Nv5gM5aLycakSV@caishenengine-postgres:5432/caishenengine_db?sslmode=disable
+DATABASE_URL=postgres://caishenengine_user:p5Nv5gM5aLycakSV@localhost:5432/caishenengine_db?sslmode=disable
 
-REDIS_URL=caishenengine-redis:6379
-RABBITMQ_URL=amqp://caishenengine:lhaN3cfjRM5MM3jK@caishenengine-rabbitmq:5672/
+REDIS_URL=localhost:6379
+RABBITMQ_URL=amqp://caishenengine:lhaN3cfjRM5MM3jK@localhost:5672/
 
 JWT_SECRET=KPcszAS8rMdfJVBgNW0EKXZzK04Cij3yAFii3qWsvX7
 caishenengine_ENVIRONMENT=sandbox
 CaishenEngine_APP_KEY=base64:H9SO6s8jlpW01g060jiWdVMCuJcK1GhxXpiutlUwzFU=
+INTERNAL_API_SECRET=caishenengine_internal_secret_2026

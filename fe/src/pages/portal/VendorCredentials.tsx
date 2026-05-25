@@ -76,6 +76,14 @@ export default function VendorCredentialsPage() {
     setSuccess(null);
 
     try {
+      // Automatically set is_production based on current portal environment
+      // We send it as "1" or "0" string because the backend validation 
+      // expects a string for fields with type 'checkbox'.
+      const credentialsWithEnv = {
+        ...formData.credentials,
+        is_production: env === 'production' ? "1" : "0"
+      };
+
       const res = await fetch(`/api/portal/vendors/${vendorCode}/credentials`, {
         method: "POST",
         headers: {
@@ -84,10 +92,9 @@ export default function VendorCredentialsPage() {
           "X-XSRF-TOKEN": getCookie("XSRF-TOKEN") || "",
           "X-CaishenEngine-Environment": env
         },
-        // We only send credentials now, account_name is gone
         body: JSON.stringify({
-            credentials: formData.credentials,
-            account_name: "Legacy Field" // API might still expect it in some logic, but we won't show it
+            credentials: credentialsWithEnv,
+            account_name: "Legacy Field"
         }),
       });
 
@@ -184,14 +191,14 @@ export default function VendorCredentialsPage() {
             }
           >
             <div className="space-y-5">
-              {config.fields.map((f: any) => (
+              {config.fields.filter((f: any) => f.key !== 'is_production').map((f: any) => (
                 <div key={f.key} className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor={f.key}>{f.label}</Label>
                     {f.required && <span className="text-[10px] uppercase text-portal-text-dim">Required</span>}
                   </div>
                   
-                  {f.type === 'boolean' ? (
+                  {f.type === 'boolean' || f.type === 'checkbox' ? (
                     <div className="flex items-center gap-3 p-3 rounded-lg border border-portal-border bg-portal-elev/40">
                        <Checkbox 
                         id={f.key} 
@@ -223,7 +230,7 @@ export default function VendorCredentialsPage() {
                       required={f.required}
                     />
                   )}
-                  {f.description && f.type !== 'boolean' && (
+                  {f.description && f.type !== 'boolean' && f.type !== 'checkbox' && (
                     <p className="text-[11px] text-portal-text-dim">{f.description}</p>
                   )}
                 </div>

@@ -50,39 +50,43 @@ func (a *PayokAdapter) GenerateQRIS(ctx context.Context, req providers.GenerateQ
 
 	path := "/api-pay/payment/V3.6/order/create-api"
 	
-	// Create request body
+	// Create request body matching Node.js SDK logic exactly
 	body := map[string]interface{}{
-		"requestTime":       time.Now().UTC().Format("2006-01-02T15:04:05.000Z"),
-		"merchantId":        creds.MerchantID,
 		"paymentMethodCode": "QRIS",
+		"notificationUrl":   "https://api.caishenengine.com/api/v1/callbacks/PAYOK",
+		"requestTime":       time.Now().UTC().Format("2006-01-02T15:04:05.000Z"),
+		"amount":            int(req.Amount),
+		"merchantId":        creds.MerchantID,
 		"countryCode":       "IDN",
-		"merchantOrderId":   req.TransactionID,
-		"amount":            req.Amount,
-		"currency":          "IDR",
-		"notificationUrl":   "https://api.caishenengine.com/api/v1/callbacks/PAYOK", // Usually sent by core
+		"currency":          "Rp",
 		"language":          "ID",
+		"merchantOrderId":   req.TransactionID,
+		"goodsInfo": map[string]interface{}{
+			"price": fmt.Sprintf("%.2f", req.Amount),
+			"name":  "QRIS Payment",
+			"id":    req.TransactionID,
+		},
 		"customer": map[string]interface{}{
 			"name":     "Customer",
 			"email":    "customer@email.com",
 			"phone":    "08123456789",
+			"city":     "Jakarta",
 			"deviceId": "DEVICE-" + req.TransactionID,
-		},
-		"goodsInfo": map[string]interface{}{
-			"name": "QRIS Payment",
 		},
 	}
 
 	jsonBytes, _ := json.Marshal(body)
-	
-	// Signature: Base64(RSA-SHA256(JSON_BODY + ENDPOINT_URL))
-	signature, err := a.generateSignature(string(jsonBytes)+path, creds.MerchantPrivateKey)
+	fmt.Printf("[PAYOK] Request Body: %s\n", string(jsonBytes))
+
+	// Signature: Base64(RSA-SHA256(JSON_BODY + '&' + ENDPOINT_URL))
+	signature, err := a.generateSignature(string(jsonBytes)+"&"+path, creds.MerchantPrivateKey)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate payok signature: %w", err)
 	}
 
 	httpReq, _ := http.NewRequestWithContext(ctx, "POST", a.baseURL+path, bytes.NewBuffer(jsonBytes))
 	httpReq.Header.Set("Content-Type", "application/json;charset=utf-8")
-	httpReq.Header.Set("sign", signature)
+	httpReq.Header.Set("Sign", signature) // SDK uses capital 'Sign'
 
 	resp, err := a.client.Do(httpReq)
 	if err != nil {
@@ -111,19 +115,17 @@ func (a *PayokAdapter) GenerateQRIS(ctx context.Context, req providers.GenerateQ
 		return nil, fmt.Errorf("payok api error: %s - %s", resData.Code, resData.Message)
 	}
 
-	// For QRIS, content is a JSON string containing qr_code
 	var qrContent struct {
 		QRCode string `json:"qr_code"`
 		PayURL string `json:"pay_url"`
 	}
-	// Try to unmarshal the content if it's JSON
 	if resData.PaymentInfo.Type == "json" {
 		_ = json.Unmarshal([]byte(resData.PaymentInfo.Content), &qrContent)
 	}
 
 	qrisString := qrContent.QRCode
 	if qrisString == "" {
-		qrisString = resData.PaymentInfo.Content // Fallback to raw content
+		qrisString = resData.PaymentInfo.Content
 	}
 
 	var expiresAt *time.Time
@@ -155,7 +157,8 @@ func (a *PayokAdapter) CheckStatus(ctx context.Context, vendorTxID string, crede
 	}
 
 	jsonBytes, _ := json.Marshal(body)
-	signature, _ := a.generateSignature(string(jsonBytes)+path, creds.MerchantPrivateKey)
+	// Note: PAYOK requires '&' prefix before endpoint URL
+	signature, _ := a.generateSignature(string(jsonBytes)+"&"+path, creds.MerchantPrivateKey)
 
 	httpReq, _ := http.NewRequestWithContext(ctx, "POST", a.baseURL+path, bytes.NewBuffer(jsonBytes))
 	httpReq.Header.Set("Content-Type", "application/json;charset=utf-8")
@@ -169,7 +172,7 @@ func (a *PayokAdapter) CheckStatus(ctx context.Context, vendorTxID string, crede
 
 	var resData struct {
 		Code    string `json:"code"`
-		Status  string `json:"status"` // PENDING, SUCCESS, FAILED
+		Status  string `json:"status"`
 		Amount  float64 `json:"amount"`
 	}
 	json.NewDecoder(resp.Body).Decode(&resData)
@@ -188,7 +191,6 @@ func (a *PayokAdapter) CheckStatus(ctx context.Context, vendorTxID string, crede
 }
 
 func (a *PayokAdapter) VerifyCallback(payload []byte, signature string, secret string) bool {
-	// secret here is the PayokPublicKey
 	return a.verifyRSASignature(string(payload), signature, secret)
 }
 
@@ -240,27 +242,17 @@ func (a *PayokAdapter) Validate(ctx context.Context, credentials string) error {
 
 // Internal Helpers
 
-func (a *PayokAdapter) generateSignature(data string, privateKeyPEM string) (string, error) {
-	block, _ := pem.Decode([]byte(privateKeyPEM))
-	if block == nil {
-		return "", errors.New("failed to parse PEM block containing the private key")
-	}
-
-	priv, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+func (a *PayokAdapter) generateSignature(data string, privateKeyStr string) (string, error) {
+	priv, err := a.parsePrivateKey(privateKeyStr)
 	if err != nil {
 		return "", err
-	}
-
-	rsaPriv, ok := priv.(*rsa.PrivateKey)
-	if !ok {
-		return "", errors.New("not an RSA private key")
 	}
 
 	h := sha256.New()
 	h.Write([]byte(data))
 	hashed := h.Sum(nil)
 
-	signature, err := rsa.SignPKCS1v15(rand.Reader, rsaPriv, crypto.SHA256, hashed)
+	signature, err := rsa.SignPKCS1v15(rand.Reader, priv, crypto.SHA256, hashed)
 	if err != nil {
 		return "", err
 	}
@@ -268,19 +260,9 @@ func (a *PayokAdapter) generateSignature(data string, privateKeyPEM string) (str
 	return base64.StdEncoding.EncodeToString(signature), nil
 }
 
-func (a *PayokAdapter) verifyRSASignature(data string, signatureBase64 string, publicKeyPEM string) bool {
-	block, _ := pem.Decode([]byte(publicKeyPEM))
-	if block == nil {
-		return false
-	}
-
-	pubInterface, err := x509.ParsePKIXPublicKey(block.Bytes)
+func (a *PayokAdapter) verifyRSASignature(data string, signatureBase64 string, publicKeyStr string) bool {
+	pub, err := a.parsePublicKey(publicKeyStr)
 	if err != nil {
-		return false
-	}
-
-	pub, ok := pubInterface.(*rsa.PublicKey)
-	if !ok {
 		return false
 	}
 
@@ -295,4 +277,60 @@ func (a *PayokAdapter) verifyRSASignature(data string, signatureBase64 string, p
 
 	err = rsa.VerifyPKCS1v15(pub, crypto.SHA256, hashed, signature)
 	return err == nil
+}
+
+func (a *PayokAdapter) parsePrivateKey(keyStr string) (*rsa.PrivateKey, error) {
+	keyStr = strings.TrimSpace(keyStr)
+	
+	block, _ := pem.Decode([]byte(keyStr))
+	var der []byte
+	if block != nil {
+		der = block.Bytes
+	} else {
+		var err error
+		der, err = base64.StdEncoding.DecodeString(keyStr)
+		if err != nil {
+			return nil, errors.New("failed to parse private key: not valid PEM or base64")
+		}
+	}
+
+	if priv, err := x509.ParsePKCS8PrivateKey(der); err == nil {
+		if rsaPriv, ok := priv.(*rsa.PrivateKey); ok {
+			return rsaPriv, nil
+		}
+	}
+
+	if priv, err := x509.ParsePKCS1PrivateKey(der); err == nil {
+		return priv, nil
+	}
+
+	return nil, errors.New("failed to parse private key: unsupported format")
+}
+
+func (a *PayokAdapter) parsePublicKey(keyStr string) (*rsa.PublicKey, error) {
+	keyStr = strings.TrimSpace(keyStr)
+	
+	block, _ := pem.Decode([]byte(keyStr))
+	var der []byte
+	if block != nil {
+		der = block.Bytes
+	} else {
+		var err error
+		der, err = base64.StdEncoding.DecodeString(keyStr)
+		if err != nil {
+			return nil, errors.New("failed to parse public key: not valid PEM or base64")
+		}
+	}
+
+	if pub, err := x509.ParsePKIXPublicKey(der); err == nil {
+		if rsaPub, ok := pub.(*rsa.PublicKey); ok {
+			return rsaPub, nil
+		}
+	}
+
+	if pub, err := x509.ParsePKCS1PublicKey(der); err == nil {
+		return pub, nil
+	}
+
+	return nil, errors.New("failed to parse public key: unsupported format")
 }

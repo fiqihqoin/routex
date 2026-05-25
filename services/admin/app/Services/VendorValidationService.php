@@ -36,6 +36,7 @@ class VendorValidationService
                 'XENDIT' => $this->validateXendit($credentials),
                 'PAYDIA' => $this->validatePaydia($credentials),
                 'PAKAILINK' => $this->validatePakailink($credentials),
+                'PAYOK' => $this->validatePayok($credentials),
                 default => ValidationResult::fail("Validation logic not implemented for {$vendorCode}"),
             };
         } catch (Exception $e) {
@@ -47,7 +48,7 @@ class VendorValidationService
     protected function validatePakailink(array $creds): ValidationResult
     {
         $clientId = $creds['client_id'] ?? '';
-        $privateKeyPem = $creds['private_key'] ?? '';
+        $privateKeyRaw = $creds['private_key'] ?? '';
         $isProduction = isset($creds['is_production']) && $creds['is_production'];
 
         $baseUrl = $isProduction ? 'https://api.pakaidonk.id' : 'https://dev-api.pakaidonk.id';
@@ -58,6 +59,7 @@ class VendorValidationService
 
         $stringToSign = "{$clientId}|{$timestamp}";
 
+        $privateKeyPem = $this->ensurePem($privateKeyRaw, 'private');
         $privateKey = openssl_pkey_get_private($privateKeyPem);
         if (!$privateKey) {
             return ValidationResult::fail('Format RSA Private Key tidak valid. Gunakan format PKCS#8.');
@@ -94,7 +96,7 @@ class VendorValidationService
     protected function validatePaydia(array $creds): ValidationResult
     {
         $clientId = $creds['client_id'] ?? '';
-        $privateKeyPem = $creds['private_key'] ?? '';
+        $privateKeyRaw = $creds['private_key'] ?? '';
         $isProduction = isset($creds['is_production']) && $creds['is_production'];
 
         $baseUrl = $isProduction ? 'https://api.paydia.id' : 'https://api.paydia.co.id';
@@ -105,6 +107,7 @@ class VendorValidationService
 
         $stringToSign = "{$clientId}|{$timestamp}";
 
+        $privateKeyPem = $this->ensurePem($privateKeyRaw, 'private');
         $privateKey = openssl_pkey_get_private($privateKeyPem);
         if (!$privateKey) {
             return ValidationResult::fail('Format Private Key tidak valid');
@@ -215,5 +218,87 @@ class VendorValidationService
         }
 
         return ValidationResult::fail('Xendit validation failed');
+    }
+
+    protected function validatePayok(array $creds): ValidationResult
+    {
+        $merchantId = $creds['merchant_id'] ?? '';
+        $privateKeyRaw = $creds['merchant_private_key'] ?? '';
+        $isProduction = isset($creds['is_production']) && $creds['is_production'];
+
+        // Auto-wrap in PEM if missing
+        $privateKeyPem = $this->ensurePem($privateKeyRaw, 'private');
+
+        // Use different base URL for sandbox vs production
+        $baseUrl = $isProduction ? 'https://api-demian.com' : 'https://sit-api.payok.com';
+        $endpoint = '/api-pay/payment/V3.6/merchant/paymentMethods';
+        $fullUrl = $baseUrl . $endpoint;
+
+        // Create request body with UTC timestamp
+        $requestTime = (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d\TH:i:s.v\Z');
+        $body = [
+            'requestTime' => $requestTime,
+            'merchantId' => $merchantId,
+            'countryCode' => 'IDN',
+        ];
+
+        $jsonBody = json_encode($body, JSON_UNESCAPED_SLASHES);
+
+        // Generate signature: Base64(RSA-SHA256(JSON_BODY + '&' + ENDPOINT_URL))
+        // Note: PAYOK requires '&' prefix before endpoint URL
+        $stringToSign = $jsonBody . '&' . $endpoint;
+
+        $privateKey = openssl_pkey_get_private($privateKeyPem);
+        if (!$privateKey) {
+            return ValidationResult::fail('Format Merchant Private Key tidak valid. Gunakan format PKCS#8 atau sertakan header PEM.');
+        }
+
+        openssl_sign($stringToSign, $signatureBytes, $privateKey, OPENSSL_ALGO_SHA256);
+        $signature = base64_encode($signatureBytes);
+        if (is_resource($privateKey)) {
+            openssl_free_key($privateKey);
+        }
+
+        // Make HTTP request to validate
+        $response = Http::timeout(10)
+            ->withHeaders([
+                'sign' => $signature,
+                'Content-Type' => 'application/json;charset=utf-8',
+            ])
+            ->post($fullUrl, $body);
+
+        if ($response->status() === 401 || $response->status() === 403) {
+            return ValidationResult::fail('Merchant ID atau Private Key tidak valid');
+        }
+
+        $responseData = $response->json();
+        if ($response->successful() && isset($responseData['code']) && $responseData['code'] === 'SUCCESS') {
+            return ValidationResult::success();
+        }
+
+        // If failed, return error message from PAYOK
+        $errorMessage = $responseData['message'] ?? 'PAYOK validation failed';
+        return ValidationResult::fail('PAYOK validation failed: ' . $errorMessage);
+    }
+
+    protected function ensurePem(string $key, string $type): string
+    {
+        $key = trim($key);
+        if (str_contains($key, '-----BEGIN')) {
+            return $key;
+        }
+
+        $header = match ($type) {
+            'private' => "-----BEGIN PRIVATE KEY-----",
+            'public' => "-----BEGIN PUBLIC KEY-----",
+            default => "-----BEGIN KEY-----",
+        };
+        $footer = match ($type) {
+            'private' => "-----END PRIVATE KEY-----",
+            'public' => "-----END PUBLIC KEY-----",
+            default => "-----END KEY-----",
+        };
+
+        return $header . "\n" . $key . "\n" . $footer;
     }
 }

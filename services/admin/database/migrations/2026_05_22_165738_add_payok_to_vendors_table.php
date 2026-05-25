@@ -18,7 +18,7 @@ return new class extends Migration
                 'id' => Str::uuid(),
                 'code' => 'PAYOK',
                 'name' => 'Payok',
-                'sandbox_base_url' => 'https://api-demian.com', // Staging/Sandbox placeholder
+                'sandbox_base_url' => 'https://sit-api.payok.com', // Staging/Sandbox
                 'production_base_url' => 'https://api-demian.com', // Production base
                 'is_active' => true,
                 'created_at' => now(),

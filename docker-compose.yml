@@ -23,11 +23,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
-          memory: 128M
-        reservations:
           cpus: '0.1'
           memory: 64M
+        reservations:
+          cpus: '0.05'
+          memory: 32M
 
   # ==================== FE (Homepage + Merchant Portal) ====================
   fe:
@@ -41,11 +41,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
-          memory: 128M
-        reservations:
           cpus: '0.1'
           memory: 64M
+        reservations:
+          cpus: '0.05'
+          memory: 32M
 
   # ==================== DOCS ====================
   docs:
@@ -59,11 +59,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
-          memory: 256M
-        reservations:
           cpus: '0.1'
           memory: 128M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
 
   # ==================== LARAVEL ADMIN ====================
   admin:
@@ -83,11 +83,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '2.0'
-          memory: 1G
-        reservations:
           cpus: '0.5'
           memory: 512M
+        reservations:
+          cpus: '0.2'
+          memory: 256M
 
   # ==================== LARAVEL QUEUE WORKER ====================
   admin-queue:
@@ -108,11 +108,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'
-          memory: 512M
-        reservations:
-          cpus: '0.25'
+          cpus: '0.2'
           memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
 
   # ==================== GO TRANSACTION API ====================
   transaction-api:
@@ -134,11 +134,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'
-          memory: 512M
-        reservations:
-          cpus: '0.5'
+          cpus: '0.4'
           memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
 
   # ==================== POSTGRESQL ====================
   postgres:
@@ -163,11 +163,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '2.0'
-          memory: 2G
-        reservations:
           cpus: '0.5'
-          memory: 512M
+          memory: 768M
+        reservations:
+          cpus: '0.1'
+          memory: 256M
 
   # ==================== REDIS ====================
   redis:
@@ -189,11 +189,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
-          memory: 256M
-        reservations:
-          cpus: '0.1'
+          cpus: '0.2'
           memory: 128M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
 
   # ==================== RABBITMQ ====================
   rabbitmq:
@@ -218,11 +218,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'
-          memory: 512M
+          cpus: '0.3'
+          memory: 384M
         reservations:
-          cpus: '0.25'
-          memory: 256M
+          cpus: '0.1'
+          memory: 128M
 
 networks:
   caishenengine-net:
