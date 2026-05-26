@@ -7,10 +7,6 @@ const nextConfig: NextConfig = {
     // Abaikan error tipe saat build agar tidak memakan RAM untuk pengecekan
     ignoreBuildErrors: true,
   },
-  eslint: {
-    // Abaikan lint saat build untuk menghemat memori
-    ignoreDuringBuilds: true,
-  },
   async redirects() {
     return [
       {

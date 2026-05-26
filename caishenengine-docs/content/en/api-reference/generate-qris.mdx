@@ -28,22 +28,6 @@ QRIS code ready to be displayed to the user.
     type: "integer",
     required: true,
     description: "Transaction nominal in IDR. Full rupiah unit, not cents.",
-  },
-  {
-    name: "currency",
-    type: "string",
-    required: false,
-    description: "Currency. Currently only IDR is supported.",
-    default: "IDR",
-    enum: ["IDR"]
-  },
-  {
-    name: "payment_channel",
-    type: "string",
-    required: false,
-    description: "Payment channel.",
-    default: "qris",
-    enum: ["qris"]
   }
 ]} />
 
@@ -54,7 +38,7 @@ QRIS code ready to be displayed to the user.
 ```json
 {
   "transaction_id": "caishenengine_20260510_a1b2c3d4e5f6",
-  "status": "pending_payment",
+  "status": "pending",
   "qris_code": "00020101021226660014ID.CO.QOINHUB...",
   "amount": 50000,
   "currency": "IDR",
@@ -71,7 +55,6 @@ QRIS code ready to be displayed to the user.
 | HTTP | Error Code | Description |
 |------|------------|-----------|
 | 400 | `INVALID_AMOUNT` | Amount is less than or equal to 0 |
-| 400 | `INVALID_CURRENCY` | Currency other than IDR |
 | 409 | `IDEMPOTENCY_CONFLICT` | Idempotency key reused with different parameters |
 | 429 | `RATE_LIMITED` | Exceeded TPS limit |
 | 429 | `VOLUME_EXCEEDED` | Exceeded daily volume limit |
@@ -92,8 +75,6 @@ QRIS code ready to be displayed to the user.
     },
     body: JSON.stringify({
       amount: 50000,
-      currency: 'IDR',
-      payment_channel: 'qris',
     }),
   }
 )
