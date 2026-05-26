@@ -60,9 +60,7 @@ func (h *TransactionHandler) GenerateQRIS(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		fmt.Printf("[HANDLER] Service returned error: %v\n", err)
 		status := http.StatusInternalServerError
-		if errors.Is(err, domain.ErrCurrencyNotSupported) {
-			status = http.StatusBadRequest
-		} else if errors.Is(err, domain.ErrRateLimited) {
+		if errors.Is(err, domain.ErrRateLimited) {
 			status = http.StatusTooManyRequests
 		} else if errors.Is(err, domain.ErrNoEligibleVendor) || errors.Is(err, domain.ErrVendorError) {
 			status = http.StatusServiceUnavailable

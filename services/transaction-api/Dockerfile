@@ -1,10 +1,11 @@
-FROM golang:1.22-alpine AS builder
+FROM --platform=$BUILDPLATFORM golang:1.22-alpine AS builder
+ARG TARGETOS TARGETARCH
 WORKDIR /app
-COPY go.mod ./
+COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 RUN go mod tidy
-RUN go build -o main cmd/api/main.go
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o main cmd/api/main.go
 
 FROM alpine:latest
 RUN apk add --no-cache ca-certificates curl

@@ -70,18 +70,13 @@ func (s *transactionService) GenerateQRIS(ctx context.Context, apiKey string, id
 	start := time.Now()
 	var selectedVendorID string
 
-	fmt.Printf("[GenerateQRIS] START - Amount: %.2f, Channel: %s, Env: %s\n", req.Amount, req.PaymentChannel, s.config.Environment)
+	fmt.Printf("[GenerateQRIS] START - Amount: %.2f, Env: %s\n", req.Amount, s.config.Environment)
 
 	defer func() {
 		if selectedVendorID != "" {
 			metrics.QRISGenerationDuration.WithLabelValues(selectedVendorID).Observe(time.Since(start).Seconds())
 		}
 	}()
-
-	if req.Currency != "IDR" && req.Currency != "" {
-		fmt.Printf("[GenerateQRIS] Currency not supported: %s\n", req.Currency)
-		return nil, domain.ErrCurrencyNotSupported
-	}
 
 	uuidKey := fmt.Sprintf("idem:uuid:%s:%s", apiKey, idempotencyKey)
 	hash := sha256.Sum256(rawBody)
@@ -118,8 +113,8 @@ func (s *transactionService) GenerateQRIS(ctx context.Context, apiKey string, id
 		return nil, domain.ErrRateLimited
 	}
 
-	// Step 6: Filter eligible vendors by environment from context
-	eligible, err := s.registry.GetEligibleVendors(ctx, merchantID, req.Amount, req.PaymentChannel, env)
+	// Step 6: Filter eligible vendors by environment from context (Default to qris)
+	eligible, err := s.registry.GetEligibleVendors(ctx, merchantID, req.Amount, "qris", env)
 	if err != nil {
 		fmt.Printf("[GenerateQRIS] GetEligibleVendors error: %v\n", err)
 		return nil, domain.ErrNoEligibleVendor
@@ -248,7 +243,7 @@ func (s *transactionService) callVendorAPI(ctx context.Context, vendorObj domain
 	adapterReq := providers.GenerateQRISRequest{
 		TransactionID:  uuid.New().String(),
 		Amount:         req.Amount,
-		PaymentChannel: req.PaymentChannel,
+		PaymentChannel: "qris",
 		Credentials:    decryptedCreds,
 	}
 

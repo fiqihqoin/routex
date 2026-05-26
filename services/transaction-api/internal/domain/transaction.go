@@ -14,9 +14,7 @@ const (
 )
 
 type CreateTransactionRequest struct {
-	Amount         float64 `json:"amount"`
-	Currency       string  `json:"currency"`
-	PaymentChannel string  `json:"payment_channel"`
+	Amount float64 `json:"amount"`
 }
 
 type Transaction struct {
