@@ -237,7 +237,7 @@ func (r *postgresTransactionRepo) ListTransactions(ctx context.Context, req doma
 		lookback = *req.DateFrom
 	}
 
-	where := "WHERE t.merchant_id = $1 AND t.environment = $2 AND t.created_at >= $3"
+	where := "WHERE t.merchant_id = $1::uuid AND t.environment = $2 AND t.created_at >= $3"
 	args := []interface{}{req.MerchantID, req.Environment, lookback}
 	argCount := 3
 
@@ -247,15 +247,14 @@ func (r *postgresTransactionRepo) ListTransactions(ctx context.Context, req doma
 		args = append(args, req.Status)
 	}
 
-	joinVendors := false
 	if req.VendorID != "" {
 		argCount++
-		// If VendorID looks like a UUID, filter by t.vendor_id, otherwise use v.code
-		if len(req.VendorID) > 20 {
-			where += fmt.Sprintf(" AND t.vendor_id = $%d", argCount)
+		// If VendorID looks like a UUID (36 chars), filter by t.vendor_id
+		if len(req.VendorID) == 36 {
+			where += fmt.Sprintf(" AND t.vendor_id = $%d::uuid", argCount)
 		} else {
+			// Otherwise assume it's a vendor code
 			where += fmt.Sprintf(" AND v.code = $%d", argCount)
-			joinVendors = true
 		}
 		args = append(args, req.VendorID)
 	}
@@ -290,11 +289,7 @@ func (r *postgresTransactionRepo) ListTransactions(ctx context.Context, req doma
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		countQuery := "SELECT COUNT(*) FROM transactions t "
-		if joinVendors {
-			countQuery += "LEFT JOIN vendors v ON v.id = t.vendor_id "
-		}
-		countQuery += where
+		countQuery := "SELECT COUNT(*) FROM transactions t LEFT JOIN vendors v ON v.id = t.vendor_id " + where
 		errCount = r.db.QueryRow(ctx, countQuery, args...).Scan(&total)
 	}()
 
@@ -302,6 +297,9 @@ func (r *postgresTransactionRepo) ListTransactions(ctx context.Context, req doma
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
+		offset := (req.Page - 1) * req.PerPage
+		dataArgs := append(args, req.PerPage, offset)
+		
 		query := `SELECT 
 			t.id, t.transaction_id, t.amount, t.currency,
 			t.payment_channel, t.status, t.vendor_id,
@@ -312,8 +310,6 @@ func (r *postgresTransactionRepo) ListTransactions(ctx context.Context, req doma
 		LEFT JOIN vendors v ON v.id = t.vendor_id ` + where + ` 
 		ORDER BY t.created_at DESC LIMIT $%d OFFSET $%d`
 		
-		offset := (req.Page - 1) * req.PerPage
-		dataArgs := append(args, req.PerPage, offset)
 		dataQuery := fmt.Sprintf(query, argCount+1, argCount+2)
 
 		var rows pgx.Rows

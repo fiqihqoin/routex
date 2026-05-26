@@ -163,13 +163,29 @@ export default function TransactionsPage() {
       if (filters.status !== "all") params.append("status", filters.status);
       if (filters.vendor_id !== "all") params.append("vendor_id", filters.vendor_id);
       if (filters.search) params.append("search", filters.search);
+      
+      // Handle date range
+      if (filters.date_range !== "all") {
+        const now = new Date();
+        let dateFrom = new Date();
+        if (filters.date_range === "today") {
+          dateFrom.setHours(0, 0, 0, 0);
+        } else if (filters.date_range === "7d") {
+          dateFrom.setDate(now.getDate() - 7);
+        } else if (filters.date_range === "30d") {
+          dateFrom.setDate(now.getDate() - 30);
+        } else if (filters.date_range === "90d") {
+          dateFrom.setDate(now.getDate() - 90);
+        }
+        params.append("date_from", dateFrom.toISOString());
+      }
 
       const res = await apiRequest(`/transactions?${params.toString()}`);
       const data = await res.json();
-      if (data.data) {
-        setTransactions(data.data);
-        setMeta(data.meta);
-      }
+      
+      // Fix: Always update state even if data is null/empty
+      setTransactions(data.data || []);
+      setMeta(data.meta);
     } catch (err) {
       toast({
         title: "Error",
