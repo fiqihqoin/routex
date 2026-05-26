@@ -74,7 +74,7 @@ func (r *postgresTransactionRepo) CacheTransaction(ctx context.Context, tx *doma
 	data, _ := json.Marshal(tx)
 	
 	ttl := 30 * time.Second
-	if tx.Status == domain.StatusPaid || tx.Status == domain.StatusFailed || tx.Status == domain.StatusExpired || tx.Status == domain.StatusExpiredStale {
+	if tx.Status == domain.StatusPaid || tx.Status == domain.StatusExpired || tx.Status == domain.StatusExpired || tx.Status == domain.StatusExpired {
 		ttl = 5 * time.Minute
 	}
 	
@@ -200,7 +200,7 @@ func (r *postgresTransactionRepo) GetPendingForReconciliation(ctx context.Contex
 		amount, currency, payment_channel, status, idempotency_key, request_hash, qris_code, 
 		expires_at, paid_at, callback_delivered, reconciliation_attempts, created_at, updated_at 
 		FROM transactions 
-		WHERE status = 'pending_payment' AND created_at > NOW() - interval '24 hours' AND created_at < $1 LIMIT $2`
+		WHERE status = 'pending' AND created_at > NOW() - interval '24 hours' AND created_at < $1 LIMIT $2`
 	
 	rows, err := r.db.Query(ctx, query, threshold, limit)
 	if err != nil {
@@ -247,9 +247,16 @@ func (r *postgresTransactionRepo) ListTransactions(ctx context.Context, req doma
 		args = append(args, req.Status)
 	}
 
+	joinVendors := false
 	if req.VendorID != "" {
 		argCount++
-		where += fmt.Sprintf(" AND t.vendor_id = $%d", argCount)
+		// If VendorID looks like a UUID, filter by t.vendor_id, otherwise use v.code
+		if len(req.VendorID) > 20 {
+			where += fmt.Sprintf(" AND t.vendor_id = $%d", argCount)
+		} else {
+			where += fmt.Sprintf(" AND v.code = $%d", argCount)
+			joinVendors = true
+		}
 		args = append(args, req.VendorID)
 	}
 
@@ -283,7 +290,11 @@ func (r *postgresTransactionRepo) ListTransactions(ctx context.Context, req doma
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		countQuery := "SELECT COUNT(*) FROM transactions t " + where
+		countQuery := "SELECT COUNT(*) FROM transactions t "
+		if joinVendors {
+			countQuery += "LEFT JOIN vendors v ON v.id = t.vendor_id "
+		}
+		countQuery += where
 		errCount = r.db.QueryRow(ctx, countQuery, args...).Scan(&total)
 	}()
 

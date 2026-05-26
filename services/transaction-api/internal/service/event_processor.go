@@ -57,7 +57,7 @@ func (p *asyncEventProcessor) handleEvent(ctx context.Context, event domain.Tran
 
 	switch event.EventType {
 	case domain.EventQRGenerated:
-		tx.Status = domain.StatusPendingPayment
+		tx.Status = domain.StatusPending
 	case domain.EventCallbackReceived:
 		// Logic to parse callback and update status
 		var payload map[string]interface{}
@@ -68,7 +68,7 @@ func (p *asyncEventProcessor) handleEvent(ctx context.Context, event domain.Tran
 	case domain.EventStatusUpdated:
 		// Direct status update
 	case domain.EventExpiredStale:
-		tx.Status = domain.StatusExpiredStale
+		tx.Status = domain.StatusExpired
 	}
 
 	return p.repo.UpdateReadModel(ctx, tx)

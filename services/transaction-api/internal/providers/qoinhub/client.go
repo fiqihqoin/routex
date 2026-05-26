@@ -197,10 +197,18 @@ func (a *qoinhubAdapter) NormalizeCallback(payload []byte) (*providers.Normalize
 		fmt.Sscanf(fmt.Sprintf("%v", amt["value"]), "%f", &amount)
 	}
 
+	rawStatus := strings.ToLower(fmt.Sprintf("%v", data["status"]))
+	status := "expired"
+	if rawStatus == "success" || rawStatus == "paid" {
+		status = "paid"
+	} else if rawStatus == "pending" {
+		status = "pending"
+	}
+
 	return &providers.NormalizedCallback{
 		VendorTransactionID: fmt.Sprintf("%v", data["referenceNo"]),
 		ReferenceID:         fmt.Sprintf("%v", data["partnerReferenceNo"]),
-		Status:              strings.ToLower(fmt.Sprintf("%v", data["status"])),
+		Status:              status,
 		Amount:              amount,
 		PaidAt:              time.Now(),
 	}, nil

@@ -8,12 +8,11 @@ import (
 type TransactionStatus string
 
 const (
-	StatusPendingPayment TransactionStatus = "pending_payment"
-	StatusPaid           TransactionStatus = "paid"
-	StatusFailed         TransactionStatus = "failed"
-	StatusExpired        TransactionStatus = "expired"
-	StatusExpiredStale   TransactionStatus = "expired_stale"
+	StatusPending TransactionStatus = "pending"
+	StatusPaid    TransactionStatus = "paid"
+	StatusExpired TransactionStatus = "expired"
 )
+
 type CreateTransactionRequest struct {
 	Amount         float64 `json:"amount"`
 	Currency       string  `json:"currency"`

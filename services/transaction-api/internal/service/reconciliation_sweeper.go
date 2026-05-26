@@ -72,7 +72,7 @@ func (s *reconciliationSweeper) sweep(ctx context.Context) {
 func (s *reconciliationSweeper) markAsExpiredStale(ctx context.Context, tx domain.Transaction) {
 	log.Printf("ALERT: Transaction %s is expired_stale (>24h, no resolution).", tx.TransactionID)
 	
-	tx.Status = domain.StatusExpiredStale
+	tx.Status = domain.StatusExpired
 	if err := s.repo.UpdateReadModel(ctx, &tx); err != nil {
 		log.Printf("Error updating status to expired_stale for %s: %v", tx.TransactionID, err)
 		return

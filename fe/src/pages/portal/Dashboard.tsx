@@ -241,7 +241,7 @@ function DashboardContent() {
         <div className="grid grid-cols-1 gap-4">
             <MiniStat 
                 icon={Clock} 
-                label={stats.pending_payment.label} 
+                label="Awaiting Payment" 
                 value={stats.pending_payment.value} 
                 color="text-amber-500" 
                 bgColor="bg-amber-500/10" 
@@ -249,10 +249,10 @@ function DashboardContent() {
             />
             <MiniStat 
                 icon={AlertCircle} 
-                label={stats.failed_transactions.label} 
+                label="Expired Transactions" 
                 value={stats.failed_transactions.value} 
-                color="text-red-500" 
-                bgColor="bg-red-500/10" 
+                color="text-portal-text-dim" 
+                bgColor="bg-portal-elev" 
             />
         </div>
       </div>
@@ -572,10 +572,8 @@ const ActionItem = ({
 const StatusDot = ({ status }: { status: string }) => {
     const colors: Record<string, string> = {
         'paid': 'bg-teal shadow-[0_0_8px_hsl(var(--teal)/0.6)]',
-        'pending_payment': 'bg-amber-500 animate-pulse shadow-[0_0_8px_hsl(var(--warning)/0.6)]',
-        'failed': 'bg-red-500 shadow-[0_0_8px_hsl(var(--danger)/0.6)]',
+        'pending': 'bg-amber-500 animate-pulse shadow-[0_0_8px_hsl(var(--warning)/0.6)]',
         'expired': 'bg-gray-500',
-        'expired_stale': 'bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.6)]',
     };
     return <span className={cn("h-2 w-2 rounded-full shrink-0", colors[status] || 'bg-gray-400')} />;
 };

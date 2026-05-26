@@ -173,10 +173,18 @@ func (a *midtransAdapter) NormalizeCallback(payload []byte) (*providers.Normaliz
 	_amount := 0.0
 	fmt.Sscanf(fmt.Sprintf("%v", data["gross_amount"]), "%f", &_amount)
 
+	rawStatus := strings.ToLower(fmt.Sprintf("%v", data["transaction_status"]))
+	status := "expired"
+	if rawStatus == "settlement" || rawStatus == "capture" {
+		status = "paid"
+	} else if rawStatus == "pending" {
+		status = "pending"
+	}
+
 	return &providers.NormalizedCallback{
 		VendorTransactionID: fmt.Sprintf("%v", data["transaction_id"]),
 		ReferenceID:         fmt.Sprintf("%v", data["order_id"]),
-		Status:              strings.ToLower(fmt.Sprintf("%v", data["transaction_status"])),
+		Status:              status,
 		Amount:              _amount,
 		PaidAt:              time.Now(),
 	}, nil

@@ -73,10 +73,8 @@ class Transaction extends Model
     {
         return match ($this->status) {
             'paid' => 'teal',
-            'pending_payment' => 'amber',
-            'failed' => 'red',
+            'pending' => 'amber',
             'expired' => 'gray',
-            'expired_stale' => 'orange',
             default => 'gray',
         };
     }

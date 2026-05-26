@@ -1,8 +1,7 @@
-import { useState, useEffect, useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
 import {
   Search,
-  Filter,
   ChevronRight,
   Calendar,
   Clock,
@@ -10,16 +9,13 @@ import {
   RefreshCcw,
   ArrowLeft,
   ArrowRight,
-  MoreVertical,
   X,
   Copy,
-  Check,
   ExternalLink,
   Receipt,
   FileText,
   Activity,
   History,
-  Info,
   Terminal as TerminalIcon,
   Loader2
 } from "lucide-react";
@@ -50,6 +46,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { apiRequest } from "@/lib/api";
 
 // Types
 type TransactionSummary = {
@@ -58,7 +55,7 @@ type TransactionSummary = {
   amount: number;
   currency: string;
   payment_channel: string;
-  status: 'pending_payment' | 'paid' | 'failed' | 'expired' | 'expired_stale';
+  status: string;
   vendor_id: string;
   vendor_code: string;
   environment: 'sandbox' | 'production';
@@ -103,9 +100,9 @@ type TransactionDetail = TransactionSummary & {
 };
 
 export default function TransactionsPage() {
-  const { env, setEnv } = usePortal();
+  const { env } = usePortal();
   const { toast } = useToast();
-  const { txId } = useParams(); // For deep linking
+  const { txId } = useParams();
 
   // State
   const [transactions, setTransactions] = useState<TransactionSummary[]>([]);
@@ -128,7 +125,6 @@ export default function TransactionsPage() {
   const [isDetailLoading, setIsDetailLoading] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  // Constants
   const dateRanges = [
     { label: "Today", value: "today" },
     { label: "Last 7 days", value: "7d" },
@@ -139,19 +135,14 @@ export default function TransactionsPage() {
   const statuses = [
     { label: "Semua Status", value: "all" },
     { label: "Paid", value: "paid" },
-    { label: "Pending", value: "pending_payment" },
-    { label: "Failed", value: "failed" },
+    { label: "Pending", value: "pending" },
     { label: "Expired", value: "expired" },
-    { label: "Stale", value: "expired_stale" },
   ];
 
-  // Logic: Fetch Stats
   const fetchStats = async () => {
     setIsStatsLoading(true);
     try {
-      const res = await fetch(`/api/portal/transactions/stats?environment=${env}&date_range=${filters.date_range}`, {
-        headers: { "Accept": "application/json" }
-      });
+      const res = await apiRequest(`/transactions/stats?environment=${env}&date_range=${filters.date_range}`);
       const data = await res.json();
       setStats(data);
     } catch (err) {
@@ -161,7 +152,6 @@ export default function TransactionsPage() {
     }
   };
 
-  // Logic: Fetch Transactions
   const fetchTransactions = async () => {
     setIsLoading(true);
     try {
@@ -173,11 +163,8 @@ export default function TransactionsPage() {
       if (filters.status !== "all") params.append("status", filters.status);
       if (filters.vendor_id !== "all") params.append("vendor_id", filters.vendor_id);
       if (filters.search) params.append("search", filters.search);
-      // Date handling would go here
 
-      const res = await fetch(`/api/portal/transactions?${params.toString()}`, {
-        headers: { "Accept": "application/json" }
-      });
+      const res = await apiRequest(`/transactions?${params.toString()}`);
       const data = await res.json();
       if (data.data) {
         setTransactions(data.data);
@@ -194,13 +181,10 @@ export default function TransactionsPage() {
     }
   };
 
-  // Logic: Fetch Detail
   const fetchDetail = async (id: string) => {
     setIsDetailLoading(true);
     try {
-      const res = await fetch(`/api/portal/transactions/${id}`, {
-        headers: { "Accept": "application/json" }
-      });
+      const res = await apiRequest(`/transactions/${id}`);
       const data = await res.json();
       setTxDetail(data);
     } catch (err) {
@@ -223,7 +207,6 @@ export default function TransactionsPage() {
     fetchTransactions();
   }, [env, filters]);
 
-  // Handle deep linking from URL
   useEffect(() => {
     if (txId) {
       setSelectedTxId(txId);
@@ -332,9 +315,10 @@ export default function TransactionsPage() {
             isLoading={isStatsLoading}
           />
           <StatCard 
-            title="Total Volume" 
-            value={stats ? formatIDR(stats.total_volume).replace('Rp', 'Rp ') : "Rp 0"} 
-            subtitle="dari transaksi sukses"
+            title="Expired" 
+            value={stats?.failed.toLocaleString() || "0"} 
+            subtitle="failed/expired"
+            color="text-portal-text-dim"
             isLoading={isStatsLoading}
           />
         </div>
@@ -367,9 +351,12 @@ export default function TransactionsPage() {
               </SelectTrigger>
               <SelectContent className="bg-portal-surface border-portal-border text-portal-text">
                 <SelectItem value="all">Semua Vendor</SelectItem>
-                <SelectItem value="qoinhub">Qoinhub</SelectItem>
-                <SelectItem value="midtrans">Midtrans</SelectItem>
-                <SelectItem value="xendit">Xendit</SelectItem>
+                <SelectItem value="QOINHUB">Qoinhub</SelectItem>
+                <SelectItem value="MIDTRANS">Midtrans</SelectItem>
+                <SelectItem value="XENDIT">Xendit</SelectItem>
+                <SelectItem value="PAYDIA">Paydia</SelectItem>
+                <SelectItem value="PAKAILINK">PakaiLink</SelectItem>
+                <SelectItem value="PAYOK">Payok</SelectItem>
               </SelectContent>
             </Select>
 
@@ -381,30 +368,6 @@ export default function TransactionsPage() {
                 Reset Filter
               </button>
             )}
-          </div>
-
-          {/* ACTIVE FILTER PILLS */}
-          <div className="flex flex-wrap gap-2 px-1">
-             {filters.status !== "all" && (
-                <Badge variant="secondary" className="bg-portal-elev text-portal-text border-portal-border gap-1 py-1 px-2.5">
-                   Status: {statuses.find(s => s.value === filters.status)?.label}
-                   <X className="h-3 w-3 cursor-pointer hover:text-red-500" onClick={() => setFilters(f => ({...f, status: "all"}))} />
-                </Badge>
-             )}
-             {filters.vendor_id !== "all" && (
-                <Badge variant="secondary" className="bg-portal-elev text-portal-text border-portal-border gap-1 py-1 px-2.5 uppercase text-[10px] tracking-wider">
-                   Vendor: {filters.vendor_id}
-                   <X className="h-3 w-3 cursor-pointer hover:text-red-500" onClick={() => setFilters(f => ({...f, vendor_id: "all"}))} />
-                </Badge>
-             )}
-             {(filters.status !== "all" || filters.vendor_id !== "all") && (
-                <button 
-                  onClick={handleReset}
-                  className="text-[10px] font-bold text-red-500/80 hover:text-red-500 uppercase tracking-widest px-2"
-                >
-                  Clear All
-                </button>
-             )}
           </div>
         </div>
 
@@ -437,9 +400,6 @@ export default function TransactionsPage() {
                           <Receipt className="h-12 w-12 text-portal-text-dim opacity-10" />
                           <div className="text-lg font-semibold text-portal-text-dim">Belum ada transaksi</div>
                           <p className="text-sm text-portal-text-muted">Transaksi yang kamu buat akan muncul di sini.</p>
-                          <a href="/docs" className="text-teal text-sm hover:underline flex items-center gap-1 mt-2">
-                             Lihat dokumentasi <ChevronRight className="h-3 w-3" />
-                          </a>
                        </div>
                     </td>
                   </tr>
@@ -495,63 +455,33 @@ export default function TransactionsPage() {
               </tbody>
             </table>
           </div>
-
-          {/* PAGINATION */}
-          {meta && meta.total > 0 && (
-            <div className="px-6 py-4 bg-portal-elev/20 border-t border-portal-border flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="text-xs text-portal-text-muted">
-                Menampilkan <span className="text-portal-text font-semibold">{((filters.page - 1) * filters.per_page) + 1}–{Math.min(filters.page * filters.per_page, meta.total)}</span> dari <span className="text-portal-text font-semibold">{meta.total.toLocaleString()}</span> transaksi
-              </div>
-
-              <div className="flex items-center gap-1.5">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  disabled={!meta.has_prev}
-                  onClick={() => setFilters(f => ({...f, page: f.page - 1}))}
-                  className="h-8 border-portal-border bg-portal-surface hover:bg-portal-elev"
-                >
-                  <ArrowLeft className="h-3.5 w-3.5 mr-1" /> Prev
-                </Button>
-                
-                <div className="flex items-center gap-1 px-2">
-                   {[...Array(Math.min(5, meta.total_pages))].map((_, i) => {
-                      const p = i + 1;
-                      return (
-                        <button 
-                          key={p}
-                          onClick={() => setFilters(f => ({...f, page: p}))}
-                          className={`h-8 w-8 rounded text-xs font-bold transition-all ${filters.page === p ? 'bg-teal text-white shadow-lg shadow-teal/20' : 'text-portal-text-muted hover:bg-portal-elev'}`}
-                        >
-                          {p}
-                        </button>
-                      );
-                   })}
-                   {meta.total_pages > 5 && <span className="text-portal-text-dim">...</span>}
+          
+          {/* Pagination */}
+          {meta && meta.total > meta.per_page && (
+            <div className="flex items-center justify-between px-6 py-4 bg-portal-elev/10 border-t border-portal-border">
+                <div className="text-xs text-portal-text-muted">
+                    Showing <span className="font-bold text-portal-text">{(meta.page - 1) * meta.per_page + 1}</span> to <span className="font-bold text-portal-text">{Math.min(meta.page * meta.per_page, meta.total)}</span> of <span className="font-bold text-portal-text">{meta.total}</span>
                 </div>
-
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  disabled={!meta.has_next}
-                  onClick={() => setFilters(f => ({...f, page: f.page + 1}))}
-                  className="h-8 border-portal-border bg-portal-surface hover:bg-portal-elev"
-                >
-                  Next <ArrowRight className="h-3.5 w-3.5 ml-1" />
-                </Button>
-              </div>
-
-              <Select value={filters.per_page.toString()} onValueChange={v => setFilters(f => ({...f, per_page: parseInt(v), page: 1}))}>
-                <SelectTrigger className="w-[120px] h-8 bg-portal-surface border-portal-border text-xs">
-                  <SelectValue placeholder="25 per page" />
-                </SelectTrigger>
-                <SelectContent className="bg-portal-surface border-portal-border text-portal-text">
-                  <SelectItem value="10">10 per page</SelectItem>
-                  <SelectItem value="25">25 per page</SelectItem>
-                  <SelectItem value="50">50 per page</SelectItem>
-                  <SelectItem value="100">100 per page</SelectItem>
-                </SelectContent>
-              </Select>
+                <div className="flex items-center gap-2">
+                    <Button 
+                        variant="outline" 
+                        size="sm" 
+                        disabled={!meta.has_prev}
+                        onClick={() => setFilters(f => ({ ...f, page: f.page - 1 }))}
+                        className="h-8 border-portal-border bg-portal-surface"
+                    >
+                        <ArrowLeft className="h-3 w-3 mr-1" /> Prev
+                    </Button>
+                    <Button 
+                        variant="outline" 
+                        size="sm" 
+                        disabled={!meta.has_next}
+                        onClick={() => setFilters(f => ({ ...f, page: f.page + 1 }))}
+                        className="h-8 border-portal-border bg-portal-surface"
+                    >
+                        Next <ArrowRight className="h-3 w-3 ml-1" />
+                    </Button>
+                </div>
             </div>
           )}
         </div>
@@ -566,7 +496,6 @@ export default function TransactionsPage() {
               </div>
             ) : txDetail && (
               <div className="flex flex-col h-full animate-in slide-in-from-right duration-300">
-                {/* DRAWER HEADER */}
                 <div className="px-6 py-6 border-b border-portal-border sticky top-0 bg-portal-surface z-10">
                   <div className="flex items-center justify-between mb-4">
                     <div className="h-10 w-10 rounded-xl bg-portal-elev border border-portal-border flex items-center justify-center text-teal">
@@ -581,30 +510,21 @@ export default function TransactionsPage() {
                        <code className="text-base font-mono text-portal-text">{txDetail.transaction_id}</code>
                        <StatusPill status={txDetail.status} />
                     </SheetTitle>
-                    <SheetDescription className="text-xs text-portal-text-muted flex items-center gap-2 pt-1">
-                       <History className="h-3 w-3" />
-                       Internal ID: {txDetail.id}
-                    </SheetDescription>
                   </SheetHeader>
                 </div>
 
                 <div className="p-6 space-y-8 flex-1">
-                   {/* OVERVIEW SECTION */}
                    <div className="space-y-4">
                       <h4 className="text-[10px] uppercase font-bold text-portal-text-dim tracking-widest flex items-center gap-2">
                         <FileText className="h-3 w-3" /> Overview
                       </h4>
                       <div className="bg-portal-elev/40 border border-portal-border rounded-xl divide-y divide-portal-border overflow-hidden">
                          <DetailRow label="Amount" value={<span className="font-bold text-teal">{formatIDR(txDetail.amount)}</span>} />
-                         <DetailRow label="Channel" value="QRIS" />
-                         <DetailRow label="Environment" value={<Badge variant="outline" className={txDetail.environment === 'sandbox' ? 'text-amber-500' : 'text-teal'}>{txDetail.environment.toUpperCase()}</Badge>} />
-                         <DetailRow label="Created" value={new Date(txDetail.created_at).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} />
-                         {txDetail.paid_at && <DetailRow label="Paid at" value={new Date(txDetail.paid_at).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} />}
-                         {txDetail.status === 'pending_payment' && txDetail.expires_at && <DetailRow label="Expires at" value={new Date(txDetail.expires_at).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} />}
+                         <DetailRow label="Environment" value={<Badge variant="outline">{txDetail.environment.toUpperCase()}</Badge>} />
+                         <DetailRow label="Created" value={new Date(txDetail.created_at).toLocaleString('id-ID')} />
                       </div>
                    </div>
 
-                   {/* ROUTING SECTION */}
                    <div className="space-y-4">
                       <h4 className="text-[10px] uppercase font-bold text-portal-text-dim tracking-widest flex items-center gap-2">
                         <RefreshCcw className="h-3 w-3" /> Routing Decision
@@ -612,62 +532,19 @@ export default function TransactionsPage() {
                       <div className="bg-portal-elev/40 border border-portal-border rounded-xl divide-y divide-portal-border overflow-hidden">
                          <DetailRow label="Selected Vendor" value={<VendorBadge code={txDetail.vendor_code} />} />
                          <DetailRow label="Routing Reason" value={txDetail.routing_reason || "Dynamic routing"} />
-                         <DetailRow label="Vendor Tx ID" value={<code className="text-xs font-mono">{txDetail.vendor_transaction_id || "-"}</code>} />
-                         <DetailRow label="Recon Attempts" value={txDetail.reconciliation_attempts} />
                       </div>
                    </div>
 
-                   {/* QRIS SECTION */}
-                   {txDetail.status === 'pending_payment' && txDetail.qris_code && (
+                   {txDetail.status === 'pending' && txDetail.qris_code && (
                       <div className="space-y-4">
                         <h4 className="text-[10px] uppercase font-bold text-portal-text-dim tracking-widest flex items-center gap-2">
                           <CreditCard className="h-3 w-3" /> QRIS Code
                         </h4>
-                        <div className="relative group">
-                           <div className="bg-black/60 border-2 border-teal/30 rounded-xl p-5 pr-14 font-mono text-[10px] break-all text-teal-400 selection:bg-teal/20">
-                             {txDetail.qris_code}
-                           </div>
-                           <button 
-                             onClick={() => copyText(txDetail.qris_code!, "QRIS String")}
-                             className="absolute top-1/2 -translate-y-1/2 right-3 p-2 rounded-lg bg-teal text-white hover:bg-teal/90 transition-all shadow-lg"
-                           >
-                             <Copy className="h-3.5 w-3.5" />
-                           </button>
+                        <div className="bg-black/60 border-2 border-teal/30 rounded-xl p-5 font-mono text-[10px] break-all text-teal-400">
+                          {txDetail.qris_code}
                         </div>
                       </div>
                    )}
-
-                   {/* TIMELINE SECTION */}
-                   <div className="space-y-4 pb-12">
-                      <h4 className="text-[10px] uppercase font-bold text-portal-text-dim tracking-widest flex items-center gap-2">
-                        <Activity className="h-3 w-3" /> Event Timeline
-                      </h4>
-                      <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-px before:bg-portal-border">
-                         {txDetail.events.map((event, i) => (
-                            <div key={event.id} className="relative">
-                               <div className={`absolute -left-[22px] top-1.5 h-3 w-3 rounded-full border-2 border-portal-surface ${i === txDetail.events.length - 1 ? 'bg-teal animate-pulse scale-110 shadow-[0_0_8px_hsl(var(--teal)/0.5)]' : 'bg-portal-text-dim'}`} />
-                               <div className="flex flex-col">
-                                  <span className="text-[10px] font-mono text-portal-text-dim uppercase tracking-tighter">
-                                    {new Date(event.created_at).toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                                  </span>
-                                  <span className="text-xs font-semibold text-portal-text mt-0.5">
-                                    {event.event_type.replace(/_/g, ' ').toUpperCase()}
-                                  </span>
-                               </div>
-                            </div>
-                         ))}
-                      </div>
-                   </div>
-                </div>
-
-                {/* DRAWER FOOTER */}
-                <div className="px-6 py-6 border-t border-portal-border bg-portal-elev/20 mt-auto flex items-center gap-3">
-                   <Button variant="outline" className="flex-1 border-portal-border bg-portal-surface hover:bg-portal-elev text-xs h-10" onClick={() => copyText(txDetail.transaction_id, "ID")}>
-                      <Copy className="h-3.5 w-3.5 mr-2" /> Copy Transaction ID
-                   </Button>
-                   <Button className="flex-1 bg-teal hover:bg-teal/90 text-white text-xs font-bold h-10 shadow-lg shadow-teal/10">
-                      <ExternalLink className="h-3.5 w-3.5 mr-2" /> View JSON API
-                   </Button>
                 </div>
               </div>
             )}
@@ -686,16 +563,12 @@ function StatCard({ title, value, subtitle, color = "text-portal-text", isLoadin
         <div className="space-y-3 animate-pulse">
            <div className="h-3 bg-portal-elev rounded w-24" />
            <div className="h-8 bg-portal-elev rounded w-32" />
-           <div className="h-3 bg-portal-elev rounded w-20" />
         </div>
       ) : (
         <>
           <h4 className="text-[10px] font-bold uppercase tracking-widest text-portal-text-dim">{title}</h4>
           <div className={`mt-2 text-3xl font-extrabold tracking-tight ${color}`}>{value}</div>
           <p className="mt-1 text-[11px] text-portal-text-muted font-medium">{subtitle}</p>
-          <div className="absolute -right-4 -bottom-4 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity rotate-12">
-             <FileText className="h-24 w-24" />
-          </div>
         </>
       )}
     </PortalCard>
@@ -703,15 +576,25 @@ function StatCard({ title, value, subtitle, color = "text-portal-text", isLoadin
 }
 
 function StatusPill({ status }: { status: string }) {
+  const normalizedStatus = status.toLowerCase();
+  
   const config: Record<string, { label: string, color: string, pulse: boolean }> = {
     paid: { label: "Paid", color: "bg-teal text-white", pulse: false },
+    settlement: { label: "Paid", color: "bg-teal text-white", pulse: false },
+    capture: { label: "Paid", color: "bg-teal text-white", pulse: false },
+    success: { label: "Paid", color: "bg-teal text-white", pulse: false },
+    
+    pending: { label: "Pending", color: "bg-amber-500 text-white", pulse: true },
     pending_payment: { label: "Pending", color: "bg-amber-500 text-white", pulse: true },
-    failed: { label: "Failed", color: "bg-red-500 text-white", pulse: false },
+    
     expired: { label: "Expired", color: "bg-gray-500 text-white", pulse: false },
-    expired_stale: { label: "Stale", color: "bg-orange-500 text-white", pulse: false },
+    expire: { label: "Expired", color: "bg-gray-500 text-white", pulse: false },
+    failed: { label: "Expired", color: "bg-gray-500 text-white", pulse: false },
+    deny: { label: "Expired", color: "bg-gray-500 text-white", pulse: false },
+    expired_stale: { label: "Expired", color: "bg-gray-500 text-white", pulse: false },
   };
 
-  const item = config[status] || { label: status, color: "bg-gray-500 text-white", pulse: false };
+  const item = config[normalizedStatus] || { label: status, color: "bg-gray-500 text-white", pulse: false };
 
   return (
     <div className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${item.color}`}>
@@ -727,6 +610,9 @@ function VendorBadge({ code }: { code: string }) {
     QOINHUB: "bg-purple-500/10 text-purple-400 border-purple-500/20",
     MIDTRANS: "bg-blue-500/10 text-blue-400 border-blue-500/20",
     XENDIT: "bg-pink-500/10 text-pink-400 border-pink-500/20",
+    PAYDIA: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+    PAKAILINK: "bg-teal-500/10 text-teal-400 border-teal-500/20",
+    PAYOK: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
   };
   
   return (

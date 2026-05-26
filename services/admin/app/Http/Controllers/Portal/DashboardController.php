@@ -116,8 +116,8 @@ class DashboardController extends Controller
                 ->selectRaw("
                     COUNT(*) as total,
                     COUNT(*) FILTER (WHERE status = 'paid') as paid,
-                    COUNT(*) FILTER (WHERE status = 'pending_payment') as pending,
-                    COUNT(*) FILTER (WHERE status IN ('failed', 'expired', 'expired_stale')) as failed,
+                    COUNT(*) FILTER (WHERE status = 'pending') as pending,
+                    COUNT(*) FILTER (WHERE status = 'expired') as failed,
                     COALESCE(SUM(amount) FILTER (WHERE status = 'paid'), 0) as volume
                 ")
                 ->first();
@@ -161,7 +161,7 @@ class DashboardController extends Controller
                 ],
                 'failed_transactions' => [
                     'value' => number_format($cur->failed),
-                    'label' => 'Failed/Expired'
+                    'label' => 'Expired/Failed'
                 ]
             ];
         });

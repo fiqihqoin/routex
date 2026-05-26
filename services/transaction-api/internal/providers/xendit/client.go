@@ -155,6 +155,8 @@ func (a *xenditAdapter) NormalizeCallback(payload []byte) (*providers.Normalized
 	status := "pending"
 	if event == "qr_code.paid" {
 		status = "paid"
+	} else if event == "qr_code.expired" {
+		status = "expired"
 	}
 
 	qris, _ := data["data"].(map[string]interface{})

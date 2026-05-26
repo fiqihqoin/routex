@@ -210,7 +210,7 @@ func (s *transactionService) GenerateQRIS(ctx context.Context, apiKey string, id
 		Amount:         req.Amount,
 		Currency:       "IDR",
 		PaymentChannel: "qris",
-		Status:         domain.StatusPendingPayment,
+		Status:         domain.StatusPending,
 		IdempotencyKey: idempotencyKey,
 		RequestHash:    bodyHash,
 		QRISCode:       qrisCode,
@@ -331,7 +331,8 @@ func (s *transactionService) ReconcileStatus(ctx context.Context, transactionID 
 }
 
 func (s *transactionService) checkVendorStatus(ctx context.Context, tx *domain.Transaction) (string, *time.Time, error) {
-	return "pending_payment", nil, nil 
+	// For now return current status if not implemented
+	return string(tx.Status), tx.PaidAt, nil
 }
 
 func (s *transactionService) HandleVendorCallback(ctx context.Context, vendorID string, payload []byte, signature string) error {

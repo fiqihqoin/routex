@@ -177,11 +177,11 @@ func (a *PayokAdapter) CheckStatus(ctx context.Context, vendorTxID string, crede
 	}
 	json.NewDecoder(resp.Body).Decode(&resData)
 
-	status := "failed"
+	status := "expired"
 	if resData.Status == "SUCCESS" {
 		status = "paid"
 	} else if resData.Status == "PENDING" {
-		status = "pending_payment"
+		status = "pending"
 	}
 
 	return &providers.StatusResponse{
@@ -207,7 +207,7 @@ func (a *PayokAdapter) NormalizeCallback(payload []byte) (*providers.NormalizedC
 		return nil, err
 	}
 
-	status := "failed"
+	status := "expired"
 	if data.Status == "SUCCESS" {
 		status = "paid"
 	}

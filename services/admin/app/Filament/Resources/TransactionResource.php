@@ -73,10 +73,9 @@ class TransactionResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'pending_payment' => 'gray',
+                        'pending' => 'gray',
                         'paid' => 'success',
-                        'failed' => 'danger',
-                        'expired' => 'warning',
+                        'expired' => 'danger',
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('created_at')
@@ -86,9 +85,8 @@ class TransactionResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'pending_payment' => 'Pending Payment',
+                        'pending' => 'Pending',
                         'paid' => 'Paid',
-                        'failed' => 'Failed',
                         'expired' => 'Expired',
                     ]),
                 Tables\Filters\SelectFilter::make('environment')

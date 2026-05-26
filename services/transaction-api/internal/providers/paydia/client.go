@@ -172,11 +172,11 @@ func (a *PaydiaAdapter) CheckStatus(ctx context.Context, vendorTxID string, cred
 		return nil, err
 	}
 
-	status := "failed"
+	status := "expired"
 	if resData.LatestTransactionStatus == "00" {
 		status = "paid"
 	} else if resData.LatestTransactionStatus == "01" {
-		status = "pending_payment"
+		status = "pending"
 	}
 
 	return &providers.StatusResponse{
@@ -210,12 +210,12 @@ func (a *PaydiaAdapter) NormalizeCallback(payload []byte) (*providers.Normalized
 		fmt.Sscanf(fmt.Sprintf("%v", amt["value"]), "%f", &amount)
 	}
 
-	status := "failed"
+	status := "expired"
 	rawStatus := fmt.Sprintf("%v", data["latestTransactionStatus"])
 	if rawStatus == "00" {
 		status = "paid"
 	} else if rawStatus == "01" {
-		status = "pending_payment"
+		status = "pending"
 	}
 
 	paidAt := time.Now()

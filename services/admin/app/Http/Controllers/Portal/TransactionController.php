@@ -60,21 +60,30 @@ class TransactionController extends Controller
     {
         $merchant = Auth::guard('portal')->user();
         $environment = $request->input('environment', 'sandbox');
-        $dateFrom = $request->input('date_from', now()->subDays(30)->toDateString());
+        $range = $request->input('date_range', '30d');
+
+        $rangeDays = match($range) {
+            'today' => 0,
+            '7d' => 7,
+            '90d' => 90,
+            default => 30
+        };
+
+        $dateFrom = $rangeDays === 0 ? now()->startOfDay() : now()->subDays($rangeDays)->startOfDay();
 
         // Cache stats for 5 minutes
-        $cacheKey = "transaction:stats:{$merchant->id}:{$environment}:{$dateFrom}";
+        $cacheKey = "transaction:stats:{$merchant->id}:{$environment}:{$range}";
 
         $result = Cache::remember($cacheKey, 300, function () use ($merchant, $environment, $dateFrom) {
             $stats = DB::table('transactions')
                 ->where('merchant_id', $merchant->id)
                 ->where('environment', $environment)
-                ->whereDate('created_at', '>=', $dateFrom)
+                ->where('created_at', '>=', $dateFrom)
                 ->selectRaw("
                     COUNT(*) as total,
                     COUNT(*) FILTER (WHERE status = 'paid') as paid,
-                    COUNT(*) FILTER (WHERE status = 'pending_payment') as pending,
-                    COUNT(*) FILTER (WHERE status IN ('failed', 'expired', 'expired_stale')) as failed,
+                    COUNT(*) FILTER (WHERE status = 'pending') as pending,
+                    COUNT(*) FILTER (WHERE status = 'expired') as failed,
                     COALESCE(SUM(amount) FILTER (WHERE status = 'paid'), 0) as total_volume
                 ")
                 ->first();
